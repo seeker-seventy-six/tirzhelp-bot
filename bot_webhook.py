@@ -2,6 +2,7 @@ from flask import Flask, request
 import requests
 import os
 from dotenv import load_dotenv
+import functions as botfunc
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +32,7 @@ def webhook():
 
         # Respond to the /newbie command
         if text.startswith("/newbie"):
-            welcome_message = "🎉 Welcome to the group! Feel free to introduce yourself."
+            welcome_message = botfunc.welcome_newbie()
             send_message(chat_id, welcome_message)
 
     return {"ok": True}
