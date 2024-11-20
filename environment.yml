@@ -1,0 +1,10 @@
+name: tirzbot
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - telebot
+      - flask
+      - dotenv
