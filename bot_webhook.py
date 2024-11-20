@@ -39,6 +39,7 @@ def webhook():
         # Check if the update contains 'new_chat_members'
         if "message" in update and "new_chat_member" in update["message"]:
             new_member_id = update["message"]["new_chat_member"]["id"]
+            logging.debug(f"New Chat Member joined. Welcoming {new_member_id}")
             # Send a direct message to the new user
             welcome_message = botfunc.welcome_newbie()
             send_message(new_member_id, welcome_message)
