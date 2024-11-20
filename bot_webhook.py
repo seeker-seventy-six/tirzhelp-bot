@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import requests
 import os
 from dotenv import load_dotenv
@@ -24,23 +24,48 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    update = request.get_json()
-    if "message" in update:
-        message = update["message"]
-        chat_id = message["chat"]["id"]
-        text = message.get("text", "")
+    try:
+        update = request.get_json()
+        
+        if update is None:
+            return jsonify({"error": "Invalid JSON format"}), 400
+        
+        # Check if the update contains 'new_chat_members'
+        if "message" in update and "new_chat_members" in update["message"]:
+            new_members = update["message"]["new_chat_members"]
+            
+            for new_member in new_members:
+                user_id = new_member["id"]
+                
+                # Send a direct message to the new user
+                welcome_message = botfunc.welcome_newbie()
+                send_message(user_id, welcome_message)
+        
+        # otherwise, look for specific commands
+        elif "message" in update:
+            message = update["message"]
+            chat_id = message["chat"]["id"]
+            text = message.get("text", "")
 
-        # Respond to the /newbie command
-        if text.startswith("/newbie"):
-            welcome_message = botfunc.welcome_newbie()
-            send_message(chat_id, welcome_message)
+            # Respond to the /newbie command
+            if text.startswith("/newbie"):
+                welcome_message = botfunc.welcome_newbie()
+                send_message(chat_id, welcome_message)
 
-        # Respond to the /newbie command
-        if text.startswith("/summarize"):
-            summary_message = botfunc.summarize_channel()
-            send_message(chat_id, summary_message)
+            # Respond to the /newbie command
+            if text.startswith("/summarize"):
+                summary_message = botfunc.summarize_channel()
+                send_message(chat_id, summary_message)
 
-    return {"ok": True}
+        else:
+            return jsonify({"error": "No new_chat_members found"}), 400
+
+        return jsonify({"ok": True})
+
+    except Exception as e:
+        # Log the error to check what went wrong
+        print(f"Error processing webhook: {e}")
+        return jsonify({"error": f"Internal server error: {e}"}), 500
 
 # Helper function to send a message
 def send_message(chat_id, text):
