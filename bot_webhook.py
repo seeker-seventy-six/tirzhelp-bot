@@ -2,7 +2,12 @@ from flask import Flask, request, jsonify
 import requests
 import os
 from dotenv import load_dotenv
+import logging
 import functions as botfunc
+
+# Setup basic logging configuration
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +31,7 @@ def set_webhook():
 def webhook():
     try:
         update = request.get_json()
+        logging.debug(f"Received update: {update}")
         
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
