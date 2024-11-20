@@ -52,7 +52,7 @@ def webhook():
 
             # Respond to the /newbie command
             if text.startswith("/newbie"):
-                welcome_message = botfunc.welcome_newbie()
+                welcome_message = botfunc.welcome_newbie('')
                 send_message(chat_id, welcome_message)
 
             # Respond to the /newbie command
