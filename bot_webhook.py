@@ -36,7 +36,7 @@ def webhook():
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
         
-        # Check if the update contains 'new_chat_members'
+        # Check if the update contains 'new_chat_participant'
         if "message" in update and "new_chat_participant" in update["message"]:
             new_member = update["message"]["new_chat_participant"]
             chat_id = update["message"]["chat"]["id"]
@@ -48,17 +48,18 @@ def webhook():
         elif "message" in update:
             message = update["message"]
             chat_id = message["chat"]["id"]
+            message_thread_id = message["reply_to_message"]["message_thread_id"]
             text = message.get("text", "")
 
             # Respond to the /newbie command
             if text.startswith("/newbie"):
                 welcome_message = botfunc.welcome_newbie('')
-                send_message(chat_id, welcome_message)
+                send_message(chat_id, welcome_message, message_thread_id)
 
             # Respond to the /newbie command
             if text.startswith("/summarize"):
                 summary_message = botfunc.summarize_channel()
-                send_message(chat_id, summary_message)
+                send_message(chat_id, summary_message, message_thread_id)
 
         else:
             return jsonify({"error": "No response found"}), 400
@@ -71,7 +72,7 @@ def webhook():
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
 # Helper function to send a message
-def send_message(chat_id, text):
+def send_message(chat_id, text, message_thread_id=None):
     url = f"{API_URL}/sendMessage"
     payload = {
         "chat_id": chat_id,
@@ -79,6 +80,8 @@ def send_message(chat_id, text):
         "parse_mode": "HTML",
         "disable_web_page_preview": True
     }
+    if message_thread_id:
+        payload['message_thread_id'] = message_thread_id
     requests.post(url, json=payload)
 
 if __name__ == "__main__":
