@@ -1,9 +1,8 @@
 
 def welcome_newbie():
     """
-    Sends a welcome message to the group when the /newbie command is used.
+    Formats a welcome message for newbies.
     """
-    # Format your message
     guides_toc = "<a href='https://t.me/c/2462675990/2/75'>📖Guides Channel Table of Contents</a>"
     newbie_faq = "<a href='https://docs.google.com/document/d/1LHSXeIgIJFIcE3dsKEUUVyNyH2FT0Ku3ikWfdldg3Lk/edit?usp=sharing'>❓Newbie FAQ</a>"
     greeting_message = """
@@ -12,4 +11,8 @@ def welcome_newbie():
     welcome_message = "\n".join([greeting_message + guides_toc + newbie_faq])
 
     return welcome_message
+
+
+def summarize_channel():
+    return "🛠️WIP🛠️"
 

@@ -35,6 +35,11 @@ def webhook():
             welcome_message = botfunc.welcome_newbie()
             send_message(chat_id, welcome_message)
 
+        # Respond to the /newbie command
+        if text.startswith("/summarize"):
+            summary_message = botfunc.summarize_channel()
+            send_message(chat_id, summary_message)
+
     return {"ok": True}
 
 # Helper function to send a message
