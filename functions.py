@@ -8,7 +8,7 @@ def welcome_newbie():
     greeting_message = """
     Welcome to the Telegram community for r/tirzepatidehelp! 🎉 You've found your way to the end of the rabbit hole where you can ask all your questions about vendor sources and more ✨🐰\n\nBefore jumping in, we’ve gathered answers to the most common newbie questions in the Guides channel linked below💡 Once you’ve checked it out, feel free to post any follow-up questions in the appropriate channel. We're here to help and excited to have you join the conversation! 😊"""
     
-    welcome_message = "\n".join([greeting_message + guides_toc + newbie_faq])
+    welcome_message = f"""{greeting_message}\n\n{guides_toc}\n{newbie_faq}"""
 
     return welcome_message
 
