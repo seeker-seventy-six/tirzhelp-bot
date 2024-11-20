@@ -49,17 +49,18 @@ def webhook():
             message = update["message"]
             chat_id = message["chat"]["id"]
             message_thread_id = message["reply_to_message"]["message_thread_id"]
+            message_id = message["reply_to_message"]["message_id"]
             text = message.get("text", "")
 
             # Respond to the /newbie command
             if text.startswith("/newbie"):
                 welcome_message = botfunc.welcome_newbie('')
-                send_message(chat_id, welcome_message, message_thread_id)
+                send_message(chat_id, welcome_message, message_thread_id, reply_to_message_id=message_id)
 
             # Respond to the /newbie command
             if text.startswith("/summarize"):
                 summary_message = botfunc.summarize_channel()
-                send_message(chat_id, summary_message, message_thread_id)
+                send_message(chat_id, summary_message, message_thread_id, reply_to_message_id=message_id)
 
         else:
             return jsonify({"error": "No response found"}), 400
@@ -72,7 +73,7 @@ def webhook():
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
 # Helper function to send a message
-def send_message(chat_id, text, message_thread_id=None):
+def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None):
     url = f"{API_URL}/sendMessage"
     payload = {
         "chat_id": chat_id,
@@ -81,7 +82,9 @@ def send_message(chat_id, text, message_thread_id=None):
         "disable_web_page_preview": True
     }
     if message_thread_id:
-        payload['reply_to_message_id'] = message_thread_id
+        payload['message_thread_id'] = message_thread_id
+    if reply_to_message_id:
+        payload['reply_to_message_id'] = reply_to_message_id
     requests.post(url, json=payload)
 
 if __name__ == "__main__":
