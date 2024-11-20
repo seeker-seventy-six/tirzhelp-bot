@@ -81,7 +81,7 @@ def send_message(chat_id, text, message_thread_id=None):
         "disable_web_page_preview": True
     }
     if message_thread_id:
-        payload['message_thread_id'] = message_thread_id
+        payload['reply_to_message_id'] = message_thread_id
     requests.post(url, json=payload)
 
 if __name__ == "__main__":
