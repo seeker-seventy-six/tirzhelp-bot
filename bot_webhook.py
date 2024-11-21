@@ -48,8 +48,8 @@ def webhook():
         elif "message" in update and "reply_to_message" in update["message"]:
             message = update["message"]
             chat_id = message["chat"]["id"]
-            message_thread_id = message["reply_to_message"]["message_thread_id"]
-            message_id = message["reply_to_message"]["message_id"]
+            message_thread_id = message["reply_to_message"].get("message_thread_id")
+            message_id = message["reply_to_message"].get("message_id")
             text = message.get("text", "")
 
             # Respond to the /newbie command
