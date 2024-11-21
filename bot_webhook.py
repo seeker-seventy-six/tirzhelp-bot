@@ -62,14 +62,11 @@ def webhook():
                 summary_message = botfunc.summarize_channel()
                 send_message(chat_id, summary_message, message_thread_id, reply_to_message_id=message_id)
 
-        else:
-            return jsonify({"error": "No response found"}), 400
-
         return jsonify({"ok": True}), 200
 
     except Exception as e:
         # Log the error to check what went wrong
-        print(f"Error processing webhook: {e}")
+        logging.debug(f"Error processing webhook: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
 # Helper function to send a message
