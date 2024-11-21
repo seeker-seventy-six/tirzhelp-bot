@@ -60,7 +60,7 @@ def webhook():
 
             # Respond to the /newbie command
             if text.startswith("/summarize"):
-                summary_message = botfunc.summarize_channel()
+                summary_message = botfunc.summarize(update, BOT_TOKEN, OPENAI_TOKEN)
                 # send_message(chat_id, summary_message, message_thread_id, reply_to_message_id=message_id)
 
         return jsonify({"ok": True}), 200
