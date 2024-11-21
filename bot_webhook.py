@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 # Load environment variables
 load_dotenv()
 
+OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
@@ -60,7 +61,7 @@ def webhook():
             # Respond to the /newbie command
             if text.startswith("/summarize"):
                 summary_message = botfunc.summarize_channel()
-                send_message(chat_id, summary_message, message_thread_id, reply_to_message_id=message_id)
+                # send_message(chat_id, summary_message, message_thread_id, reply_to_message_id=message_id)
 
         return jsonify({"ok": True}), 200
 
