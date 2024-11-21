@@ -65,7 +65,7 @@ def webhook():
         else:
             return jsonify({"error": "No response found"}), 400
 
-        return jsonify({"ok": True})
+        return jsonify({"ok": True}), 200
 
     except Exception as e:
         # Log the error to check what went wrong
