@@ -36,7 +36,7 @@ def webhook():
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
         
-        # Check if the update contains 'new_chat_participant'
+        # Check if a new member has joined as 'new_chat_participant'
         if "message" in update and "new_chat_participant" in update["message"]:
             new_member = update["message"]["new_chat_participant"]
             chat_id = update["message"]["chat"]["id"]
@@ -44,8 +44,8 @@ def webhook():
             welcome_message = botfunc.welcome_newbie(new_member)
             send_message(chat_id, welcome_message)
     
-        # otherwise, look for specific commands
-        elif "message" in update:
+        # otherwise, look for specific commands made 
+        elif "message" in update and "reply_to_message" in update["message"]:
             message = update["message"]
             chat_id = message["chat"]["id"]
             message_thread_id = message["reply_to_message"]["message_thread_id"]
