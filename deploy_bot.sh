@@ -54,9 +54,12 @@ if [[ -z "$HEROKU_URL" ]]; then
 fi
 echo "Heroku app URL is: $HEROKU_URL"
 
+WEBHOOK_URL="${HEROKU_URL}webhook"
+heroku config:set BOT_TOKEN=$BOT_TOKEN --app $HEROKU_APP_NAME
+heroku config:set WEBHOOK_URL=$WEBHOOK_URL --app $HEROKU_APP_NAME
+
 # Step 4: Configure the Telegram Webhook with the new URL
 echo "Setting Telegram webhook..."
-WEBHOOK_URL="${HEROKU_URL}webhook"
 curl -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
     -H "Content-Type: application/json" \
     -d "{\"url\": \"${WEBHOOK_URL}\", \"allowed_updates\": [\"message\", \"chat_member\", \"new_chat_members\"]}"
