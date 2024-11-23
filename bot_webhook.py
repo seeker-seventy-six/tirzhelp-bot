@@ -59,7 +59,7 @@ def webhook():
                 send_message(chat_id, welcome_message, message_thread_id, reply_to_message_id=message_id)
 
             # Respond to the /lastcall command
-            if text.startswith("/lastcall"):
+            if text.startswith("/lastcall cost="):
                 lastcall_message = botfunc.lastcall(update, BOT_TOKEN)
                 response = send_message(chat_id, lastcall_message, message_thread_id)
                 try:
