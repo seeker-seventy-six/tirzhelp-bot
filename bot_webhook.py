@@ -62,9 +62,10 @@ def webhook():
             if text.startswith("/lastcall"):
                 lastcall_message = botfunc.lastcall(update, BOT_TOKEN)
                 response = send_message(chat_id, lastcall_message, message_thread_id)
-                lastcall_message_id = response['result']['message_id']
-                response = pin_message(chat_id, lastcall_message_id)
-                if response.status_code != 200:
+                try:
+                    lastcall_message_id = response['result']['message_id']
+                    pin_message(chat_id, lastcall_message_id)
+                except:
                     send_message(chat_id, "⚠️ If you would like to pin this post, I will need Admin rights. Then rerun the command.", message_thread_id)
 
             # Respond to the /newbie command
@@ -105,8 +106,11 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
 def pin_message(chat_id, message_id):
     url = f"{API_URL}/pinChatMessage"
     payload = {"chat_id": chat_id, "message_id": message_id}
-    requests.post(url, json=payload)
-
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to send message: {response.json().get('description', 'Unknown error')}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8443)
