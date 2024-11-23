@@ -54,36 +54,36 @@ def lastcall(update, bot_token):
 
 # Define the /summarize command
 def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
-    try:
-        # get telegram ids
-        chat_id = update['message']['chat']['id']
-        message_thread_id = update['message']['message_thread_id']
+    # try:
+    #     # get telegram ids
+    #     chat_id = update['message']['chat']['id']
+    #     message_thread_id = update['message']['message_thread_id']
     
-        # Get the current time in UTC and calculate the time 24 hours ago
-        now = datetime.now(timezone.utc)
-        one_day_ago = now - timedelta(hours=24)
+    #     # Get the current time in UTC and calculate the time 24 hours ago
+    #     now = datetime.now(timezone.utc)
+    #     one_day_ago = now - timedelta(hours=24)
 
-        # Fetch messages from the chat in the last 24 hours
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
-        response = requests.get(url).json()
-        logging.debug(f"response: {response}")
+    #     # Fetch messages from the chat in the last 24 hours
+    #     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
+    #     response = requests.get(url).json()
+    #     logging.debug(f"response: {response}")
 
-        # Filter messages from the current chat and within the last 24 hours
-        messages = [
-            update["message"]["text"]
-            for update in response.get("result", [])
-            if update.get("message", {}).get("message_thread_id", {}) == message_thread_id
-            and datetime.fromtimestamp(update["message"]["date"], tz=timezone.utc) >= one_day_ago
-        ]
+    #     # Filter messages from the current chat and within the last 24 hours
+    #     messages = [
+    #         update["message"]["text"]
+    #         for update in response.get("result", [])
+    #         if update.get("message", {}).get("message_thread_id", {}) == message_thread_id
+    #         and datetime.fromtimestamp(update["message"]["date"], tz=timezone.utc) >= one_day_ago
+    #     ]
 
-        # If no messages found, respond accordingly
-        if not messages:
-            return jsonify({"error": "No messages found in the last 24 hours to summarize."}), 500
+    #     # If no messages found, respond accordingly
+    #     if not messages:
+    #         return jsonify({"error": "No messages found in the last 24 hours to summarize."}), 500
 
-        # Join messages for summarization
-        combined_text = "\n".join(messages)
+    #     # Join messages for summarization
+    #     combined_text = "\n".join(messages)
 
-        logging.debug(f"Messages in past 24 hours: {combined_text}")
+    #     logging.debug(f"Messages in past 24 hours: {combined_text}")
 
         # # Summarize using Bedrock LLaMA2
         # client = OpenAI(
@@ -101,6 +101,8 @@ def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
 
         # # Send the summary back to the user
         # update.message.reply_text(summary)
+    try:
+        return "WIP"
 
     except Exception as e:
         logging.error(f"Error in summarize command: {e}")
