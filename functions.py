@@ -40,7 +40,7 @@ def lastcall(update, bot_token):
             key, value = pair.split('=')
             arguments[key] = value
     # Access specific arguments
-    test_cost = float(arguments.get('cost'),0)
+    test_cost = float(arguments.get('cost',0))
     vial_donors = int(arguments.get('vialdonors',0))
     split_members = member_count - vial_donors
     
