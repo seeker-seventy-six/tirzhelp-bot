@@ -61,7 +61,7 @@ def webhook():
             # Respond to the /lastcall command
             if text.startswith("/lastcall"):
                 lastcall_message = botfunc.lastcall(update, BOT_TOKEN)
-                response = send_message(chat_id, lastcall_message)
+                response = send_message(chat_id, lastcall_message, message_thread_id)
                 lastcall_message_id = response['result']['message_id']
                 pin_message(chat_id, lastcall_message_id)
 

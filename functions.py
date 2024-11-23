@@ -29,7 +29,6 @@ def lastcall(update, bot_token):
     url = f"https://api.telegram.org/bot{bot_token}/getChatMemberCount"
     response = requests.get(url, params={'chat_id':chat_id})
     member_count = int(response.json().get("result"))
-    logging.debug(f"MEmber count: {member_count}")
 
     # Get the full command text after '/lastcall'
     command_text = update['message']['text'][len('/lastcall '):].strip()
