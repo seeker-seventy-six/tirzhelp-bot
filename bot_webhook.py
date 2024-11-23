@@ -66,7 +66,7 @@ def webhook():
                     lastcall_message_id = response['result']['message_id']
                     pin_message(chat_id, lastcall_message_id)
                 except:
-                    send_message(chat_id, "⚠️ If you would like to pin this post, I will need Admin rights. Then rerun the command.", message_thread_id)
+                    send_message(chat_id, "⚠️ If you would like me to pin this post, I will need Admin rights. Then rerun the command!", message_thread_id)
 
             # Respond to the /newbie command
             if text.startswith("/summarize"):
