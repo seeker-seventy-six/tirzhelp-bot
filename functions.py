@@ -23,6 +23,35 @@ def welcome_newbie(new_user):
 
     return welcome_message
 
+def lastcall(update, bot_token):
+    chat_id = message["chat"]["id"]
+    
+    # get chat member count
+    url = f"https://api.telegram.org/bot{bot_token}/getChatMemberCount"
+    response = requests.get(url, params={'chat_id':chat_id})
+    member_count = response.json().get("result")
+
+    # Get the full command text after '/lastcall'
+    command_text = update.message.text[len('/lastcall '):].strip()
+    # Parse arguments (basic example)
+    arguments = {}
+    if '=' in command_text:
+        pairs = command_text.split(' ')
+        for pair in pairs:
+            key, value = pair.split('=')
+            arguments[key] = value
+    # Access specific arguments
+    test_cost = arguments.get('cost')
+    vial_donors = arguments.get('vialdonors')
+    
+    # construct message
+    vial_donors_message = f"The group has elected to waive the vial donors testing portion, so the {vial_donors} are deduceted from this calculation." if vial_donors else ""
+    
+    message = f"""Hi Researchers ❗📢❗ This is your final notice and last call for deciding whether you will be participating in this test. This test will be closing END OF TODAY! If you choose to stay in this group chat after today, you are committing to pay your portion of the testing costs and getting access to the test results. \nThe total testing cost is currently {test_cost} and with current number of users in the group is estimated to be ${test_cost/(member_count - vial_donors):.2f} per researcher. {vial_donors_message} \n\n"""
+    lastcall_message = message 
+    
+    return lastcall_message
+
 
 # Define the /summarize command
 def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
