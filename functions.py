@@ -40,16 +40,18 @@ def lastcall(update, bot_token):
             key, value = pair.split('=')
             arguments[key] = value
     # Access specific arguments
-    test_cost = float(arguments.get('cost'))
+    test_cost = float(arguments.get('cost'),0)
     vial_donors = int(arguments.get('vialdonors',0))
     split_members = member_count - vial_donors
     
     # construct message
     vial_donors_message = f"NOTE: The group has elected to waive the vial donors testing payment portion, so those {vial_donors} members are accounted for in this calculation." if vial_donors else ""
     
-    lastcall_message = f"""Hi Researchers ❗📢❗ This is your final notice and last call for deciding if you will be participating in this test. This test will be closing END OF TODAY! If you choose to stay in this group chat after today, you are committing to pay your portion of the testing costs and getting access to the test results. \n\n**The total testing cost is currently ${test_cost} and with the current number of members in the group your payment portion is estimated to be ${test_cost/split_members:.2f}.** \n\n{vial_donors_message}"""
+    lastcall_message = f"""Hi Researchers ❗📢❗ This is your final notice and last call for deciding if you will be participating in this test. This test will be closing END OF TODAY! If you choose to stay in this group chat after today, you are committing to pay your portion of the testing costs and getting access to the test results. \n\n**The total testing cost is currently ${test_cost} and with {member_count} members in the group your payment portion is estimated to be ${test_cost/split_members:.2f}.** \n\n{vial_donors_message}"""
+
+    error_message = """I need at least a test cost to calculate estimated test cost splitting. If you want to waive test cost splitting for vial donors, please also add the vialdonors parameter. Please use this command in one of the following ways:\n\n > \\lastcall cost=123\n\n>  \\lastcall cost=123 vialdonors=2"""
     
-    return lastcall_message
+    return lastcall_message if test_cost else error_message
 
 
 # Define the /summarize command
