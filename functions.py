@@ -29,6 +29,7 @@ def lastcall(update, bot_token):
     url = f"https://api.telegram.org/bot{bot_token}/getChatMemberCount"
     response = requests.get(url, params={'chat_id':chat_id})
     member_count = int(response.json().get("result"))
+    logging.debug(f"MEmber count: {member_count}")
 
     # Get the full command text after '/lastcall'
     command_text = update['message']['text'][len('/lastcall '):].strip()
@@ -41,8 +42,8 @@ def lastcall(update, bot_token):
             arguments[key] = value
     # Access specific arguments
     test_cost = float(arguments.get('cost'))
-    vial_donors = arguments.get('vialdonors')
-    split_members = member_count - vial_donors if vial_donors else member_count
+    vial_donors = int(arguments.get('vialdonors',0))
+    split_members = member_count - vial_donors
     
     # construct message
     vial_donors_message = f"The group has elected to waive the vial donors testing portion, so the {vial_donors} are deducted from this calculation." if vial_donors else ""
