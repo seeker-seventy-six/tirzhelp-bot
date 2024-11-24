@@ -9,7 +9,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-# define the welcome message
 def welcome_newbie(new_user):
     """
     Formats a welcome message for newbies.
@@ -22,6 +21,7 @@ def welcome_newbie(new_user):
     welcome_message = f"""{greeting_message}\n\n{guides_toc}\n{newbie_faq}"""
 
     return welcome_message
+
 
 def lastcall(update, bot_token):
     # get chat member count
@@ -52,8 +52,10 @@ def lastcall(update, bot_token):
     return lastcall_message
 
 
-# Define the /summarize command
-def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
+def summarize(update, BOT_TOKEN):
+    from dotenv import load_dotenv
+    load_dotenv()
+    OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
     # try:
     #     # get telegram ids
     #     chat_id = update['message']['chat']['id']
@@ -107,3 +109,6 @@ def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
     except Exception as e:
         logging.error(f"Error in summarize command: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
+    
+
+
