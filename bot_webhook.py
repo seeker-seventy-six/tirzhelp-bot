@@ -40,7 +40,7 @@ def webhook():
             new_member = update["message"]["new_chat_participant"]
             chat_id = update["message"]["chat"]["id"]
             # only for the main tirzhelp supergroup chat, post automated join welcome messages
-            if chat_id=="-1002462675990":
+            if str(chat_id) in ["-1002462675990", "-1002334662710"]:
                 # Send a welcome message when new user joins
                 welcome_message = botfunc.welcome_newbie(new_member)
                 send_message(chat_id, welcome_message)
