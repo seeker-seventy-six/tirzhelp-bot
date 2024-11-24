@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import telebot
 import requests
 import os
 from dotenv import load_dotenv
@@ -9,29 +8,30 @@ import create_messages as botfunc
 # Setup basic logging configuration
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 # Load environment variables
 load_dotenv()
 
+OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
-# Webhook Configuration
-WEBHOOK_PORT = 8443  # Default HTTPS port for Telegram webhooks
-WEBHOOK_PATH = f"/{BOT_TOKEN}"
 
-bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-# Handle incoming updates
-@app.route(WEBHOOK_PATH, methods=['POST'])
-def webhook():
-    json_update = request.get_json()
-    try:
-        update = telebot.types.Update.de_json(json_update)
-        bot.process_new_updates([update])
-        logging.debug(f"Received update: {update}")
+# Set the webhook
+@app.route('/setwebhook', methods=['GET'])
+def set_webhook():
+    url = f"{API_URL}/setWebhook"
+    payload = {"url": f"{WEBHOOK_URL}"}
+    response = requests.post(url, json=payload)
+    return response.json()
 
+# Handle incoming updates
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    update = request.get_json()
+    logging.debug(f"Received update: {update}")
+    try:
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
         
@@ -39,8 +39,8 @@ def webhook():
         if "message" in update and "new_chat_participant" in update["message"]:
             new_member = update["message"]["new_chat_participant"]
             chat_id = update["message"]["chat"]["id"]
-            # only post newbie joining if it's for the main tirzhelp supergroup
-            if chat_id=='-1002462675990':
+            # only for the main tirzhelp supergroup chat, post automated join welcome messages
+            if chat_id=="-1002462675990":
                 # Send a welcome message when new user joins
                 welcome_message = botfunc.welcome_newbie(new_member)
                 send_message(chat_id, welcome_message)
@@ -68,7 +68,7 @@ def webhook():
                 except:
                     send_message(chat_id, "⚠️ If you would like me to pin this post, I will need Admin rights. Then rerun the command!", message_thread_id)
 
-            # Respond to the /summarize command
+            # Respond to the /newbie command
             if text.startswith("/summarize"):
                 summary_message = botfunc.summarize(update, BOT_TOKEN)
                 send_message(chat_id, summary_message, message_thread_id, reply_to_message_id=message_id)
@@ -79,13 +79,8 @@ def webhook():
         # Log the error to check what went wrong
         logging.debug(f"Error processing webhook: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
-    
-# Function to set webhook
-def set_webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url=WEBHOOK_URL + WEBHOOK_PATH)
 
-###################################
+
 # Helper function to send a message
 def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None):
     url = f"{API_URL}/sendMessage"
@@ -106,6 +101,7 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
     else:
         raise Exception(f"Failed to send message: {response.json().get('description', 'Unknown error')}")
 
+
 # Helper function to pin a message
 def pin_message(chat_id, message_id):
     url = f"{API_URL}/pinChatMessage"
@@ -116,8 +112,5 @@ def pin_message(chat_id, message_id):
     else:
         raise Exception(f"Failed to send message: {response.json().get('description', 'Unknown error')}")
 
-
-# Start the Flask server
 if __name__ == "__main__":
-    set_webhook()
-    app.run(host="0.0.0.0", port=WEBHOOK_PORT)
+    app.run(host="0.0.0.0", port=8443)
