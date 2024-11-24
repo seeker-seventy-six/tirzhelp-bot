@@ -29,6 +29,7 @@ RANGE_NAME = "raw_data!A:G"  # Adjust as per your sheet structure
 
 # Function to append data to Google Sheets
 def append_to_sheet(data):
+    global service
     body = {"values": [data]}
     service.spreadsheets().values().append(
         spreadsheetId=SPREADSHEET_ID,
@@ -45,6 +46,7 @@ def read_sheet():
     Returns:
     - pd.DataFrame: A DataFrame containing all rows, with column names taken from the first row of the sheet.
     """
+    global service
     result = service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID,
         range=RANGE_NAME
@@ -57,6 +59,7 @@ def read_sheet():
     return pd.DataFrame(values[1:], columns=values[0])  # Exclude header row for data
 
 def calculate_statistics(vendor_name):
+    global service
     # Read data from Google Sheets
     result = service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID,

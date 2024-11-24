@@ -1,13 +1,21 @@
-import openai
+import base64
 import os
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
-openai.api_key = OPENAI_TOKEN
+client = OpenAI(api_key=OPENAI_TOKEN)
 
+print(OPENAI_TOKEN)
+
+# Function to encode the image
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+  
 
 def extract_data_with_openai(file_path):
     """
@@ -19,9 +27,8 @@ def extract_data_with_openai(file_path):
     Returns:
         list: A list containing extracted data (e.g., mass and purity).
     """
-    # Define a placeholder prompt for the model
-    # You can replace this with a domain-specific prompt as needed
-    prompt = """You are a data extraction assistant. Extract the 'mass (mg)' and 'purity (%)' values from the provided document. Return the data in the following JSON format: 
+    global client
+    prompt = """Extract the values from the provided image as defined in the schema below. Return the data in the following JSON format: 
     {
       'Vendor': 'vendor name of the tested peptide sometimes called manufacturer',
       'Test Date': 'MM/DD/YYYY',
@@ -34,29 +41,39 @@ def extract_data_with_openai(file_path):
     }"""
     
     try:
-        # Open the file in binary mode
-        with open(file_path, "rb") as file:
-            # Send the file to GPT-4 with a low temperature for factual extraction
-            response = openai.ChatCompletion.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": "You are an AI expert in data extraction from images and PDFs."},
-                    {"role": "user", "content": prompt}
-                ],
-                file=file.read(),  # Attach the document content
-                temperature=0.2  # Low temperature for deterministic results
-            )
-
-        # Parse the response to extract mass and purity
-        response_text = response['choices'][0]['message']['content']
-        
-        # Example of simple parsing logic (update this based on your exact output format)
-        mass = float(response_text.split("Mass:")[1].split("mg")[0].strip())
-        purity = float(response_text.split("Purity:")[1].split("%")[0].strip())
-        
-        return [mass, purity]
+        # Getting the base64 string
+        base64_image = encode_image(file_path)
+        # Send image and instructions to openai gpt model
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=300,
+            temperature=0.1,
+            messages=[
+                {"role": "system", "content": "You are an expert data extraction assistant who is provided data extraction instructions and an image and you return the extracted data as instructed."},
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                        "type": "text",
+                        "text": prompt,
+                        },
+                        {
+                        "type": "image_url",
+                        "image_url": {
+                            "url":  f"data:image/jpeg;base64,{base64_image}"
+                        },
+                        },
+                    ]
+                }
+            ]
+        )
+        print(response.choices[0])
     
     except Exception as e:
         # Handle exceptions (e.g., file not found, OpenAI errors)
         print(f"Error during data extraction: {e}")
         return [None, None]
+    
+
+if __name__=='__main__':
+   extract_data_with_openai('./test-image.jpg')
