@@ -1,9 +1,11 @@
 from flask import jsonify
 import os
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 import requests
-from openai import OpenAI
 import logging
+import helpers_openai
+import helpers_google
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -23,10 +25,10 @@ def welcome_newbie(new_user):
     return welcome_message
 
 
-def lastcall(update, bot_token):
+def lastcall(update, BOT_TOKEN):
     # get chat member count
     chat_id = update['message']["chat"]["id"]
-    url = f"https://api.telegram.org/bot{bot_token}/getChatMemberCount"
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMemberCount"
     response = requests.get(url, params={'chat_id':chat_id})
     member_count = int(response.json().get("result"))
 
@@ -52,10 +54,62 @@ def lastcall(update, bot_token):
     return lastcall_message
 
 
-def summarize(update, BOT_TOKEN):
-    from dotenv import load_dotenv
-    load_dotenv()
-    OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
+def summarize_test_results(update, BOT_TOKEN):
+    message = update["message"]
+
+    # Handle documents or photos
+    if "document" in message:
+        file_id = message["document"]["file_id"]
+    elif "photo" in message:
+        file_id = message["photo"][-1]["file_id"]
+    else:
+        raise ValueError("No document or photo found in the message.")
+
+    # Get file info
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile"
+    file_info = requests.get(url, params={"file_id": file_id}).json()
+    file_path = file_info["result"]["file_path"]
+
+    # Download the file
+    file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+    downloaded_file = requests.get(file_url).content
+    local_path = f"./temp{uuid4()}/{os.path.basename(file_path)}"
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    with open(local_path, "wb") as f:
+        f.write(downloaded_file)
+
+    # Process the file using OpenAI
+    extracted_data = helpers_openai.extract_data_with_openai(local_path)
+    vendor_name = extracted_data[0]
+
+    # Append data to Google Sheets
+    today = datetime.date.today()
+    data_row = [today.isoformat()] + extracted_data
+    helpers_google.append_to_sheet(data_row)
+
+    # Calculate statistics
+    grouped_stats = helpers_google.calculate_statistics(vendor_name)
+
+    # Initialize the message text
+    message_text = f"📊 <b>{vendor_name.upper()} Analysis for the last 3 months:</b>\n\n"
+
+    # Iterate through each group and append stats to the message
+    for expected_mass, stats in grouped_stats.items():
+        message_text += (
+            f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
+            f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
+            f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
+            f"   • Std Dev Mass: {stats['std_mass']:.2f} mg\n"
+            f"   • Std Dev Purity: {stats['std_purity']:.2f}%\n\n"
+        )
+
+    # Clean up
+    os.remove(local_path)
+
+    return message_text
+
+
+def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
     # try:
     #     # get telegram ids
     #     chat_id = update['message']['chat']['id']
@@ -109,6 +163,3 @@ def summarize(update, BOT_TOKEN):
     except Exception as e:
         logging.error(f"Error in summarize command: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
-    
-
-
