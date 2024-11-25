@@ -27,16 +27,40 @@ def extract_data_with_openai(file_path):
     """
     global client
 
+    vendor_disambiguations = {
+        "ALM": ["Alimo Peptides"],
+        "Amo": ["Amolist", "Amopure", "Amopeptide"],
+        "ASC": ["Angel Shanghai Chemical"],
+        "GB": ["Guangebio"],
+        "GYC": ["Nantong Guangyuan Pharma"],
+        "HYB": ["Hangzhou Youngpeptide Biotechnology"],
+        "Innotech": ["Innotech"],
+        "QSC": ["Qingdao Sigma Chemical"],
+        "QYC": ["Qian Yecao"],
+        "Raven": ["The Raven's Nest"],
+        "Royal": ["Royal Peptides", "Cantydes"],
+        "SBB": ["Shenzhen Biolink Biotechnology"],
+        "SNP": ["Nexaph", "Shanghai Nexa Pharma", "SPC"],
+        "SRY": ["Shanghai Senria Tech", "Shanghai Senria Biotechnology"],
+        "SSA": ["Sigma Audley", "Shanghai Teruiop", "Shanghai Sigma Audley"],
+        "TCI": ["Tianjin Cangtu", "HB Cangtu", "Cangtu International"],
+        "Tydes": ["Tydes"],
+        "Uther": ["Uther"],
+        "YC": ["Yiwu Changtu"],
+        "ZLZ": ["ZLZPeptide"],
+        "ZZT": ["Zhejiang Zhaobo Tech", "Zhaobo Technology"]
+    }
+
     # Create the schema
     class TestResult(BaseModel):
-        vendor: str = Field(alias="vendor", description='vendor name of the tested peptide sometimes called manufacturer')
-        test_date: str = Field(alias="test_date", description='date test was performed as MM/DD/YYYY')
-        batch: str = Field(alias="batch", description='if present the batch identifier')
-        peptide: str = Field(alias="peptide", description='name of the peptide tested')
-        expected_mass_mg: int = Field(alias="expected_mass_mg", description='usually 5, 10, 15, 20, 30, 50, or 60 mg')
-        mass_mg: float = Field(alias="mass_mg", description='the actual mass in mg found by the test')
-        purity_percent: float = Field(alias="purity_percent", description='the actual purity in percent found by the test; a float number between 0 and 100')
-        test_lab: str = Field(alias="test_lab", description="the lab name who tested the sample. Pull this from the name in the url")
+        vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the key value for this field:\n{vendor_disambiguations}")
+        test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY')
+        batch: str = Field(alias="batch", description='If present, the batch identifier')
+        peptide: str = Field(alias="peptide", description='Name of the peptide tested')
+        expected_mass_mg: int = Field(alias="expected_mass_mg", description='Usually 5, 10, 15, 20, 30, 50, or 60 mg')
+        mass_mg: float = Field(alias="mass_mg", description='The actual mass in mg found by the test')
+        purity_percent: float = Field(alias="purity_percent", description='The actual purity in percent found by the test; a float number between 0 and 100')
+        test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name  from the name in the url")
 
     # if the uploaded doc is a pdf, first convert to image
     if file_path.endswith('.pdf') or file_path.endswith('.PDF'):
