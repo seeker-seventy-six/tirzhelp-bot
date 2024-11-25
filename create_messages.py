@@ -84,7 +84,7 @@ def summarize_test_results(update, BOT_TOKEN):
 
     # Append data to Google Sheets
     data_row = (
-        + [extracted_data.vendor]
+          [extracted_data.vendor]
         + [extracted_data.test_date]
         + [extracted_data.batch]
         + [extracted_data.expected_mass_mg]

@@ -50,6 +50,7 @@ def webhook():
             chat_id = message["chat"]["id"]
             message_thread_id = message["reply_to_message"].get("message_thread_id")
             message_id = message["reply_to_message"].get("message_id")
+            topic_name = message["reply_to_message"].get("forum_topic_created",{}).get("name")
             text = message.get("text", "")
 
             # Respond to the /newbie command
@@ -73,7 +74,7 @@ def webhook():
                 send_message(chat_id, summary_message, message_thread_id)
 
             # Respond to uploaded document in Test Results channel
-            if "document" in message or "photo" in message:
+            if ("document" in message or "photo" in message) and (topic_name=='Test Results'):
                 test_results_summary = botfunc.summarize_test_results(update, BOT_TOKEN)
                 send_message(chat_id, test_results_summary, message_thread_id)
 

@@ -7,7 +7,7 @@ from openai import OpenAI
 from pydantic import BaseModel, Field, model_validator, ValidationError
 
 # Load environment variables
-load_dotenv('.env-dev')
+load_dotenv()
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
@@ -97,7 +97,7 @@ def generate_parser_instructions(schema):
         peptide="Tirzepatide",
         expected_mass_mg=60,
         mass_mg=58.43,
-        purity_percent=99.892,
+        purity_percent=98.892,
         test_lab="Lab B"
     ).model_dump(by_alias=True)
     
@@ -109,5 +109,5 @@ def generate_parser_instructions(schema):
 
 
 if __name__=='__main__':
-    test_result = extract_data_with_openai('./test-image2.jpg')
+    test_result = extract_data_with_openai('./test-image.jpg')
     print(test_result)
