@@ -96,10 +96,10 @@ def summarize_test_results(update, BOT_TOKEN):
     helpers_google.append_to_sheet(data_row)
 
     # Calculate statistics
-    grouped_stats = helpers_google.calculate_statistics(extracted_data.vendor_name, extracted_data.peptide)
+    grouped_stats = helpers_google.calculate_statistics(extracted_data.vendor, extracted_data.peptide)
 
     # Initialize the message text
-    message_text = f"📊 <b>{extracted_data.vendor_name.upper()} {extracted_data.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
+    message_text = f"📊 <b>{extracted_data.vendor.upper()} {extracted_data.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
 
     # Iterate through each group and append stats to the message
     for expected_mass, stats in grouped_stats.items():
