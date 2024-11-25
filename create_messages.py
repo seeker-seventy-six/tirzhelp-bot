@@ -92,7 +92,7 @@ def summarize_test_results(update, BOT_TOKEN):
         + [extracted_data.purity_percent]
         + [extracted_data.test_lab]
     )
-    print(data_row)
+
     helpers_google.append_to_sheet(data_row)
 
     # Calculate statistics

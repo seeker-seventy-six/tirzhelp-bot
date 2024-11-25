@@ -1,8 +1,10 @@
 import base64
+
 import os
 import json
 import re
 from dotenv import load_dotenv
+from pdf2image import convert_from_path
 from openai import OpenAI
 from pydantic import BaseModel, Field, model_validator, ValidationError
 
@@ -12,12 +14,6 @@ load_dotenv()
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
 
-
-# Function to encode the image
-def encode_image(image_path):
-  with open(image_path, "rb") as image_file:
-    return base64.b64encode(image_file.read()).decode('utf-8')
-  
 
 def extract_data_with_openai(file_path):
     """
@@ -41,6 +37,10 @@ def extract_data_with_openai(file_path):
         mass_mg: float = Field(alias="mass_mg", description='the actual mass in mg found by the test')
         purity_percent: float = Field(alias="purity_percent", description='the actual purity in percent found by the test; a float number between 0 and 100')
         test_lab: str = Field(alias="test_lab", description="the lab name who tested the sample. Pull this from the name in the url")
+
+    # if the uploaded doc is a pdf, first convert to image
+    if file_path.endswith('.pdf') or file_path.endswith('.PDF'):
+        file_path = convert_first_page_to_image(file_path)
 
     # Getting the base64 string
     base64_image = encode_image(file_path)
@@ -106,6 +106,35 @@ def generate_parser_instructions(schema):
     for _, field_info in schema.model_fields.items():
         instructions += f"- **{field_info.alias}**: {field_info.description}\n"
     return instructions
+
+
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+  
+
+def convert_first_page_to_image(pdf_path, output_name="first_page.png"):
+    """
+    Converts the first page of a PDF to an image and saves it as PNG.
+    
+    Args:
+        pdf_path (str): Path to the PDF file.
+        output_path (str): Path to save the output image.
+
+    Returns:
+        str: Path to the saved image.
+    """
+    # Convert only the first page of the PDF
+    images = convert_from_path(pdf_path, first_page=1, last_page=1)
+
+    # Get the directory of the PDF file
+    pdf_dir = os.path.dirname(pdf_path)
+    # Create the output path by appending the output_name to the directory
+    output_path = os.path.join(pdf_dir, output_name)
+
+    # Save the first page as an image
+    images[0].save(output_path, "PNG")
+    return output_path
 
 
 if __name__=='__main__':
