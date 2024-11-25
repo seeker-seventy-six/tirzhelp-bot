@@ -58,7 +58,7 @@ def read_sheet():
     
     return pd.DataFrame(values[1:], columns=values[0])  # Exclude header row for data
 
-def calculate_statistics(vendor_name):
+def calculate_statistics(vendor_name, peptide):
     global service
     # Read data from Google Sheets
     result = service.spreadsheets().values().get(
@@ -78,7 +78,8 @@ def calculate_statistics(vendor_name):
     three_months_ago = datetime.now() - pd.DateOffset(months=3)
     recent_data = df[
         (df['Test Date'] >= three_months_ago) &
-        (df['Vendor'].str.lower() == vendor_name.lower())
+        (df['Vendor'].str.lower() == vendor_name.lower()) &
+        (df['Peptide'].str.lower()== peptide.lower())
     ]
 
     # Group by 'Expected Mass mg' and calculate stats for each group

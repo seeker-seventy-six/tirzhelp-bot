@@ -80,11 +80,11 @@ def summarize_test_results(update, BOT_TOKEN):
 
     # Process the file using OpenAI
     extracted_data = helpers_openai.extract_data_with_openai(local_path)
-    vendor_name = extracted_data.vendor
 
     # Append data to Google Sheets
     data_row = (
           [extracted_data.vendor]
+        + [extracted_data.peptide]
         + [extracted_data.test_date]
         + [extracted_data.batch]
         + [extracted_data.expected_mass_mg]
@@ -96,10 +96,10 @@ def summarize_test_results(update, BOT_TOKEN):
     helpers_google.append_to_sheet(data_row)
 
     # Calculate statistics
-    grouped_stats = helpers_google.calculate_statistics(vendor_name)
+    grouped_stats = helpers_google.calculate_statistics(extracted_data.vendor_name, extracted_data.peptide)
 
     # Initialize the message text
-    message_text = f"📊 <b>{vendor_name.upper()} Analysis for the last 3 months:</b>\n\n"
+    message_text = f"📊 <b>{extracted_data.vendor_name.upper()} {extracted_data.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
 
     # Iterate through each group and append stats to the message
     for expected_mass, stats in grouped_stats.items():
