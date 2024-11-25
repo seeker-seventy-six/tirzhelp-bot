@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv('.env-dev')
+load_dotenv()
 
 # Define the scope
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']

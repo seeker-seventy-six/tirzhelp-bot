@@ -1,6 +1,6 @@
 .env-dev
 .env-main
 tirzhelpbot-56fa11612518.json
-test-image.jpg
+test-image*.jpg
 __pycache__/
 *.pyc

@@ -80,11 +80,19 @@ def summarize_test_results(update, BOT_TOKEN):
 
     # Process the file using OpenAI
     extracted_data = helpers_openai.extract_data_with_openai(local_path)
-    vendor_name = extracted_data[0]
+    vendor_name = extracted_data.vendor
 
     # Append data to Google Sheets
-    today = datetime.date.today()
-    data_row = [today.isoformat()] + extracted_data
+    data_row = (
+        + [extracted_data.vendor]
+        + [extracted_data.test_date]
+        + [extracted_data.batch]
+        + [extracted_data.expected_mass_mg]
+        + [extracted_data.mass_mg]
+        + [extracted_data.purity_percent]
+        + [extracted_data.test_lab]
+    )
+    print(data_row)
     helpers_google.append_to_sheet(data_row)
 
     # Calculate statistics
