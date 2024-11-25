@@ -39,7 +39,7 @@ def webhook():
             new_member = update["message"]["new_chat_participant"]
             chat_id = update["message"]["chat"]["id"]
             # only for the main tirzhelp supergroup chat, post automated join welcome messages
-            if str(chat_id) in ["-1002462675990", "-1002334662710"]:
+            if str(chat_id) in ['-1002462675990', '-1002334662710']:
                 # Send a welcome message when new user joins
                 welcome_message = botfunc.welcome_newbie(new_member)
                 send_message(chat_id, welcome_message)
@@ -50,7 +50,6 @@ def webhook():
             chat_id = message["chat"]["id"]
             message_thread_id = message["reply_to_message"].get("message_thread_id")
             message_id = message["reply_to_message"].get("message_id")
-            topic_name = message["reply_to_message"].get("forum_topic_created",{}).get("name")
             text = message.get("text", "")
 
             # Respond to the /newbie command
@@ -74,7 +73,7 @@ def webhook():
                 send_message(chat_id, summary_message, message_thread_id)
 
             # Respond to uploaded document in Test Results channel
-            if ("document" in message or "photo" in message) and (topic_name=='Test Results'):
+            if ("document" in message or "photo" in message) and str(message_thread_id) in ['4','367']:
                 test_results_summary = botfunc.summarize_test_results(update, BOT_TOKEN)
                 send_message(chat_id, test_results_summary, message_thread_id)
 
