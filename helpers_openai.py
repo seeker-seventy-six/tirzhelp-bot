@@ -1,12 +1,15 @@
 import base64
-
 import os
 import json
 import re
+import logging
 from dotenv import load_dotenv
 from pdf2image import convert_from_path
 from openai import OpenAI
-from pydantic import BaseModel, Field, model_validator, ValidationError
+from pydantic import BaseModel, Field
+
+# Setup basic logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load environment variables
 load_dotenv()
@@ -58,8 +61,8 @@ def extract_data_with_openai(file_path):
         batch: str = Field(alias="batch", description='If present, the batch identifier')
         peptide: str = Field(alias="peptide", description='Name of the peptide tested')
         expected_mass_mg: int = Field(alias="expected_mass_mg", description='Usually 5, 10, 15, 20, 30, 50, or 60 mg')
-        mass_mg: float = Field(alias="mass_mg", description='The actual mass in mg found by the test')
-        purity_percent: float = Field(alias="purity_percent", description='The actual purity in percent found by the test; a float number between 0 and 100')
+        mass_mg: float = Field(alias="mass_mg", description="The actual mass in mg found by the test.  If 'not detected' fill in 0")
+        purity_percent: float = Field(alias="purity_percent", description="The actual purity in percent found by the test; a float number between 0 and 100. If 'not detected' fill in 0")
         test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name  from the name in the url")
 
     # if the uploaded doc is a pdf, first convert to image
@@ -70,11 +73,11 @@ def extract_data_with_openai(file_path):
     base64_image = encode_image(file_path)
     # Setup JSON schema and prompt instructions for data extraction
     instructions = generate_parser_instructions(TestResult)
-    
+
     # Send image and instructions to openai gpt model
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        max_tokens=300,
+        max_tokens=2000,
         temperature=0.1,
         messages=[
             {"role": "system", "content": "You are an expert data extraction assistant who is provided data extraction instructions and an image and you return the extracted data as instructed."},
@@ -97,33 +100,51 @@ def extract_data_with_openai(file_path):
     )
     # Extract the message content, which should be a JSON string wrapped in markdown
     json_response = response.choices[0].message.content
-    match = re.search(r'```json\n(.*?)\n```', json_response, re.DOTALL)
-    if not match:
-        raise ValueError("JSON content not found in the response")
-    json_content = match.group(1)
     
-    # Parse the JSON content into a Python dictionary
-    try:
-        parsed_json = json.loads(json_content)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON format: {e}")
+    if "Unsupported Test" not in json_response:
+        match = re.search(r'```json\n(.*?)\n```', json_response, re.DOTALL)
+        if not match:
+            raise ValueError("JSON content not found in the response")
+        json_content = match.group(1)
     
-    # Return the parsed data as an instance of TestResult
-    return TestResult(**parsed_json)
+        # Parse the JSON content into a Python dictionary
+        try:
+            parsed_json = json.loads(json_content)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON format: {e}")
+        
+        # Convert each JSON object into a TestResult instance
+        test_results = [TestResult(**result) for result in parsed_json]
+        return test_results
+    
+    else:
+        return None
     
 
 def generate_parser_instructions(schema):
-    instructions = "Extract the values from the provided image as defined in the schema below. Respond only in JSON. Here is an example schema:\n\n"
-    example_data = schema(
-        vendor="Vendor A",
-        test_date="11-01-2024",
-        batch="VA T-60 Mfg 2024-10-22",
-        peptide="Tirzepatide",
-        expected_mass_mg=60,
-        mass_mg=58.43,
-        purity_percent=98.892,
-        test_lab="Lab B"
-    ).model_dump(by_alias=True)
+    instructions = "Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg and purity_percent. IF the test results are results for something other than mass_mg and purity_percent, just reply in plain text 'Unsupported Test'. Here is an example schema:\n\n"
+    example_data = [
+        schema(
+            vendor="Vendor A",
+            test_date="11-01-2024",
+            batch="VA T-60 Mfg 2024-10-22",
+            peptide="Tirzepatide",
+            expected_mass_mg=60,
+            mass_mg=58.43,
+            purity_percent=98.892,
+            test_lab="Lab B"
+        ).model_dump(by_alias=True),
+        schema(
+            vendor="Vendor A",
+            test_date="11-01-2024",
+            batch="VA T-60 Mfg 2024-10-22",
+            peptide="Tirzepatide",
+            expected_mass_mg=60,
+            mass_mg=62.98,
+            purity_percent=98.723,
+            test_lab="Lab B"
+        ).model_dump(by_alias=True),
+    ]
     
     instructions += json.dumps(example_data, indent=2) + "\n\n"
     instructions += "Field Descriptions:\n"
@@ -162,5 +183,5 @@ def convert_first_page_to_image(pdf_path, output_name="first_page.png"):
 
 
 if __name__=='__main__':
-    test_result = extract_data_with_openai('./test-image.jpg')
+    test_result = extract_data_with_openai('./test-non-purity-mass.jpg')
     print(test_result)

@@ -24,7 +24,7 @@ service = build('sheets', 'v4', credentials=credentials)
 
 # Define your spreadsheet ID
 SPREADSHEET_ID = '1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y'  # Found in the URL of your spreadsheet
-RANGE_NAME = "raw_data!A:G"  # Adjust as per your sheet structure
+RANGE_NAME = "raw_data!A:I"  # Adjust as per your sheet structure
 
 
 # Function to append data to Google Sheets
@@ -54,7 +54,7 @@ def read_sheet():
     values = result.get("values", [])
     
     if not values:
-        return pd.DataFrame(columns=["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "Test Lab"])
+        return pd.DataFrame(columns=["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "Test Lab", "File Name"])
     
     return pd.DataFrame(values[1:], columns=values[0])  # Exclude header row for data
 
@@ -95,22 +95,3 @@ def calculate_statistics(vendor_name, peptide):
         }
 
     return group_stats
-
-
-if __name__=='__main__':
-    vendor = 'VendorB'
-    grouped_stats = calculate_statistics(vendor)
-
-    # Initialize the message text
-    message_text = f"📊 <b>{vendor.upper()} Analysis for the last 3 months:</b>\n\n"
-
-    # Iterate through each group and append stats to the message
-    for expected_mass, stats in grouped_stats.items():
-        message_text += (
-            f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
-            f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
-            f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
-            f"   • Std Dev Mass: {stats['std_mass']:.2f} mg\n"
-            f"   • Std Dev Purity: {stats['std_purity']:.2f}%\n\n"
-        )
-    print(message_text)
