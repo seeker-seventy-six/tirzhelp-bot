@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load environment variables
-load_dotenv()
+load_dotenv('.env-dev')
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
@@ -56,14 +56,15 @@ def extract_data_with_openai(file_path):
 
     # Create the schema
     class TestResult(BaseModel):
-        vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the key value for this field:\n{vendor_disambiguations}")
+        vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the abbreviation key value for this field:\n{vendor_disambiguations}")
         test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY')
         batch: str = Field(alias="batch", description='If present, the batch identifier')
-        peptide: str = Field(alias="peptide", description='Name of the peptide tested')
+        peptide: str = Field(alias="peptide", description='Name of the compound tested')
         expected_mass_mg: int = Field(alias="expected_mass_mg", description='Usually 5, 10, 15, 20, 30, 50, or 60 mg')
-        mass_mg: float = Field(alias="mass_mg", description="The actual mass in mg found by the test.  If 'not detected' fill in 0")
-        purity_percent: float = Field(alias="purity_percent", description="The actual purity in percent found by the test; a float number between 0 and 100. If 'not detected' fill in 0")
-        test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name  from the name in the url")
+        mass_mg: float | None = Field(alias="mass_mg", description="The actual mass in mg found by the test; a float number between 0 and the expected_mass_mg. If not tested fill in the JSON value for null")
+        purity_percent: float | None = Field(alias="purity_percent", description="The actual purity in percent found by the test; a float number between 0 and 100. If not tested fill in the JSON value for null")
+        tfa_present: float | None = Field(alias='tfa_present', description="The amount of TFA or trifluoroacetic acid found by the test; a float number between 0 and 100. If 'not detected' fill in 0. If not tested fill in the JSON value for null")
+        test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name from the name in the url")
 
     # if the uploaded doc is a pdf, first convert to image
     if file_path.endswith('.pdf') or file_path.endswith('.PDF'):
@@ -122,7 +123,7 @@ def extract_data_with_openai(file_path):
     
 
 def generate_parser_instructions(schema):
-    instructions = "Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg and purity_percent. IF the test results are results for something other than mass_mg and purity_percent, just reply in plain text 'Unsupported Test'. Here is an example schema:\n\n"
+    instructions = "Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg, purity_percent, and tfa_present. IF the test results are results for something other than compound mass, purity, or TFA, just reply in plain text 'Unsupported Test'. Here is an example schema:\n\n"
     example_data = [
         schema(
             vendor="Vendor A",
@@ -132,6 +133,7 @@ def generate_parser_instructions(schema):
             expected_mass_mg=60,
             mass_mg=58.43,
             purity_percent=98.892,
+            tfa_present=None,
             test_lab="Lab B"
         ).model_dump(by_alias=True),
         schema(
@@ -142,6 +144,7 @@ def generate_parser_instructions(schema):
             expected_mass_mg=60,
             mass_mg=62.98,
             purity_percent=98.723,
+            tfa_present=None,
             test_lab="Lab B"
         ).model_dump(by_alias=True),
     ]

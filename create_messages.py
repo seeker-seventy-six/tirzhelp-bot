@@ -1,6 +1,4 @@
-from flask import jsonify
 import os
-from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 import requests
 import logging
@@ -49,7 +47,7 @@ def lastcall(update, BOT_TOKEN):
     # construct message
     vial_donors_message = f"✨ <b>NOTE:</b> The group has decided to waive the test payment for our {vial_donors} vial donors, so their shares have already been accounted for in this calculation." if vial_donors else ""
 
-    lastcall_message = f"""<b>Hello Researchers! 🧪🔬🌟</b>\n\nThis is your <b>FINAL reminder</b> and last call to decide if you'll be participating in this group test! 🚨 <b>The test will close at the end of today!</b>\n\nBy staying in this group chat after today, you’re committing to:  \n1️⃣ Paying your share of the testing costs within 24hrs of when the payment instructions are shared.  \n2️⃣ Receiving access to the test results!\n\n<b>Here’s the breakdown:</b>  \n- <b>Total testing cost:</b> ${test_cost}  \n- <b>Group size:</b> {member_count} members (including you!)  \n- <b>Estimated cost per member:</b> ${test_cost/split_members:.2f}\n\n{vial_donors_message}  \n\nIf you do not wish to participate, please select <b>"Leave Group"</b> from the group chat menu. Just a heads-up: <i>archiving the chat won’t remove you from the group.</i>\n\nThank you for being part of the testers who are making this community better for everyone! 🧪🔍"""
+    lastcall_message = f"""<b>Hello Researchers! 🧪🔬🌟</b>\n\nThis is your <b>FINAL reminder</b> and last call to decide if you'll be participating in this group test! 🚨 <b>The test will close at the end of today!</b>\n\nBy staying in this group chat after today, you’re committing to:  \n1️⃣ Paying your share of the testing costs within 24hrs of when the payment instructions are shared.  \n2️⃣ Receiving access to the test results!\n\n<b>Here’s the breakdown:</b>  \n- <b>Total testing cost:</b> ${test_cost}  \n- <b>Group size:</b> {member_count} members (including you!)  \n- <b>Estimated cost per member:</b> ${test_cost/split_members:.2f}\n\n{vial_donors_message}  \n\nIf you do not wish to participate, please select <b>"Leave Group"</b> from the group chat menu. <i>Archiving the chat won’t remove you from the group.</i>\n\nThank you for being a tester helping to make this community better for everyone! 🧪🔍"""
     
     return lastcall_message
 
@@ -92,6 +90,7 @@ def summarize_test_results(update, BOT_TOKEN):
                 + [sample.expected_mass_mg]
                 + [sample.mass_mg]
                 + [sample.purity_percent]
+                + [sample.tfa_present]
                 + [sample.test_lab]
                 + [local_path.split('/')[-1]]
             )
@@ -109,8 +108,8 @@ def summarize_test_results(update, BOT_TOKEN):
                 f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
                 f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
                 f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
-                f"   • Std Dev Mass: {stats['std_mass']:.2f} mg\n"
-                f"   • Std Dev Purity: {stats['std_purity']:.2f}%\n\n"
+                f"   • Std Dev Mass: +/-{stats['std_mass']:.2f} mg\n"
+                f"   • Std Dev Purity: +/-{stats['std_purity']:.2f}%\n"
             )
 
         # Clean up
@@ -118,60 +117,4 @@ def summarize_test_results(update, BOT_TOKEN):
         return message_text
     
     else:
-        return "This is currently an unsupported test type, but we're adding more test types asap!"
-
-
-def summarize(update, BOT_TOKEN, OPENAI_TOKEN):
-    # try:
-    #     # get telegram ids
-    #     chat_id = update['message']['chat']['id']
-    #     message_thread_id = update['message']['message_thread_id']
-    
-    #     # Get the current time in UTC and calculate the time 24 hours ago
-    #     now = datetime.now(timezone.utc)
-    #     one_day_ago = now - timedelta(hours=24)
-
-    #     # Fetch messages from the chat in the last 24 hours
-    #     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
-    #     response = requests.get(url).json()
-    #     logging.debug(f"response: {response}")
-
-    #     # Filter messages from the current chat and within the last 24 hours
-    #     messages = [
-    #         update["message"]["text"]
-    #         for update in response.get("result", [])
-    #         if update.get("message", {}).get("message_thread_id", {}) == message_thread_id
-    #         and datetime.fromtimestamp(update["message"]["date"], tz=timezone.utc) >= one_day_ago
-    #     ]
-
-    #     # If no messages found, respond accordingly
-    #     if not messages:
-    #         return jsonify({"error": "No messages found in the last 24 hours to summarize."}), 500
-
-    #     # Join messages for summarization
-    #     combined_text = "\n".join(messages)
-
-    #     logging.debug(f"Messages in past 24 hours: {combined_text}")
-
-        # # Summarize using Bedrock LLaMA2
-        # client = OpenAI(
-        #     organization='org-ukPKUNI1vD72DYjb83IEpRSq',
-        #     project='proj_kXDhtH3besJxGcqXaqV20Yk6',
-        # )
-        # summary_response = client.ChatCompletion.create(
-        #     model="llama2",
-        #     messages=[
-        #         {"role": "system", "content": "You are a helpful summarization assistant."},
-        #         {"role": "user", "content": combined_text},
-        #     ],
-        # )
-        # summary = summary_response["choices"][0]["message"]["content"]
-
-        # # Send the summary back to the user
-        # update.message.reply_text(summary)
-    try:
-        return "WIP"
-
-    except Exception as e:
-        logging.error(f"Error in summarize command: {e}")
-        return jsonify({"error": f"Internal server error: {e}"}), 500
+        return "😳🚧 This test type isn't supported yet, but we're working on adding more test types to parse as soon as possible!"
