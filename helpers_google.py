@@ -24,7 +24,8 @@ service = build('sheets', 'v4', credentials=credentials)
 
 # Define your spreadsheet ID
 SPREADSHEET_ID = '1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y'  # Found in the URL of your spreadsheet
-RANGE_NAME = "raw_data!A:I"  # Adjust as per your sheet structure
+RANGE_NAME = "raw_data!A:J"  # Adjust as per your sheet structure
+SPREADSHEET_COLS = ["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "TFA", "Test Lab", "File Name"]
 
 
 # Function to append data to Google Sheets
@@ -54,7 +55,7 @@ def read_sheet():
     values = result.get("values", [])
     
     if not values:
-        return pd.DataFrame(columns=["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "Test Lab", "File Name"])
+        return pd.DataFrame(columns=SPREADSHEET_COLS)
     
     return pd.DataFrame(values[1:], columns=values[0])  # Exclude header row for data
 

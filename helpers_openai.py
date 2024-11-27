@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load environment variables
-load_dotenv('.env-dev')
+load_dotenv()
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
@@ -101,6 +101,7 @@ def extract_data_with_openai(file_path):
     )
     # Extract the message content, which should be a JSON string wrapped in markdown
     json_response = response.choices[0].message.content
+    logging.info(f"model response: {json_response}")
     
     if "Unsupported Test" not in json_response:
         match = re.search(r'```json\n(.*?)\n```', json_response, re.DOTALL)

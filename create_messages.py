@@ -78,7 +78,7 @@ def summarize_test_results(update, BOT_TOKEN):
 
     # Process the file using OpenAI
     extracted_test_data = helpers_openai.extract_data_with_openai(local_path)
-
+    print(f"extracted data returned: {extracted_test_data}")
     if extracted_test_data:
         # Append data to Google Sheets for each sample tested. One Test Result image may have more than one sample
         for sample in extracted_test_data:
@@ -109,7 +109,7 @@ def summarize_test_results(update, BOT_TOKEN):
                 f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
                 f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
                 f"   • Std Dev Mass: +/-{stats['std_mass']:.2f} mg\n"
-                f"   • Std Dev Purity: +/-{stats['std_purity']:.2f}%\n"
+                f"   • Std Dev Purity: +/-{stats['std_purity']:.2f}%\n\n"
             )
 
         # Clean up
