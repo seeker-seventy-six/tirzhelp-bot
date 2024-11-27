@@ -58,18 +58,19 @@ def webhook():
                 send_message(chat_id, welcome_message, message_thread_id, reply_to_message_id=message_id)
 
             # Respond to the /lastcall command
-            if text.startswith("/lastcall cost="):
+            if text.startswith("/lastcall"):
                 lastcall_message = botfunc.lastcall(update, BOT_TOKEN)
                 response = send_message(chat_id, lastcall_message, message_thread_id)
-                try:
-                    lastcall_message_id = response['result']['message_id']
-                    pin_message(chat_id, lastcall_message_id)
-                except:
-                    send_message(chat_id, "⚠️ If you would like me to pin this post, I will need Admin rights. Then rerun the command!", message_thread_id)
+                if lastcall_message.startswith("Hello Researchers!"):
+                    try:
+                        lastcall_message_id = response['result']['message_id']
+                        pin_message(chat_id, lastcall_message_id)
+                    except:
+                        send_message(chat_id, "⚠️ If you would like me to pin this post, I will need Admin rights. Then rerun the command!", message_thread_id)
 
             # Respond to the /newbie command
             if text.startswith("/summarize"):
-                summary_message = botfunc.summarize(update, BOT_TOKEN)
+                summary_message = botfunc.summarize()
                 send_message(chat_id, summary_message, message_thread_id)
 
             # Respond to uploaded document in Test Results channel
