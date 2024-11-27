@@ -122,8 +122,8 @@ def summarize_test_results(update, BOT_TOKEN):
                 f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
                 f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
                 f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
-                f"   • Typical Deviation Tested Mass (Std Dev): +/-{stats['std_mass']:.1f} mg</b>\n"
-                f"   {icon_status_mass} <b>+/-{stats['mass_diff_percent']:.1f}% : % Std Dev of Mass from Expected mg\n"
+                f"   • Typical Deviation Tested Mass (Std Dev): +/-{stats['std_mass']:.1f} mg\n"
+                f"   {icon_status_mass} <b>+/-{stats['mass_diff_percent']:.1f}% : % Std Dev of Mass from Expected mg</b>\n"
                 f"   {icon_status_purity} <b>+/-{stats['std_purity']:.1f}% : % Std Dev of Purity from 100%</b>\n\n"
             )
 
