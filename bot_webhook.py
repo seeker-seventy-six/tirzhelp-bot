@@ -87,24 +87,28 @@ def webhook():
 
 # Helper function to send a message
 def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None):
-    url = f"{TELEGRAM_API_URL}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": text,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
-    if message_thread_id:
-        payload['message_thread_id'] = message_thread_id
-    if reply_to_message_id:
-        payload['reply_to_message_id'] = reply_to_message_id
-    logging.info(f"String length: {len(text)}")
-    response = requests.post(url, json=payload)
-    logging.info(f"send_message response: {response}")
-    if response.status_code == 200:
+    try:
+        url = f"{TELEGRAM_API_URL}/sendMessage"
+        payload = {
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": True
+        }
+        if message_thread_id:
+            payload['message_thread_id'] = message_thread_id
+        if reply_to_message_id:
+            payload['reply_to_message_id'] = reply_to_message_id
+            
+        response = requests.post(url, json=payload)
+        if response.status_code != 200:
+            logging.error(f"Telegram API returned an error: {response.text}")
+            response.raise_for_status()  # This raises an exception for non-2xx responses
         return response.json()
-    else:
-        raise Exception(f"Failed to send message: {response.json().get('description', 'Unknown error')}")
+    
+    except requests.exceptions.RequestException as e:
+        logging.error(f"send_message failed: {e}")
+        raise RuntimeError(f"send_message failed: {e}")
 
 
 # Helper function to pin a message
