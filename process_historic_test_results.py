@@ -3,9 +3,9 @@ import helpers_openai
 
 
 
-def process_local_test_result(local_path):
+def process_local_test_result(local_path, text):
     # Process the file using OpenAI
-    extracted_test_data = helpers_openai.extract_data_with_openai(local_path)
+    extracted_test_data = helpers_openai.extract_data_with_openai(local_path, text)
 
     if extracted_test_data:
         # Append data to Google Sheets for each sample tested. One Test Result image may have more than one sample
@@ -81,7 +81,7 @@ if __name__=='__main__':
     for test_path in historic_test_results:
         try:
             print(f"Processing {test_path} ...")
-            message = process_local_test_result(test_path)
+            message = process_local_test_result(test_path, "ZZTAI Tech, new source to me at least.")
             print(message,'\n')
             os.remove(test_path)
             try:

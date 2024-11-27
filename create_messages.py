@@ -54,6 +54,7 @@ def lastcall(update, BOT_TOKEN):
 
 def summarize_test_results(update, BOT_TOKEN):
     message = update["message"]
+    text = message.get("text", "")
 
     # Handle documents or photos
     if "document" in message:
@@ -77,7 +78,7 @@ def summarize_test_results(update, BOT_TOKEN):
         f.write(downloaded_file)
 
     # Process the file using OpenAI
-    extracted_test_data = helpers_openai.extract_data_with_openai(local_path)
+    extracted_test_data = helpers_openai.extract_data_with_openai(local_path, text)
     logging.info(f"Extracted data returned: {extracted_test_data}")
 
     if extracted_test_data:
@@ -126,6 +127,7 @@ def summarize_test_results(update, BOT_TOKEN):
 
         # Clean up
         os.remove(local_path)
+        logging.info(f"Message: {message_text}")
         return message_text
     
     else:

@@ -18,7 +18,7 @@ OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
 
 
-def extract_data_with_openai(file_path):
+def extract_data_with_openai(file_path, text):
     """
     Extracts data from a document using GPT-4 model.
     
@@ -73,7 +73,7 @@ def extract_data_with_openai(file_path):
     # Getting the base64 string
     base64_image = encode_image(file_path)
     # Setup JSON schema and prompt instructions for data extraction
-    instructions = generate_parser_instructions(TestResult)
+    instructions = generate_parser_instructions(TestResult, text)
 
     # Send image and instructions to openai gpt model
     response = client.chat.completions.create(
@@ -123,8 +123,8 @@ def extract_data_with_openai(file_path):
         return None
     
 
-def generate_parser_instructions(schema):
-    instructions = "Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg, purity_percent, and tfa_present. IF the test results are results for something other than compound mass, purity, or TFA, just reply in plain text 'Unsupported Test'. Here is an example schema:\n\n"
+def generate_parser_instructions(schema, text):
+    instructions = f"Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg, purity_percent, and tfa_present. IF the test results are results for something other than compound mass, purity, or TFA, just reply in plain text 'Unsupported Test'. The user may have also included a <image caption>{text}</image caption>; use <image caption> if it contains additional info that the image does not.\n\nHere is an example schema:\n\n"
     example_data = [
         schema(
             vendor="Vendor A",
