@@ -100,6 +100,7 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
         payload['reply_to_message_id'] = reply_to_message_id
     
     response = requests.post(url, json=payload)
+    logging.info(f"send_message response: {response}")
     if response.status_code == 200:
         return response.json()
     else:
