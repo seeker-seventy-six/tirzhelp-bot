@@ -98,7 +98,7 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
         payload['message_thread_id'] = message_thread_id
     if reply_to_message_id:
         payload['reply_to_message_id'] = reply_to_message_id
-    
+    logging.info(f"String length: {len(text)}")
     response = requests.post(url, json=payload)
     logging.info(f"send_message response: {response}")
     if response.status_code == 200:
