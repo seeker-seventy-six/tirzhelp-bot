@@ -32,12 +32,23 @@ def process_local_test_result(local_path):
 
         # Iterate through each group and append stats to the message
         for expected_mass, stats in grouped_stats.items():
+            icon_status_mass = (
+                "🟢" if stats['mass_diff_percent'] <= 5 else 
+                "🟡" if stats['mass_diff_percent'] <= 10 else 
+                "🔴"
+            )
+            icon_status_purity = (
+                "🟢" if stats['std_purity'] <= 2 else 
+                "🟡" if stats['std_purity'] <= 4 else 
+                "🔴"
+            )
             message_text += (
                 f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
                 f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
                 f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
-                f"   • Std Dev Mass: +/-{stats['std_mass']:.2f} mg\n"
-                f"   • Std Dev Purity: +/-{stats['std_purity']:.2f}%\n"
+                f"   • <b>Typical Tested Mass (Std Dev): +/-{stats['std_mass']:.1f} mg</b>\n"
+                f"   {icon_status_mass} <b>Typical % Difference of Mass from Expected mg: +/- {stats['mass_diff_percent']:.1f}%</b>\n"
+                f"   {icon_status_purity} <b>Typical % Difference of Purity from 100%</b>: +/- {stats['std_purity']:.1f}%\n\n"
             )
 
         # Clean up

@@ -87,12 +87,16 @@ def calculate_statistics(vendor_name, peptide):
     grouped_data = recent_data.groupby('Expected Mass mg')
 
     group_stats = {}
-    for group, data in grouped_data:
+    for group, data in grouped_data:        
+        # Calculate percentage differences
+        mass_diff_percent = (data['Mass mg'].std() / group) * 100
+
         group_stats[group] = {
             "average_mass": data['Mass mg'].mean(),
             "average_purity": data['Purity %'].mean(),
             "std_mass": data['Mass mg'].std(),
-            "std_purity": data['Purity %'].std()
+            "std_purity": data['Purity %'].std(),
+            "mass_diff_percent": mass_diff_percent
         }
 
     return group_stats

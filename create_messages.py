@@ -78,7 +78,8 @@ def summarize_test_results(update, BOT_TOKEN):
 
     # Process the file using OpenAI
     extracted_test_data = helpers_openai.extract_data_with_openai(local_path)
-    print(f"extracted data returned: {extracted_test_data}")
+    logging.info(f"Extracted data returned: {extracted_test_data}")
+
     if extracted_test_data:
         # Append data to Google Sheets for each sample tested. One Test Result image may have more than one sample
         for sample in extracted_test_data:
@@ -104,12 +105,23 @@ def summarize_test_results(update, BOT_TOKEN):
 
         # Iterate through each group and append stats to the message
         for expected_mass, stats in grouped_stats.items():
+            icon_status_mass = (
+                "🟢" if stats['mass_diff_percent'] <= 5 else 
+                "🟡" if stats['mass_diff_percent'] <= 10 else 
+                "🔴"
+            )
+            icon_status_purity = (
+                "🟢" if stats['std_purity'] <= 2 else 
+                "🟡" if stats['std_purity'] <= 4 else 
+                "🔴"
+            )
             message_text += (
                 f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
                 f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
                 f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
-                f"   • Std Dev Mass: +/-{stats['std_mass']:.2f} mg\n"
-                f"   • Std Dev Purity: +/-{stats['std_purity']:.2f}%\n\n"
+                f"   • Typical Deviation Tested Mass (Std Dev): +/-{stats['std_mass']:.1f} mg</b>\n"
+                f"   {icon_status_mass} <b>+/- {stats['mass_diff_percent']:.1f}% : % Std Dev of Mass from Expected mg\n"
+                f"   {icon_status_purity} <b>+/- {stats['std_purity']:.1f}% : % Std Dev of Purity from 100%</b>\n\n"
             )
 
         # Clean up
