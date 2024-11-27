@@ -104,6 +104,8 @@ def summarize_test_results(update, BOT_TOKEN):
         # Initialize the message text
         message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
 
+        raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y/edit?usp=sharing'>you can find the raw data here</a>"
+
         # Iterate through each group and append stats to the message
         for expected_mass, stats in grouped_stats.items():
             icon_status_mass = (
@@ -130,7 +132,7 @@ def summarize_test_results(update, BOT_TOKEN):
         # Clean up
         os.remove(local_path)
         logging.info(f"Message: {message_text}")
-        return message_text
+        return message_text + raw_data_url
     
     else:
         return "😳🚧 This test type isn't supported yet, but we're working on adding more test types to parse as soon as possible!"
