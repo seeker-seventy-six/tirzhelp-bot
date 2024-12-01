@@ -92,6 +92,7 @@ def calculate_statistics(vendor_name, peptide):
         mass_diff_percent = (data['Mass mg'].std() / group) * 100
 
         group_stats[group] = {
+            "test_count": data['Vendor'].count(),
             "average_mass": data['Mass mg'].mean(),
             "average_purity": data['Purity %'].mean(),
             "std_mass": data['Mass mg'].std(),
