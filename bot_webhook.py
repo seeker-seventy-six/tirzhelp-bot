@@ -28,10 +28,10 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
+    # Log raw request data
+    raw_data = request.data.decode('utf-8')
+    logging.debug(f"Raw request data: {raw_data}")
     try:
-        # Log raw request data
-        raw_data = request.data.decode('utf-8')
-        logging.debug(f"Raw request data: {raw_data}")
         update = request.get_json()
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
@@ -50,8 +50,8 @@ def webhook():
         elif "message" in update and "reply_to_message" in update["message"]:
             message = update["message"]
             chat_id = message["chat"]["id"]
-            message_thread_id = message["reply_to_message"].get("message_thread_id")
-            message_id = message["reply_to_message"].get("message_id")
+            message_thread_id = message["reply_to_message"].get("message_thread_id", None)
+            message_id = message["reply_to_message"].get("message_id", None)
             text = message.get("text", "")
 
             # Respond to the /newbie command
