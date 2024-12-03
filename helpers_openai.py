@@ -1,5 +1,6 @@
 import base64
 import os
+import sys
 import json
 import re
 import logging
@@ -9,7 +10,7 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 
 # Setup basic logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
 load_dotenv()

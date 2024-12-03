@@ -117,14 +117,18 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
 
 # Helper function to pin a message
 def pin_message(chat_id, message_id):
-    url = f"{TELEGRAM_API_URL}/pinChatMessage"
-    payload = {"chat_id": chat_id, "message_id": message_id}
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
+    try:
+        url = f"{TELEGRAM_API_URL}/pinChatMessage"
+        payload = {"chat_id": chat_id, "message_id": message_id}
+        response = requests.post(url, json=payload)
+        if response.status_code != 200:
+            logging.error(f"Telegram API returned an error: {response.text}")
+            response.raise_for_status()  # This raises an exception for non-2xx responses
         return response.json()
-    else:
-        raise Exception(f"Failed to send message: {response.json().get('description', 'Unknown error')}")
-
+    
+    except requests.exceptions.RequestException as e:
+        logging.error(f"pin_message failed: {e}")
+        raise RuntimeError(f"pin_message failed: {e}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8443)

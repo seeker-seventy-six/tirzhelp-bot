@@ -1,4 +1,5 @@
 import os
+import sys
 from uuid import uuid4
 import requests
 import logging
@@ -6,7 +7,7 @@ import helpers_openai
 import helpers_google
 
 # Setup basic logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 
 def welcome_newbie(new_user):
