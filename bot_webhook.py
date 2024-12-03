@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
 import requests
 import os
+import sys
 from dotenv import load_dotenv
 import logging
 import create_messages as botfunc
 
 # Setup basic logging configuration
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
 load_dotenv()
@@ -84,7 +85,7 @@ def webhook():
 
     except Exception as e:
         # Log the error to check what went wrong
-        logging.debug(f"Error processing webhook: {e}")
+        logging.error(f"Error processing webhook: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
 
