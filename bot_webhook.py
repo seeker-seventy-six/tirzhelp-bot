@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
 import requests
 import os
+import sys
 from dotenv import load_dotenv
 import logging
 import create_messages as botfunc
 
 # Setup basic logging configuration
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
 load_dotenv()
@@ -28,9 +29,11 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    update = request.get_json()
-    logging.debug(f"Received update: {update}")
+    # Log raw request data
+    raw_data = request.data.decode('utf-8')
+    logging.info(f"Raw request data: {raw_data}")
     try:
+        update = request.get_json()
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
         
@@ -45,11 +48,11 @@ def webhook():
                 send_message(chat_id, welcome_message)
     
         # otherwise, look for specific commands made 
-        elif "message" in update and "reply_to_message" in update["message"]:
+        elif "message" in update:
             message = update["message"]
             chat_id = message["chat"]["id"]
-            message_thread_id = message["reply_to_message"].get("message_thread_id")
-            message_id = message["reply_to_message"].get("message_id")
+            message_thread_id = message.get("message_thread_id", None)
+            message_id = message.get("message_id", None)
             text = message.get("text", "")
 
             # Respond to the /newbie command
@@ -82,7 +85,7 @@ def webhook():
 
     except Exception as e:
         # Log the error to check what went wrong
-        logging.debug(f"Error processing webhook: {e}")
+        logging.error(f"Error processing webhook: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
 
@@ -114,14 +117,18 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
 
 # Helper function to pin a message
 def pin_message(chat_id, message_id):
-    url = f"{TELEGRAM_API_URL}/pinChatMessage"
-    payload = {"chat_id": chat_id, "message_id": message_id}
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
+    try:
+        url = f"{TELEGRAM_API_URL}/pinChatMessage"
+        payload = {"chat_id": chat_id, "message_id": message_id}
+        response = requests.post(url, json=payload)
+        if response.status_code != 200:
+            logging.error(f"Telegram API returned an error: {response.text}")
+            response.raise_for_status()  # This raises an exception for non-2xx responses
         return response.json()
-    else:
-        raise Exception(f"Failed to send message: {response.json().get('description', 'Unknown error')}")
-
+    
+    except requests.exceptions.RequestException as e:
+        logging.error(f"pin_message failed: {e}")
+        raise RuntimeError(f"pin_message failed: {e}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8443)
