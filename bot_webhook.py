@@ -28,9 +28,11 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    update = request.get_json()
-    logging.debug(f"Received update: {update}")
     try:
+        # Log raw request data
+        raw_data = request.data.decode('utf-8')
+        logging.debug(f"Raw request data: {raw_data}")
+        update = request.get_json()
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
         
