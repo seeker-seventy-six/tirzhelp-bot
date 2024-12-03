@@ -7,7 +7,7 @@ import logging
 import create_messages as botfunc
 
 # Setup basic logging configuration
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +31,8 @@ def set_webhook():
 def webhook():
     # Log raw request data
     raw_data = request.data.decode('utf-8')
-    logging.debug(f"Raw request data: {raw_data}")
+    logging.info(f"Raw request data: {raw_data}")
+    print(f"Raw request data: {raw_data}")
     try:
         update = request.get_json()
         if update is None:
