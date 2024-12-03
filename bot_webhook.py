@@ -32,7 +32,6 @@ def webhook():
     # Log raw request data
     raw_data = request.data.decode('utf-8')
     logging.info(f"Raw request data: {raw_data}")
-    print(f"Raw request data: {raw_data}")
     try:
         update = request.get_json()
         if update is None:
@@ -49,11 +48,11 @@ def webhook():
                 send_message(chat_id, welcome_message)
     
         # otherwise, look for specific commands made 
-        elif "message" in update and "reply_to_message" in update["message"]:
+        elif "message" in update:
             message = update["message"]
             chat_id = message["chat"]["id"]
-            message_thread_id = message["reply_to_message"].get("message_thread_id", None)
-            message_id = message["reply_to_message"].get("message_id", None)
+            message_thread_id = message.get("message_thread_id", None)
+            message_id = message.get("message_id", None)
             text = message.get("text", "")
 
             # Respond to the /newbie command
