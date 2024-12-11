@@ -70,6 +70,15 @@ def safety():
     message = f"Did someone say Safety? 👀\n\nIf you haven't already seen this one...\n\n{np.random.choice(links)}"
     return message
 
+def banned_topic(banned_topic):
+    link=""
+    if 'DNP' in banned_topic:
+        link = "https://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
+
+    message = f"""⚠️ Safety Warning ⚠️ The following topic is not allowed for discussion for newcomer safety: \n\n{banned_topic}\n\n{link}"""
+
+    return message
+
 
 def summarize_test_results(update, BOT_TOKEN):
     message = update["message"]

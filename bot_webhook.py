@@ -67,8 +67,16 @@ def webhook():
 
             # Respond to the /newbie command
             if text.lower().startswith("/safety"):
-                summary_message = botfunc.safety()
-                send_message(chat_id, summary_message, message_thread_id)
+                safety_message = botfunc.safety()
+                send_message(chat_id, safety_message, message_thread_id)
+
+            # Check for banned topics
+            banned_topics = [('DNP','Dinitrophenol')] 
+            for tuple_topic in banned_topics:
+                if any(word.lower() in text.lower() for word in tuple_topic):
+                    # Pass the entire tuple to botfunc
+                    banned_topic_message = botfunc.banned_topic(tuple_topic)
+                    send_message(chat_id, banned_topic_message, message_thread_id)
 
             # Respond to uploaded document in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in ['4','367']:
