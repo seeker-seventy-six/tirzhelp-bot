@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
+import re
 import os
 import sys
 from dotenv import load_dotenv
@@ -73,10 +74,13 @@ def webhook():
             # Check for banned topics
             banned_topics = [('DNP','Dinitrophenol')] 
             for tuple_topic in banned_topics:
-                if any(word.lower() in text.lower() for word in tuple_topic):
-                    # Pass the entire tuple to botfunc
-                    banned_topic_message = botfunc.banned_topic(tuple_topic)
-                    send_message(chat_id, banned_topic_message, message_thread_id)
+                for word in tuple_topic:
+                    # Use a regular expression to match the word as a whole word
+                    pattern = r'\b' + re.escape(word.lower()) + r'\b'
+                    if re.search(pattern, text.lower()):
+                        # Pass the entire tuple to botfunc
+                        banned_topic_message = botfunc.banned_topic(tuple_topic)
+                        send_message(chat_id, banned_topic_message, message_thread_id)
 
             # Respond to uploaded document in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in ['4','367']:
