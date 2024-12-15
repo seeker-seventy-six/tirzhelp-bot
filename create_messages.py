@@ -30,7 +30,7 @@ def lastcall(update, BOT_TOKEN):
     chat_id = update['message']["chat"]["id"]
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMemberCount"
     response = requests.get(url, params={'chat_id':chat_id})
-    member_count = int(response.json().get("result"))
+    member_count = int(response.json().get("result")) - 1 # to account for Bot itself
 
     # Get the full command text after '/lastcall'
     command_text = update['message']['text'][len('/lastcall '):].strip()
@@ -50,7 +50,7 @@ def lastcall(update, BOT_TOKEN):
         # construct message
         vial_donors_message = f"✨ <b>NOTE:</b> The group has decided to waive the test payment for our {vial_donors} vial donors, so their shares have already been accounted for in this calculation." if vial_donors else ""
 
-        lastcall_message = f"""<b>Hello Researchers! 🧪🔬🌟</b>\n\nThis is your <b>FINAL reminder</b> and last call to decide if you'll be participating in this group test! 🚨 <b>The test will close at the end of today!</b>\n\nBy staying in this group chat after today, you’re committing to:  \n1️⃣ Paying your share of the testing costs within 24hrs of when the payment instructions are shared.  \n2️⃣ Receiving access to the test results!\n\n<b>Here’s the breakdown:</b>  \n- <b>Total testing cost:</b> ${test_cost}  \n- <b>Group size:</b> {member_count} members (including you!)  \n- <b>Estimated cost per member:</b> ${test_cost/split_members:.2f}\n\n{vial_donors_message}  \n\nIf you do not wish to participate, please select <b>"Leave Group"</b> from the group chat menu. <i>Archiving the chat won’t remove you from the group.</i>\n\nThank you for being a tester helping to make this community better for everyone! 🧪🔍"""
+        lastcall_message = f"""<b>Hello Researchers! 🧪🔬🌟</b>\n\nThis is your <b>FINAL reminder</b> and last call to decide if you'll be participating in this group test! 🚨 <b>The test will close at the end of today!</b>\n\nBy staying in this group chat after today, you’re committing to:  \n1️⃣ Paying your share of the testing costs within 24hrs of when the payment instructions are shared.  \n2️⃣ Receiving access to the test results!\n\n<b>Here’s the breakdown:</b>  \n- <b>Total testing cost:</b> ${test_cost}  \n- <b>Group size:</b> {member_count} members (not including TirzBot)  \n- <b>Estimated cost per member:</b> ${test_cost/split_members:.2f}\n\n{vial_donors_message}  \n\nIf you do not wish to participate, please select <b>"Leave Group"</b> from the group chat menu. <i>Archiving the chat won’t remove you from the group.</i>\n\nThank you for being a tester helping to make this community better for everyone! 🧪🔍"""
     except:
         lastcall_message = f"""💡<b>Use the following commands to calculate the test group split:</b>\n  •  <code>/lastcall cost=600</code>\n  •  <code>/lastcall cost=600 vialdonors=2</code> (to waive vial donors from paying test split)"""
 
