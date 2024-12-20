@@ -116,22 +116,30 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
             payload['message_thread_id'] = message_thread_id
         if reply_to_message_id:
             payload['reply_to_message_id'] = reply_to_message_id
-            
+
         response = requests.post(url, json=payload)
         if response.status_code != 200:
             logging.error(f"Telegram API returned an error: {response.text}")
-            response.raise_for_status()  # This raises an exception for non-2xx responses
+
+            # Check for specific error when `reply_to_message_id` is invalid
+            if "Bad Request: reply message not found" in response.text:
+                logging.warning("Reply message not found. Skipping sending message.")
+                return  # Exit the function without sending
+
+            response.raise_for_status()  # Raise for other non-2xx errors
+
         return response.json()
-    
+
     except requests.exceptions.RequestException as e:
         logging.error(f"send_message failed: {e}")
         raise RuntimeError(f"send_message failed: {e}")
 
-# Helper function to send a docuemnt or gif with or without a caption
+
+# Helper function to send a document or GIF with or without a caption
 def send_document(chat_id, document_url, message_thread_id=None, reply_to_message_id=None, caption=None):
     """
     Sends a document to a Telegram chat.
-    
+
     Args:
         chat_id (int or str): The chat ID or username to send the document to.
         document_url (str): The URL of the document to send.
@@ -171,16 +179,25 @@ def send_document(chat_id, document_url, message_thread_id=None, reply_to_messag
 
         if response.status_code != 200:
             logging.error(f"Telegram API returned an error: {response.text}")
-            response.raise_for_status()  # This raises an exception for non-2xx responses
+
+            # Check for specific error when `reply_to_message_id` is invalid
+            if "Bad Request: reply message not found" in response.text:
+                logging.warning("Reply message not found. Skipping sending document.")
+                return  # Exit the function without sending
+
+            response.raise_for_status()  # Raise for other non-2xx errors
+
         return response.json()
-    
+
     except requests.exceptions.RequestException as e:
         logging.error(f"send_document failed: {e}")
         raise RuntimeError(f"send_document failed: {e}")
+
     finally:
         # Ensure file is closed after sending
         if "files" in locals():
             files['document'].close()
+
 
 # Helper function to pin a message
 def pin_message(chat_id, message_id):
