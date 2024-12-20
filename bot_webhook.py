@@ -122,7 +122,7 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
             logging.error(f"Telegram API returned an error: {response.text}")
 
             # Check for specific error when `reply_to_message_id` is invalid
-            if "Bad Request: reply message not found" in response.text:
+            if "Bad Request: message to be replied not found" in response.text:
                 logging.warning("Reply message not found. Skipping sending message.")
                 return  # Exit the function without sending
 
@@ -181,7 +181,7 @@ def send_document(chat_id, document_url, message_thread_id=None, reply_to_messag
             logging.error(f"Telegram API returned an error: {response.text}")
 
             # Check for specific error when `reply_to_message_id` is invalid
-            if "Bad Request: reply message not found" in response.text:
+            if "Bad Request: message to be replied not found" in response.text:
                 logging.warning("Reply message not found. Skipping sending document.")
                 return  # Exit the function without sending
 
