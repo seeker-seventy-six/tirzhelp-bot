@@ -61,7 +61,7 @@ def webhook():
             # Respond to the /newbie command
             if text.lower().startswith("/newbie"):
                 welcome_message = botfunc.welcome_newbie('')
-                send_message(chat_id, welcome_message, message_thread_id, reply_to_message_id=message_id)
+                send_message(chat_id, welcome_message, message_thread_id)
 
             # Respond to the /lastcall command
             if text.lower().startswith("/lastcall"):
