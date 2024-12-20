@@ -57,15 +57,15 @@ def extract_data_with_openai(file_path, text):
 
     # Create the schema
     class TestResult(BaseModel):
-        vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the abbreviation key value for this field:\n{vendor_disambiguations}")
-        test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY')
-        batch: str = Field(alias="batch", description='If present, the batch identifier')
-        peptide: str = Field(alias="peptide", description='Name of the compound tested')
+        vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the abbreviation key value for this field:\n{vendor_disambiguations}. DO NOT LEAVE BLANK")
+        test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY. DO NOT LEAVE BLANK')
+        batch: str = Field(alias="batch", description='If present, the batch identifier. If no batch is called out, use the vendor name and the caption info. DO NOT LEAVE BLANK')
+        peptide: str = Field(alias="peptide", description='Name of the compound tested.  DO NOT LEAVE BLANK')
         expected_mass_mg: int = Field(alias="expected_mass_mg", description='Usually 5, 10, 15, 20, 30, 50, or 60 mg')
         mass_mg: float | None = Field(alias="mass_mg", description="The actual mass in mg found by the test; a float number between 0 and the expected_mass_mg. If not tested fill in the JSON value for null")
         purity_percent: float | None = Field(alias="purity_percent", description="The actual purity in percent found by the test; a float number between 0 and 100. If not tested fill in the JSON value for null")
         tfa_present: float | None = Field(alias='tfa_present', description="The amount of TFA or trifluoroacetic acid found by the test; a float number between 0 and 100. If 'not detected' fill in 0. If not tested fill in the JSON value for null")
-        test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name from the name in the url")
+        test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name from the name in the url or letterhead logo. DO NOT LEAVE BLANK")
 
     # if the uploaded doc is a pdf, first convert to image
     if file_path.endswith('.pdf') or file_path.endswith('.PDF'):
