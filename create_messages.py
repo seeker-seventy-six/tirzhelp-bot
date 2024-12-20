@@ -167,18 +167,6 @@ def summarize_test_results(update, BOT_TOKEN):
         return "😳🚧 This test type isn't supported yet, but we're working on adding more test types to parse as soon as possible!"
 
 
-def summarize():
-    markdown = r"""<code> 
-  _  _    ___  _  _         
- | || |  / _ \| || |        
- | || |_| | | | || |_       
- |__   _| | | |__   _|      
-    | | | |_| |  | |        
-    |_|  \___/   |_|        
- __          _______ _____  
- \ \        / |_   _|  __ \ 
-  \ \  /\  / /  | | | |__) |
-   \ \/  \/ /   | | |  ___/ 
-    \  /\  /   _| |_| |     
-     \/  \/   |_____|_|     </code>"""
+def unsupported():
+    markdown = r"""<code>stop poking me. seriously though. this command doesn't do anything. now clean up your mess.</code>"""
     return markdown
