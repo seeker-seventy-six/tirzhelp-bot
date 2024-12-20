@@ -58,9 +58,7 @@ def webhook():
             if command in command_dispatcher:
                 return command_dispatcher[command]()
             else:
-                unsupported_message = botfunc.unsupported()
-                document_path = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTB6M2xqdWhoMmxud3JoNHhlcTRhcHkxOHY4cXlpcXM0cGIxcnRmZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZSSoLmkYURcWqKFdVA/giphy.webp"
-                return send_document(chat_id, document_path, message_thread_id, caption=unsupported_message)
+                return send_message(chat_id, botfunc.unsupported(), message_thread_id, reply_to_message_id)
 
         # Check if a new member has joined
         if "message" in update and "new_chat_participant" in update["message"]:
