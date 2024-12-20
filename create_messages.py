@@ -15,10 +15,10 @@ def welcome_newbie(new_user):
     """
     Formats a welcome message for newbies.
     """
-    guides_toc = "<a href='https://t.me/c/2462675990/2/36295'>📖Guides Channel Table of Contents</a>"
+    guides_toc = "<a href='https://t.me/c/2462675990/2/36295'>📖Guides Channel</a>"
     newbie_faq = "<a href='https://docs.google.com/document/d/1LHSXeIgIJFIcE3dsKEUUVyNyH2FT0Ku3ikWfdldg3Lk/edit?usp=sharing'>❓Newbie FAQ</a>"
     mention = f"<a href='tg://user?id={new_user['id']}'>@{new_user['first_name']}</a> " if new_user!='' else new_user
-    greeting_message = f"""{mention}Welcome to the Telegram community for r/tirzepatidehelp! 🎉 You've found your way to the end of the rabbit hole where you can ask all your questions about vendor sources and more ✨🐰\n\nBefore jumping in, we’ve gathered answers to the most common newbie questions in the Guides channel linked below💡 Once you’ve checked it out, feel free to post any follow-up questions in the appropriate channel. We're here to help and excited to have you join the conversation! 😊"""
+    greeting_message = f"""{mention}Welcome to the Telegram community for r/tirzepatidehelp! 🎉 You've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more ✨🐰\n\nBefore jumping in, we've gathered answers to the most common newbie questions in the Guides channel linked below💡\n\nOnce you've checked the Guides out, feel free to post any follow-up questions in the Newbies channel. We're here to help and excited to have you join us! 😊"""
     
     welcome_message = f"""{greeting_message}\n\n{guides_toc}\n{newbie_faq}"""
 
