@@ -35,65 +35,66 @@ def webhook():
     # Log raw request data
     raw_data = request.data.decode('utf-8')
     logging.info(f"Raw request data: {raw_data}")
+    
     try:
         update = request.get_json()
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
         
-        # Check if a new member has joined as 'new_chat_participant'
+        # Helper to handle commands
+        def handle_command(command, chat_id, message_thread_id, reply_to_message_id, update):
+            command_dispatcher = {
+                "/newbie": lambda: send_message(
+                    chat_id, botfunc.welcome_newbie(''), message_thread_id, reply_to_message_id
+                ),
+                "/lastcall": lambda: send_message(
+                    chat_id, botfunc.lastcall(update, BOT_TOKEN), message_thread_id, reply_to_message_id
+                ),
+                "/safety": lambda: send_message(
+                    chat_id, botfunc.safety(), message_thread_id, reply_to_message_id
+                ),
+            }
+
+            if command in command_dispatcher:
+                return command_dispatcher[command]()
+            else:
+                unsupported_message = botfunc.unsupported()
+                document_path = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTB6M2xqdWhoMmxud3JoNHhlcTRhcHkxOHY4cXlpcXM0cGIxcnRmZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZSSoLmkYURcWqKFdVA/giphy.webp"
+                return send_document(chat_id, document_path, message_thread_id, caption=unsupported_message)
+
+        # Check if a new member has joined
         if "message" in update and "new_chat_participant" in update["message"]:
             new_member = update["message"]["new_chat_participant"]
             chat_id = update["message"]["chat"]["id"]
-            # only for the main tirzhelp supergroup chat, post automated join welcome messages
             if str(chat_id) in ['-1002462675990', '-1002334662710']:
-                # Send a welcome message when new user joins
                 welcome_message = botfunc.welcome_newbie(new_member)
                 send_message(chat_id, welcome_message)
-    
-        # otherwise, look for specific commands made 
+        
+        # Handle other messages
         elif "message" in update:
             message = update["message"]
             chat_id = message["chat"]["id"]
             message_thread_id = message.get("message_thread_id", None)
             message_id = message.get("message_id", None)
-            text = message.get("text", "")
+            text = message.get("text", "").strip()
 
-            # Respond to the /newbie command
-            if text.lower().startswith("/newbie"):
-                welcome_message = botfunc.welcome_newbie('')
-                send_message(chat_id, welcome_message, message_thread_id)
-
-            # Respond to the /lastcall command
-            if text.lower().startswith("/lastcall"):
-                lastcall_message = botfunc.lastcall(update, BOT_TOKEN)
-                send_message(chat_id, lastcall_message, message_thread_id)
-
-            # Respond to the /newbie command
-            if text.lower().startswith("/safety"):
-                safety_message = botfunc.safety()
-                send_message(chat_id, safety_message, message_thread_id)
+            if text.startswith("/"):
+                command = text.split()[0].lower()  # Extract the command
+                handle_command(command, chat_id, message_thread_id, message_id, update)
 
             # Check for banned topics
-            banned_topics = [('DNP','Dinitrophenol')] 
+            banned_topics = [('DNP', 'Dinitrophenol')] 
             for tuple_topic in banned_topics:
                 for word in tuple_topic:
-                    # Use a regular expression to match the word as a whole word
                     pattern = r'\b' + re.escape(word.lower()) + r'\b'
                     if re.search(pattern, text.lower()):
-                        # Pass the entire tuple to botfunc
                         banned_topic_message = botfunc.banned_topic(tuple_topic)
-                        send_message(chat_id, banned_topic_message, message_thread_id)
+                        send_message(chat_id, banned_topic_message, message_thread_id, message_id)
 
-            # Respond to uploaded document in Test Results channel
-            if ("document" in message or "photo" in message) and str(message_thread_id) in ['4','367']:
+            # Respond to uploaded documents in Test Results channel
+            if ("document" in message or "photo" in message) and str(message_thread_id) in ['4', '367']:
                 test_results_summary = botfunc.summarize_test_results(update, BOT_TOKEN)
                 send_message(chat_id, test_results_summary, message_thread_id)
-
-            # Respond to any other / command which at this point is un supported
-            if text.lower().startswith("/"):
-                unsupported_message = botfunc.unsupported()
-                document_path = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTB6M2xqdWhoMmxud3JoNHhlcTRhcHkxOHY4cXlpcXM0cGIxcnRmZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZSSoLmkYURcWqKFdVA/giphy.webp"
-                send_document(chat_id, document_path, message_thread_id, caption=unsupported_message)
 
         return jsonify({"ok": True}), 200
 
@@ -129,7 +130,7 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
         raise RuntimeError(f"send_message failed: {e}")
 
 # Helper function to send a docuemnt or gif with or without a caption
-def send_document(chat_id, document_url, message_thread_id=None, caption=None):
+def send_document(chat_id, document_url, message_thread_id=None, reply_to_message_id=None, caption=None):
     """
     Sends a document to a Telegram chat.
     
@@ -165,6 +166,8 @@ def send_document(chat_id, document_url, message_thread_id=None, caption=None):
             payload['caption'] = caption
         if message_thread_id:
             payload['message_thread_id'] = message_thread_id
+        if reply_to_message_id:
+            payload['reply_to_message_id'] = reply_to_message_id
 
         response = requests.post(url, data=payload, files=files)
 
