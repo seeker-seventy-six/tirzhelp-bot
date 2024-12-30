@@ -137,14 +137,14 @@ def summarize_test_results(update, BOT_TOKEN):
         # Iterate through each group and append stats to the message
         for expected_mass, stats in grouped_stats.items():
             icon_status_mass = (
-                "🟢" if stats['mass_diff_percent'] <= 5 else 
-                "🟡" if stats['mass_diff_percent'] <= 10 else 
+                "🟢" if stats['mass_diff_percent'] <= 5 else # more stringent USP standard
+                "🟡" if stats['mass_diff_percent'] <= 10 else # USP <905> & USP <797>
                 "🔴" if stats['mass_diff_percent'] > 10 else
                 "⚪"
             )
             icon_status_purity = (
-                "🟢" if stats['std_purity'] <= 2 else 
-                "🟡" if stats['std_purity'] <= 4 else 
+                "🟢" if stats['std_purity'] <= 2 else # from API tirz COA for FDA registered manufacturer 
+                "🟡" if stats['std_purity'] <= 4 else # arbitrary doubled
                 "🔴" if stats['std_purity'] > 4 else 
                 "⚪"
             )

@@ -52,6 +52,7 @@ def extract_data_with_openai(file_path, text):
         "Uther": ["Uther"],
         "YC": ["Yiwu Changtu"],
         "ZLZ": ["ZLZPeptide"],
+        "ZYH": ["Shanghai ZYH Biotech"],
         "ZZT": ["Zhejiang Zhaobo Tech", "Zhaobo Technology"]
     }
 
@@ -61,7 +62,7 @@ def extract_data_with_openai(file_path, text):
         test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY. DO NOT LEAVE BLANK')
         batch: str = Field(alias="batch", description='If present, the batch identifier. If no batch is called out, use the vendor name and the caption info. DO NOT LEAVE BLANK')
         peptide: str = Field(alias="peptide", description='Name of the compound tested.  DO NOT LEAVE BLANK')
-        expected_mass_mg: int = Field(alias="expected_mass_mg", description='Usually 5, 10, 15, 20, 30, 50, or 60 mg')
+        expected_mass_mg: float = Field(alias="expected_mass_mg", description='Usually 5, 10, 15, 20, 30, 50, or 60 mg')
         mass_mg: float | None = Field(alias="mass_mg", description="The actual mass in mg found by the test; a float number between 0 and the expected_mass_mg. If not tested fill in the JSON value for null")
         purity_percent: float | None = Field(alias="purity_percent", description="The actual purity in percent found by the test; a float number between 0 and 100. If not tested fill in the JSON value for null")
         tfa_present: float | None = Field(alias='tfa_present', description="The amount of TFA or trifluoroacetic acid found by the test; a float number between 0 and 100. If 'not detected' fill in 0. If not tested fill in the JSON value for null")
