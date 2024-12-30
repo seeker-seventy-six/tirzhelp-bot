@@ -1,7 +1,3 @@
-Here's a comprehensive `README.md` for your Heroku app using the Telegram Bot API. This README covers deployment, environment setup, webhook configuration, and debugging using Heroku tools.
-
----
-
 # 🤖 TirzHelpBot
 *A Telegram Bot API Heroku App for r/TirzepatideHelp*
 
@@ -28,7 +24,7 @@ The app is deployed on Heroku and uses the `deploy_bot.sh` script to deploy the 
 
 ### Environment Setup
 
-Before deploying, create a `.env` file with the following environment variables:
+Before deploying, create a `.env-dev` and `.env-prod` file with the following environment variables for each bot environment:
 
 ```
 BOT_TOKEN=your-telegram-bot-token
