@@ -32,6 +32,25 @@ TEST_NEWBIE_CHANNEL = '681'
 app = Flask(__name__)
 
 
+### NON WEBHOOK ###
+def send_hourly_announcement():
+    while True:
+        # Send the message every hour
+        message = msgs.newbie_announcement()
+        helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, message_thread_id=TEST_NEWBIE_CHANNEL)
+        time.sleep(60)  # Sleep for 1 hour (3600 seconds)
+
+def start_periodic_announcement():
+    logging.info("Starting periodic announcement thread...")
+    announcement_thread = threading.Thread(target=send_hourly_announcement)
+    announcement_thread.daemon = True  # Allow the thread to exit when the main program exits
+    announcement_thread.start()
+    logging.info("Started periodic announcement thread.")
+
+start_periodic_announcement()  # Start sending hourly announcements
+### NON WEBHOOK ###
+
+
 @app.route('/login', methods=['GET'])
 def login():
     # The login URL will send the `user_id` parameter (example: ?user_id=123456)
@@ -129,23 +148,6 @@ def webhook():
         return jsonify({"error": f"Internal server error: {e}"}), 500
 
 
-### NON WEBHOOK ###
-
-def send_hourly_announcement():
-    while True:
-        # Send the message every hour
-        message = msgs.newbie_announcement()
-        helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, message_thread_id=TEST_NEWBIE_CHANNEL)
-        time.sleep(60)  # Sleep for 1 hour (3600 seconds)
-
-def start_periodic_announcement():
-    logging.info("Starting periodic announcement thread...")
-    announcement_thread = threading.Thread(target=send_hourly_announcement)
-    announcement_thread.daemon = True  # Allow the thread to exit when the main program exits
-    announcement_thread.start()
-    logging.info("Started periodic announcement thread.")
-
-
 if __name__ == "__main__":
-    start_periodic_announcement()  # Start sending hourly announcements
     app.run(host="0.0.0.0", port=8443)
+    
