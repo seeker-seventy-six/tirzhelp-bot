@@ -139,9 +139,11 @@ def send_hourly_announcement():
         time.sleep(60)  # Sleep for 1 hour (3600 seconds)
 
 def start_periodic_announcement():
+    logging.info("Starting periodic announcement thread...")
     announcement_thread = threading.Thread(target=send_hourly_announcement)
     announcement_thread.daemon = True  # Allow the thread to exit when the main program exits
     announcement_thread.start()
+    logging.info("Started periodic announcement thread.")
 
 
 if __name__ == "__main__":
