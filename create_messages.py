@@ -28,11 +28,10 @@ def welcome_newbie(new_user):
 def newbie_announcement():
     message = (
         "🚨 Here's your hourly Newbie Announcement 🚨\n\n"
-        "Looking to learn about gray tirzepatide? 🙋‍♂️🙋‍♀️\n"
-        "👉 <a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101</a> 📚\n\n"
+        "Looking to learn about gray tirzepatide and don't know where to start? 🙋‍♂️🙋‍♀️\n"
+        "Read the wiki: 🌐 <a href='https://www.stairwaytogray.com/'>r/TirzepatideHelp</a> \n\n"
         "**Who are we?** We're a community of folks trying to get healthy by making the gray market safer and more accessible. 🫶💪\n\n"
-        "Find out more in the wiki: 🌐 <a href='https://www.stairwaytogray.com/'>r/TirzepatideHelp</a> \n\n"
-        "Welcome to the gray space! 🤍 Let's get started..."
+        "Welcome to the gray space! 🤍 Let's get this research started..."
     )
     return message
 
