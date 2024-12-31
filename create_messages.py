@@ -25,6 +25,18 @@ def welcome_newbie(new_user):
     return welcome_message
 
 
+def newbie_announcement():
+    message = (
+        "🚨 Here's your hourly Newbie Announcement 🚨\n\n"
+        "Looking to learn about gray tirzepatide? 🙋‍♂️🙋‍♀️\n"
+        "Check out the wiki right here: 👉 <a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101</a> 📚💡\n\n"
+        "Who are we? We're a *community* of folks trying to get and stay healthy by making the gray market safer and more accessible, one step at a time. 🫶💪\n"
+        "Find out more about us here: 👉 <a href='https://www.stairwaytogray.com/'>r/TirzepatideHelp</a> 🤝🌐\n\n"
+        "Welcome to the gray space! 💥🔥 Let's get started..."
+    )
+    return message
+
+
 def lastcall(update, BOT_TOKEN):
     # get chat member count
     chat_id = update['message']["chat"]["id"]

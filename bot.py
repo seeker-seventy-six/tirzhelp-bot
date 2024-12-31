@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
+import threading
+import time
 import re
 import os
 import sys
@@ -21,9 +23,11 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 # TELEGRAM IDS
 TIRZHELP_SUPERGROUP_ID = '-1002462675990'
 TIRZHELP_TEST_RESULTS_CHANNEL = '4'
+TIRZHELP_NEWBIE_CHANNEL = '23529'
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
+TEST_NEWBIE_CHANNEL = '681'
 
 app = Flask(__name__)
 
@@ -123,7 +127,23 @@ def webhook():
         # Log the error to check what went wrong
         logging.error(f"Error processing webhook: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
-    
+
+
+### NON WEBHOOK ###
+
+def send_hourly_announcement():
+    while True:
+        # Send the message every hour
+        message = msgs.newbie_announcement()
+        helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, message_thread_id=TEST_NEWBIE_CHANNEL)
+        time.sleep(60)  # Sleep for 1 hour (3600 seconds)
+
+def start_periodic_announcement():
+    announcement_thread = threading.Thread(target=send_hourly_announcement)
+    announcement_thread.daemon = True  # Allow the thread to exit when the main program exits
+    announcement_thread.start()
+
 
 if __name__ == "__main__":
+    start_periodic_announcement()  # Start sending hourly announcements
     app.run(host="0.0.0.0", port=8443)
