@@ -39,15 +39,18 @@ def start_periodic_announcement():
             # Replace with your message sending logic
             message = msgs.newbie_announcement()
             helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
-            time.sleep(3600)  # Wait for 1 hour (3600 seconds)
+            time.sleep(60)  # Wait for 1 hour (3600 seconds)
         except Exception as e:
             print(f"Error in announcement thread: {e}")
 
 # Initialize the periodic announcement thread
 def initialize_announcement_thread():
-    print("Starting periodic announcement thread...")
+    logging.info("Starting periodic announcement thread...")
     thread = threading.Thread(target=start_periodic_announcement, daemon=True)
     thread.start()
+
+# Ensure thread is started on app import
+initialize_announcement_thread()
 ### NON WEBHOOK END ###
 
 
@@ -149,7 +152,6 @@ def webhook():
 
 
 if __name__ == "__main__":
-    initialize_announcement_thread()
     # Start the Flask app for web workers
     app.run(host="0.0.0.0", port=8443)
     
