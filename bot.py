@@ -32,31 +32,22 @@ TEST_NEWBIE_CHANNEL = '681'
 app = Flask(__name__)
 
 ### NON WEBHOOK ###
-# Global variable to track thread initialization
-announcement_thread_started = False
-announcement_lock = threading.Lock()
-
+# Function to send periodic announcements
 def start_periodic_announcement():
     while True:
         try:
             # Replace with your message sending logic
-            message = helpers_telegram.newbie_announcement()
-            msgs.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
-            time.sleep(3600)  # Wait for 1 hour
+            message = msgs.newbie_announcement()
+            helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
+            time.sleep(3600)  # Wait for 1 hour (3600 seconds)
         except Exception as e:
             print(f"Error in announcement thread: {e}")
 
-# Function to initialize the thread safely
+# Initialize the periodic announcement thread
 def initialize_announcement_thread():
-    global announcement_thread_started
-    with announcement_lock:
-        if not announcement_thread_started:
-            print("Starting periodic announcement thread...")
-            announcement_thread_started = True
-            thread = threading.Thread(target=start_periodic_announcement, daemon=True)
-            thread.start()
-        else:
-            print("Periodic announcement thread is already running.")
+    print("Starting periodic announcement thread...")
+    thread = threading.Thread(target=start_periodic_announcement, daemon=True)
+    thread.start()
 ### NON WEBHOOK END ###
 
 
@@ -159,5 +150,6 @@ def webhook():
 
 if __name__ == "__main__":
     initialize_announcement_thread()
+    # Start the Flask app for web workers
     app.run(host="0.0.0.0", port=8443)
     

@@ -1,1 +1,1 @@
-web: gunicorn --worker-class gevent bot:app
+web: gunicorn --worker-class gevent --workers=1 bot:app
