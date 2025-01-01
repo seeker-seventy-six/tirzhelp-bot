@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import requests
 import threading
 import time
+import datetime
 import re
 import os
 import sys
@@ -36,10 +37,15 @@ app = Flask(__name__)
 def start_periodic_announcement():
     while True:
         try:
+            now = datetime.datetime.now()
+            # Calculate how much time is left until the next hour
+            seconds_until_next_hour = 3600 - (now.minute * 60 + now.second)
+            # Wait until the next full hour
+            time.sleep(seconds_until_next_hour)
             # Replace with your message sending logic
             message = msgs.newbie_announcement()
             helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
-            time.sleep(60)  # Wait for 1 hour (3600 seconds)
+            logging.info("Made newbie announcement")
         except Exception as e:
             print(f"Error in announcement thread: {e}")
 

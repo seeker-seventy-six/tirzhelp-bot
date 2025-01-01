@@ -28,7 +28,7 @@ def welcome_newbie(new_user):
 def newbie_announcement():
     message = (
         "🚨 Here's your hourly Newbie Announcement 🚨\n\n"
-        "Looking to learn about gray tirzepatide and don't know where to start? 🙋‍♂️🙋‍♀️\n"
+        "Looking to learn about gray tirzepatide and don't know where to start? 🙋‍♂️🙋‍♀️\n\n"
         "<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Start with the wiki here 🌐</a> \n\n"
         "**Who are we?** We're a community of folks trying to get healthy by making the gray market safer and more accessible. 🫶💪\n\n"
         "Welcome to the gray space! 🤍 Let's get this research started..."
