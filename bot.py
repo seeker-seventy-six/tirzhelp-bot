@@ -19,6 +19,7 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 # TELEGRAM IDS
@@ -44,7 +45,10 @@ def start_periodic_announcement():
             time.sleep(seconds_until_next_hour)
             # Replace with your message sending logic
             message = msgs.newbie_announcement()
-            helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
+            if ENVIRONMENT=='PROD':
+                helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, message, TIRZHELP_NEWBIE_CHANNEL)
+            else:
+                helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
             logging.info("Made newbie announcement")
         except Exception as e:
             print(f"Error in announcement thread: {e}")
