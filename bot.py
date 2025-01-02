@@ -60,7 +60,7 @@ def initialize_announcement_thread():
     thread.start()
 
 # Ensure thread is started on app import
-# initialize_announcement_thread()
+initialize_announcement_thread()
 ### NON WEBHOOK END ###
 
 
