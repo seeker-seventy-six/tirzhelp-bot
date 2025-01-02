@@ -17,7 +17,7 @@ def welcome_newbie(new_user):
     """
     wiki = "<a href='https://www.stairwaytogray.com/'>📖 Community Wiki</a>"
     mention = f"<a href='tg://user?id={new_user['id']}'>@{new_user['first_name']}</a> " if new_user!='' else new_user
-    welcome_message = f"""{mention}Welcome to the Telegram community for r/tirzepatidehelp! 🎉 You've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more ✨🐰\n\nBefore jumping in, we've gathered answers to the most common newbie questions in our Wiki linked below💡\n\n{wiki}\n\nOnce you've read thru the <b>Who Are We?</b> and <b>Gray 101</b> guide, feel free to post any follow-up questions in the <i>Newbies</i> channel and further explore the *Guides* channel. We're here to help and happy to have you join us! 😊"""
+    welcome_message = f"""{mention}Welcome to the Telegram community for r/tirzepatidehelp! 🎉 You've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more ✨🐰\n\nBefore jumping in, we've gathered answers to the most common newbie questions in our Wiki linked below💡\n\n{wiki}\n\nOnce you've read thru the <b>Who Are We?</b> and <b>Gray 101</b> guide, feel free to post any follow-up questions in the <i>Newbies</i> channel and further explore the <i>Guides</i> channel. We're here to help and happy to have you join us! 😊"""
     return welcome_message
 
 
