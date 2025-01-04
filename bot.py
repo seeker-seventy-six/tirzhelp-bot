@@ -149,8 +149,8 @@ def webhook():
                         helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
 
             # Check for specific L## Amo question (pattern "L##" and "?" in the text)
-            pattern1, pattern2 = r"\sL\d{2}.*\?", r'Amo.*L.*\?'
-            if re.search(pattern1, text) or re.search(pattern2, text):
+            pattern1, pattern2, pattern3 = r"\sL\d{2}.*\?", r'L\s\d{2}.*\?', r'Amo.*L.*\?', 
+            if re.search(pattern1, text) or re.search(pattern2, text) or re.search(pattern3, text):
                 message = msgs.amo_L_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
 
