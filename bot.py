@@ -146,7 +146,13 @@ def webhook():
                     pattern = r'\b' + re.escape(word.lower()) + r'\b'
                     if re.search(pattern, text.lower()):
                         banned_topic_message = msgs.banned_topic(tuple_topic)
-                        helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, message_id)
+                        helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
+
+            # Check for specific L## Amo question (pattern "L##" and "?" in the text)
+            pattern1, pattern2 = r"\sL\d{2}.*\?", r'Amo.*L.*\?'
+            if re.search(pattern1, text) or re.search(pattern2, text):
+                message = msgs.amo_L_question()
+                helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
 
             # Respond to uploaded documents in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
