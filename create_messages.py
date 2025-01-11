@@ -49,16 +49,16 @@ def amo_L_question():
     return message
 
 def qsc_question():
-    message = """🚨 <b>QSC 101</b> 🚨
+    message = """<b>QSC + Newbies = 😵‍💫💔🤦‍♀️</b>
 
 Thinking about ordering from QSC as a newbie? TLDR: Please Don't.
 
 Here's what you need to know:
 
-- <b>Payment:</b> Only accepts crypto or bank transfers. Bank transfers might not always work, so be aware. If you're not already familiar with crypto, we advise not complicating your first purchase with this additional step.
-- <b>Customer Service:</b> Expect minimal communication. Don't expect them to confirm payment, provide tracking, or answer your questions promptly or at all. They will not provide hand holding through the purchase process.
-- <b>Packaging:</b> Items come unlabeled, and you'll need a decoder to understand the packing list.
-- <b>Delays:</b> Shipments can take more than a month to arrive, and support is slow to respond.
+• <b>Payment:</b> Only accepts crypto or bank transfers. Bank transfers might not always work, so be aware. If you're not already familiar with crypto, we advise not complicating your first purchase with this additional step.
+• <b>Customer Service:</b> Expect minimal communication. Don't expect them to confirm payment, provide tracking, or answer your questions promptly or at all. They will not provide hand holding through the purchase process.
+• <b>Packaging:</b> Items come unlabeled, and you'll need a decoder to understand the packing list.
+• <b>Delays:</b> Shipments can take more than a month to arrive, and support is slow to respond.
 
 QSC offers great prices, but their customer service is objectively the worst of the bunch and requires trust in the system. If you're new to the gray market, it's better to try a simpler, more reliable vendor first. Even seasoned buyers sometimes avoid QSC due to the hassle.
 
