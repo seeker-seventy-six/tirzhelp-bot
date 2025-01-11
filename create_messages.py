@@ -49,18 +49,18 @@ def amo_L_question():
     return message
 
 def qsc_question():
-    message = """🚨 **QSC 101** 🚨
+    message = """🚨 <b>QSC 101</b> 🚨
 
 Thinking about ordering from QSC as a newbie? TLDR: Please Don't.
 
 Here's what you need to know:
 
-- **Payment:** Only accepts crypto or bank transfers. Bank transfers might not always work, so be aware.
-- **Customer Service:** Expect minimal communication. Don't count on them confirming payments, providing tracking, or answering your questions promptly.
-- **Packaging:** Items come unlabeled, and you'll need a decoder to understand the packing list.
-- **Delays:** Shipments can take a month, and support is slow to respond.
+- <b>Payment:</b> Only accepts crypto or bank transfers. Bank transfers might not always work, so be aware. If you're not already familiar with crypto, we advise not complicating your first purchase with this additional step.
+- <b>Customer Service:</b> Expect minimal communication. Don't expect them to confirm payment, provide tracking, or answer your questions promptly or at all. They will not provide hand holding through the purchase process.
+- <b>Packaging:</b> Items come unlabeled, and you'll need a decoder to understand the packing list.
+- <b>Delays:</b> Shipments can take more than a month to arrive, and support is slow to respond.
 
-QSC offers great prices, but their customer service is objectively the worst of the bunch and requires trust in the system. If you're new to gray market vendors, it's better to try a simpler, more reliable vendor first. Even seasoned buyers sometimes avoid QSC due to the hassle.
+QSC offers great prices, but their customer service is objectively the worst of the bunch and requires trust in the system. If you're new to the gray market, it's better to try a simpler, more reliable vendor first. Even seasoned buyers sometimes avoid QSC due to the hassle.
 
 Check out any of the other vendors for your first purchase in order to get familiar with the nuances and differences of ordering peptides from the gray market. Especially look for vendors who offer credit card options such as Alibaba or PayPal.
 """
