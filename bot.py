@@ -151,15 +151,13 @@ def webhook():
             # Define patterns for L## Amo and QSC questions
             amo_patterns = [r"\sL\d{2}.*\?", r"L\s\d{2}.*\?", r"Amo.*L.*\?"]
             qsc_patterns = [r"QSC", r"qsc"]
-            logging.info(f"message_thread_id: {message_thread_id} NEWBIE CHANNEL: {TEST_NEWBIE_CHANNEL}")
             # Check if the message contains any Amo-related pattern
-            if any(re.search(pattern, text) for pattern in amo_patterns) and message_thread_id in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
+            if any(re.search(pattern, text) for pattern in amo_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.amo_L_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
 
             # Autoreply for QSC mentions in Newbies
-            if any(re.search(pattern, text) for pattern in qsc_patterns) and message_thread_id in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
-                logging.info(f"found pattern in newbie channel")
+            if any(re.search(pattern, text) for pattern in qsc_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.qsc_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
  
