@@ -148,12 +148,20 @@ def webhook():
                         banned_topic_message = msgs.banned_topic(tuple_topic)
                         helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
 
-            # Check for specific L## Amo question (pattern "L##" and "?" in the text)
-            pattern1, pattern2, pattern3 = r"\sL\d{2}.*\?", r'L\s\d{2}.*\?', r'Amo.*L.*\?', 
-            if re.search(pattern1, text) or re.search(pattern2, text) or re.search(pattern3, text):
+            # Define patterns for L## Amo and QSC questions
+            amo_patterns = [r"\sL\d{2}.*\?", r"L\s\d{2}.*\?", r"Amo.*L.*\?"]
+            qsc_patterns = [r"QSC", r"qsc"]
+
+            # Check if the message contains any Amo-related pattern
+            if any(re.search(pattern, text) for pattern in amo_patterns) and message_thread_id in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.amo_L_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
 
+            # Autoreply for QSC mentions in Newbies
+            if any(re.search(pattern, text) for pattern in qsc_patterns) and message_thread_id in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
+                message = msgs.qsc_question()
+                helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
+ 
             # Respond to uploaded documents in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
                 test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
