@@ -88,7 +88,7 @@ def lastcall(update, BOT_TOKEN):
     try:
         test_cost = float(arguments['cost'])
         vial_donors = int(arguments['vialdonors'])
-        vdvalue = float(arguments['vdvalue'])
+        vdvalue = float(arguments.get('vdvalue', 0))
         split_members = member_count - vial_donors
 
         if split_members <= 0:
