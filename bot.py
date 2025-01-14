@@ -47,9 +47,9 @@ def start_periodic_announcement():
             message = msgs.newbie_announcement()
             if ENVIRONMENT=='PROD':
                 helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, message, TIRZHELP_NEWBIE_CHANNEL)
-            else:
-                helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
-            logging.info("Made newbie announcement")
+                logging.info("Made newbie announcement")
+            # else:
+            #     helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
         except Exception as e:
             print(f"Error in announcement thread: {e}")
 
@@ -60,7 +60,7 @@ def initialize_announcement_thread():
     thread.start()
 
 # Ensure thread is started on app import
-initialize_announcement_thread()
+# initialize_announcement_thread()
 ### NON WEBHOOK END ###
 
 
