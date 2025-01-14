@@ -23,9 +23,9 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 # TELEGRAM IDS
-TIRZHELP_SUPERGROUP_ID = '-1002462675990'
-TIRZHELP_TEST_RESULTS_CHANNEL = '4'
-TIRZHELP_NEWBIE_CHANNEL = '23529'
+TIRZHELP_SUPERGROUP_ID = '-1002410577414'
+TIRZHELP_TEST_RESULTS_CHANNEL = '48'
+TIRZHELP_NEWBIE_CHANNEL = '1408'
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
@@ -60,7 +60,7 @@ def initialize_announcement_thread():
     thread.start()
 
 # Ensure thread is started on app import
-# initialize_announcement_thread()
+initialize_announcement_thread()
 ### NON WEBHOOK END ###
 
 
