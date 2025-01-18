@@ -24,8 +24,8 @@ service = build('sheets', 'v4', credentials=credentials)
 
 # Define your spreadsheet ID
 SPREADSHEET_ID = '1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y'  # Found in the URL of your spreadsheet
-RANGE_NAME = "raw_data!A:J"  # Adjust as per your sheet structure
-SPREADSHEET_COLS = ["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "TFA", "Test Lab", "File Name"]
+RANGE_NAME = "raw_data!A:M"  # Adjust as per your sheet structure
+SPREADSHEET_COLS = ["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "TFA", "Test Lab", "File Name", "Lab URL", "Test Key", "Test Task"]
 
 
 # Function to append data to Google Sheets

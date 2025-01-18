@@ -182,6 +182,9 @@ def summarize_test_results(update, BOT_TOKEN):
                 + [sample.tfa_present]
                 + [sample.test_lab]
                 + [local_path.split('/')[-1]]
+                + [sample.test_link]
+                + [sample.test_key]
+                + [sample.test_task]
             )
             helpers_google.append_to_sheet(data_row)
 
@@ -223,7 +226,7 @@ def summarize_test_results(update, BOT_TOKEN):
         return message_text + raw_data_url
     
     else:
-        return "😳🚧 This test type isn't supported yet, but we're working on adding more test types to parse as soon as possible!"
+        return "😳🚧 Oops! We cannot parse this test result. This test type may not be supported yet, but we're working on supporting more test types soon!"
 
 
 def unsupported():

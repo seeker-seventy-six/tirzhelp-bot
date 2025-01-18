@@ -10,3 +10,4 @@ google-auth-httplib2
 google-auth-oauthlib
 pandas
 pdf2image
+telethon
