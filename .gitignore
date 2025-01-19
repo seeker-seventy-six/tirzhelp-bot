@@ -4,4 +4,5 @@ tirzhelpbot-56fa11612518.json
 test-image*.jpg
 __pycache__/
 *.pyc
-./historic_test_results/*
+historic_test_results/*
+my_session*

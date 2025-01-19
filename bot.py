@@ -8,8 +8,8 @@ import os
 import sys
 from dotenv import load_dotenv
 import logging
-import create_messages as msgs
-import helpers_telegram 
+from src import create_messages as msgs
+from src import helpers_telegram 
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
