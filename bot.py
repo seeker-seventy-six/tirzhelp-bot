@@ -64,19 +64,11 @@ def initialize_announcement_thread():
 
 # Initialize Global variables
 def create_globals():
-    global banned_words, pattern, banned_data, dont_link_domains
+    global banned_data, dont_link_domains
 
     # Get banned topics
     with open('./mod_topics/banned_topics.yml', 'r') as file:
         banned_data = yaml.safe_load(file)
-    # Flatten all banned topics into a set for O(1) lookups
-    banned_words = set()
-    for _, data in banned_data.items():
-        banned_topics = data.get('substances')
-        for topic_list in banned_topics:
-            banned_words.update(word.lower() for word in topic_list)
-    # Create a single regex pattern for all banned words
-    pattern = r'\b(?:' + '|'.join(re.escape(word) for word in banned_words) + r')\b'
 
     # Get dont link communities
     with open('./mod_topics/dont_link.yml', 'r') as file:
@@ -84,7 +76,7 @@ def create_globals():
     dont_link_domains = domains.get('domain_urls', [])
     
     logging.info("Setting global variables...")
-    return banned_words, pattern, banned_data, dont_link_domains
+    return banned_data, dont_link_domains
 
 # Ensure thread is started and globals created on app import
 initialize_announcement_thread()
@@ -159,15 +151,17 @@ def webhook():
         
         elif "message" in update:
             ### CHECK FOR BANNED TOPICS ###
-            # Check if any banned word exists in the text
-            if re.search(pattern, text.lower()):
-                # Find which banned topic triggered the message (optional)
-                for _, data in banned_data.items():
-                    banned_message = data.get('message')
-                    banned_topics = data.get('substances')
-                    for topic_list in banned_topics:
-                        if any(word.lower() in banned_words for word in topic_list):
-                            banned_topic_message = msgs.banned_topic(topic_list, banned_message)
+            # Iterate through each banned category and their corresponding substances and messages
+            for _, data in banned_data.items():
+                banned_message = data.get('message')
+                banned_topics = data.get('substances')
+                # Check for banned topics
+                for tuple_topic in banned_topics:
+                    for word in tuple_topic:
+                        pattern = r'\b' + re.escape(word.lower()) + r'\b'
+                        if re.search(pattern, text.lower()):
+                            # Pass the tuple_topic and header message to the banned_topic function
+                            banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
                             return jsonify({"ok": True}), 200
 
@@ -204,6 +198,9 @@ def webhook():
                 test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
                 helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
                 return jsonify({"ok": True}), 200
+        
+        # if none of the bot functions need to run, also return success so update is accounted for
+        return jsonify({"ok": True}), 200
 
     except Exception as e:
         # Log the error to check what went wrong
