@@ -62,8 +62,32 @@ def initialize_announcement_thread():
     thread = threading.Thread(target=start_periodic_announcement, daemon=True)
     thread.start()
 
-# Ensure thread is started on app import
+# Initialize Global variables
+def create_globals():
+    global banned_words, pattern, banned_data, dont_link_domains
+
+    # Get banned topics
+    with open('./mod_topics/banned_topics.yml', 'r') as file:
+        banned_data = yaml.safe_load(file)
+    # Flatten all banned topics into a set for O(1) lookups
+    banned_words = set()
+    for _, data in banned_data.items():
+        banned_topics = data.get('substances')
+        for topic_list in banned_topics:
+            banned_words.update(word.lower() for word in topic_list)
+    # Create a single regex pattern for all banned words
+    pattern = r'\b(?:' + '|'.join(re.escape(word) for word in banned_words) + r')\b'
+
+    # Get dont link communities
+    with open('./mod_topics/dont_link.yml', 'r') as file:
+        domains = yaml.safe_load(file)
+    dont_link_domains = domains.get('domain_urls', [])
+
+    return banned_words, pattern, banned_data, dont_link_domains
+
+# Ensure thread is started and globals created on app import
 initialize_announcement_thread()
+create_globals()
 ### NON WEBHOOK END ###
 
 
@@ -94,6 +118,8 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
+    global banned_words, pattern, banned_data, dont_link_domains
+    
     # Log raw request data
     raw_data = request.data.decode('utf-8')
     logging.info(f"Raw request data: {raw_data}")
@@ -102,75 +128,70 @@ def webhook():
         update = request.get_json()
         if update is None:
             return jsonify({"error": "Invalid JSON format"}), 400
+            
+        ### EXTRACT TG UPDATE IDs ###
+        message = update.get('message', {})
+        chat_id = message.get('chat', {}).get('id', None)
+        message_thread_id = message.get("message_thread_id", None)
+        message_id = message.get("message_id", None)
+        user_id = message.get('from', {}).get('id', None)
+        text = message.get("text", "").strip()
+
+        ### HANDLE COMMANDS ###
+        if text.startswith("/"):
+            command = text.split()[0].lower()  # Extract the command
+            handle_command(command, chat_id, message_thread_id, message_id, update)
         
-        # Helper to handle commands
-        def handle_command(command, chat_id, message_thread_id, reply_to_message_id, update):
-            command_dispatcher = {
-                "/newbie": lambda: helpers_telegram.send_message(
-                    chat_id, msgs.welcome_newbie(''), message_thread_id, reply_to_message_id
-                ),
-                "/lastcall": lambda: helpers_telegram.send_message(
-                    chat_id, msgs.lastcall(update, BOT_TOKEN), message_thread_id, reply_to_message_id
-                ),
-                "/safety": lambda: helpers_telegram.send_message(
-                    chat_id, msgs.safety(), message_thread_id, reply_to_message_id
-                ),
-            }
+        ### Skip the rest of the Bot functions if update is not from the main moderation TG groups
+        if str(chat_id) not in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
+            return jsonify({"ok": True}), 200  # Exit after handling the command for non-target groups
 
-            if command in command_dispatcher:
-                return command_dispatcher[command]()
-            else:
-                return helpers_telegram.send_message(chat_id, msgs.unsupported(), message_thread_id, reply_to_message_id)
-
-        # Check if a new member has joined
-        if "message" in update and "new_chat_participant" in update["message"]:
-            new_member = update["message"]["new_chat_participant"]
-            chat_id = update["message"]["chat"]["id"]
+        ### AUTOMATED WELCOME MESSAGE FOR NEW MEMBER ###
+        if "message" in update and "new_chat_participant" in message:
+            new_member = message["new_chat_participant"]
             if str(chat_id) in [TIRZHELP_SUPERGROUP_ID,TEST_SUPERGROUP_ID]:
                 welcome_message = msgs.welcome_newbie(new_member)
                 helpers_telegram.send_message(chat_id, welcome_message)
         
-        # Handle other messages
         elif "message" in update:
-            message = update["message"]
-            chat_id = message["chat"]["id"]
-            message_thread_id = message.get("message_thread_id", None)
-            message_id = message.get("message_id", None)
-            text = message.get("text", "").strip()
-
-            if text.startswith("/"):
-                command = text.split()[0].lower()  # Extract the command
-                handle_command(command, chat_id, message_thread_id, message_id, update)
-
-            # Check for banned topics
-            with open('./mod_topics/banned_topics.yml', 'r') as file:
-                banned_data = yaml.safe_load(file)
-            # Iterate through each banned category and their corresponding substances and messages
-            for _, data in banned_data.items():
-                banned_message = data.get('message')
-                banned_topics = data.get('substances')
-                # Check for banned topics
-                for topic_list in banned_topics:
-                    for word in topic_list:
-                        pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()):
-                            # Pass the topic_list and header message to the banned_topic function
+            ### CHECK FOR BANNED TOPICS ###
+            # Check if any banned word exists in the text
+            if re.search(pattern, text.lower()):
+                # Find which banned topic triggered the message (optional)
+                for _, data in banned_data.items():
+                    banned_message = data.get('message')
+                    banned_topics = data.get('substances')
+                    for topic_list in banned_topics:
+                        if any(word.lower() in banned_words for word in topic_list):
                             banned_topic_message = msgs.banned_topic(topic_list, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
+                            break  # Stop after sending one message
 
-            # Define patterns for L## Amo and QSC questions
+            ### AUTO REMOVE LINKED COMMUNITIES TWMNBN ###
+            for domain in dont_link_domains:
+                # Create the domain regex pattern to detect the domain in the text
+                pattern = r'\b(?:' + re.escape(domain) + r')\b'
+                if re.search(pattern, text.lower()):
+                    # Tag the user and reply
+                    reply_message = msgs.dont_link(user_id)
+                    helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
+                    # Delete the posted message
+                    helpers_telegram.delete_message(chat_id, message_id)
+                    break  # Stop checking once a match is found            
+
+            ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
             amo_patterns = [r"\sL\d{2}.*\?", r"L\s\d{2}.*\?", r"Amo.*L.*\?"]
             qsc_patterns = [r"QSC", r"qsc"]
             # Check if the message contains any Amo-related pattern
             if any(re.search(pattern, text) for pattern in amo_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.amo_L_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
-
             # Autoreply for QSC mentions in Newbies
             if any(re.search(pattern, text) for pattern in qsc_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.qsc_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
- 
+    
+            ### AUTO EXTRACT TEST RESULTS ###
             # Respond to uploaded documents in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
                 test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
@@ -182,6 +203,25 @@ def webhook():
         # Log the error to check what went wrong
         logging.error(f"Error processing webhook: {e}")
         return jsonify({"error": f"Internal server error: {e}"}), 500
+
+
+# Helper to handle commands
+def handle_command(command, chat_id, message_thread_id, reply_to_message_id, update):
+    command_dispatcher = {
+        "/newbie": lambda: helpers_telegram.send_message(
+            chat_id, msgs.welcome_newbie(''), message_thread_id, reply_to_message_id
+        ),
+        "/lastcall": lambda: helpers_telegram.send_message(
+            chat_id, msgs.lastcall(update, BOT_TOKEN), message_thread_id, reply_to_message_id
+        ),
+        "/safety": lambda: helpers_telegram.send_message(
+            chat_id, msgs.safety(), message_thread_id, reply_to_message_id
+        ),
+    }
+    if command in command_dispatcher:
+        return command_dispatcher[command]()
+    else:
+        return helpers_telegram.send_message(chat_id, msgs.unsupported(), message_thread_id, reply_to_message_id)
 
 
 if __name__ == "__main__":

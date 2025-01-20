@@ -138,6 +138,13 @@ def banned_topic(banned_topic, header_msg, topic_msg=""):
     return message
 
 
+def dont_link(user_id):
+    message = (
+        f"<a href='tg://user?id={user_id}'>@{user_id}</a> 💨 We're auto-poofing this direct link to a community who has requested they not be linked to directly. We don't like gatekeeping info either, but also want to be good neighbors and respect their moderation wishes. Please DM any invite links in the future. Thank you!"
+    )
+    return message
+
+
 def summarize_test_results(update, BOT_TOKEN):
     message = update["message"]
     text = message.get("text", "")
