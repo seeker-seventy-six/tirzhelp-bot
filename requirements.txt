@@ -3,11 +3,12 @@ gevent
 requests
 python-dotenv
 gunicorn
-telebot
 openai
 google-api-python-client 
 google-auth-httplib2 
 google-auth-oauthlib
 pandas
+PyYAML
 pdf2image
+telebot
 telethon
