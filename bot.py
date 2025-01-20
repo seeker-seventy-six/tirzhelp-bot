@@ -9,6 +9,8 @@ import sys
 import yaml
 from dotenv import load_dotenv
 import logging
+
+sys.path.append('./src')
 from src import create_messages as msgs
 from src import helpers_telegram 
 
