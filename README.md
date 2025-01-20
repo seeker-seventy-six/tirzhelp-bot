@@ -116,6 +116,7 @@ Handles incoming messages and updates sent to the bot. This is the main endpoint
   - It processes commands such as `/newbie`, `/lastcall`, and `/safety`.
   - Automatically responds to banned topics (e.g., "DNP" for Dinitrophenol) in all channels.
   - Summarizes test results if documents or photos are uploaded in the specified #Test Results channel.
+  - Automatically posts an hourly Newbie Announcement in Newbies channel.
 
 ### **Commands**
 

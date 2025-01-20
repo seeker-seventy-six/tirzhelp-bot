@@ -4,8 +4,10 @@ from uuid import uuid4
 import numpy as np
 import requests
 import logging
-import helpers_openai
-import helpers_google
+
+sys.path.append('./src')
+from src import helpers_openai
+from src import helpers_google
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -66,7 +68,6 @@ Check out any of the other vendors for your first purchase in order to get famil
 """
     return message
 
-
 def lastcall(update, BOT_TOKEN):
     # Get chat member count
     chat_id = update['message']["chat"]["id"]
@@ -109,12 +110,9 @@ def lastcall(update, BOT_TOKEN):
         lastcall_message = f"""<b>Hello Researchers! 🧪🔬🌟</b>\n\nThis is your <b>FINAL reminder</b> and last call to decide if you'll be participating in this group test! 🚨 <b>The test will close in 24 hours!</b>\n\nBy staying in this group chat after today, you're committing to: \n1️⃣ Paying your share of the testing costs within 48hrs of when the payment instructions are shared. \n2️⃣ Receiving access to the test results!\n\n<b>Here's the breakdown:</b>  \n- <b>Total testing cost:</b> ${test_cost}  \n- <b>Group size:</b> {member_count} members (including {vial_donors} vial donors)  \n- <b>Estimated cost per non-vial-donor member:</b> ${non_vial_split:.2f}  \n- <b>Estimated cost per vial donor:</b> ${vial_donor_split:.2f}\n\n{vial_donors_message} \nIf you do not wish to participate, please select <b>"Leave Group"</b> from the group chat menu. <i>Archiving the chat won't remove you from the group.</i>\n\nThank you for being a tester helping to make this community better for everyone! 🧪🔍"""
 
     except:
-        lastcall_message = f"""💡<b>Use the following command to calculate the test group split:</b>\n  •  <code>/lastcall cost=600 vialdonors=2 vdvalue=20</code> (to account for vial donors' effective contributions)"""
+        lastcall_message = f"""💡<b>Use the following command to calculate the test group split:</b>\n\n <code>/lastcall cost=600 vialdonors=2 vdvalue=20</code> \n\n(to account for vial donors' effective contributions)"""
 
     return lastcall_message
-
-
-
 
 def safety():
     """
@@ -129,13 +127,22 @@ def safety():
     message = f"Did someone say Safety? 👀\n\nIf you haven't already seen this one...\n\n{np.random.choice(links)}"
     return message
 
-def banned_topic(banned_topic):
-    link=""
+def banned_topic(banned_topic, header_msg, topic_msg=""):
     if 'DNP' in banned_topic:
-        link = "https://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
+        topic_msg = "\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
+    elif 'Botox' in banned_topic:
+        topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
 
-    message = f"""⚠️ Safety Warning ⚠️ The following topic is not allowed for discussion for newcomer safety: \n\n{banned_topic}\n\n{link}"""
+    message = f"""{header_msg}\n\n{banned_topic}\n{topic_msg}"""
 
+    return message
+
+
+def dont_link(user_id, user_name):
+    message = (
+    f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 " 
+    "We're auto-poofing this direct link to a community who has requested they not be linked to directly. \n\nWe don't like gatekeeping info either, but also want to be good neighbors and respect their moderation wishes. Please DM any invite links in the future. Thank you! 🙏"
+    )
     return message
 
 

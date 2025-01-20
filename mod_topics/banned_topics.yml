@@ -1,0 +1,53 @@
+Unsafe_Banned_Substance:
+  message: "⚠️ Safety Warning ⚠️ The following topic is not allowed for sourcing discussion for newcomer safety. In order to maintain a research peptide focused community, we kindly ask that all conversations about this substance be taken elsewhere:"
+  substances:
+    - ['DNP', 'Dinitrophenol']
+    - ['Botox', 'Botulinum']
+DEA_Scheduled_Substance_1:
+  message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing for said substance. 🚫"
+  substances:
+    - ['Heroin', 'diamorphine']
+    - ['Methaqualone', 'Quaalude', 'Parest', 'Somnafac', 'Opitimil', 'Mandrax']
+    - ['Methcathinone', 'N-Methylcathinone', 'cat']
+    - ['Methylone', '3,4-Methylenedioxy-N-methylcathinone']
+    - ['Methylphenidate', 'Concerta', 'Ritalin', 'Methylin']
+    - ['Mescaline', 'Peyote']
+    - ['Psilocybin', 'Magic mushrooms']
+    - ['LSD', 'lysergide']
+    - ['Cannabis', 'marijuana', 'THC']
+    - ['FUB-144', '4-Fluorobenzyl']
+    - ['PHP', 'PCPy', 'rolicyclidine', '1-Phenylcyclohexyl']
+    - ['TCP', 'TCPy', 'tenocyclidine']
+    - ['Cimbi-82','Cimbi-5']
+    - ['DMA', '2,5-DMA']
+    - ['MDMA', 'Ecstasy', 'XTC']
+    - ['China White', 'Fentanyl', 'Fent']
+    - ['DMT', 'Dimethyltryptamine']
+    - ['GHB', 'gamma hydroxybutyrate', 'sodium oxybate']
+DEA_Scheduled_Substance_2:
+  message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing for said substance. 🚫"
+  substances:
+    - ['Carfentanil', 'Wildnil']
+    - ['Cocaine', 'Methyl benzoylecgonine', 'Crack cocaine']
+    - ['Opium']
+    - ['PCP', 'Sernylan']
+    - ['Duragesic', 'Oralet', 'Actiq', 'Sublimaze', 'Innovar']
+    - ['Hydrocodone', 'dihydrocodeinone']
+    - ['Methadone', 'Dolophine', 'Methadose', 'Amidone']
+    - ['Morphine', 'MS Contin', 'Roxanol', 'Oramorph', 'RMS', 'MSIR']
+    - ['Alfentanil', 'Alfenta']
+    - ['Dexedrine', 'Adderall', 'Obetrol']
+    - ['Dionin', 'Ethylmorphine']
+    - ['Etorphine HCl', 'M 99', 'M99']
+    - ['Glutethimide', 'Doriden', 'Dorimide']
+    - ['Vyvanse', 'Lisdexamfetamine']
+DEA_Scheduled_Substance_3:
+  message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing for said substance. 🚫"
+  substances:
+    - ['Steroids', 'Anabolic steroids', 'Methandrostenolone', 'Dianabol', 'Metabolina', 'Nerobol', 'Perbolin']
+    - ['Buprenorphine', 'Buprenex', 'Temgesic', 'Subutex', 'Suboxone']
+    - ['Ketamine', 'Ketaset', 'Ketalar', 'Special K', 'K']
+    - ['Testosterone', 'Androgel', 'Testim', 'Androderm', 'Testoderm']
+    - ['Anabolex', 'Andractim', 'Pesomax', 'Stanolone']
+    - ['Carfentanil', 'Wildnil']
+    - ['Tributane', 'Embutramide']
