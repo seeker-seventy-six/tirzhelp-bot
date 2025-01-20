@@ -136,6 +136,7 @@ def webhook():
         message_thread_id = message.get("message_thread_id", None)
         message_id = message.get("message_id", None)
         user_id = message.get('from', {}).get('id', None)
+        user_name = message.get('from', {}).get('first_name', None)
         text = message.get("text", "").strip()
 
         ### HANDLE COMMANDS ###
@@ -176,7 +177,7 @@ def webhook():
                 pattern = r'\b(?:' + re.escape(domain) + r')\b'
                 if re.search(pattern, text.lower()):
                     # Tag the user and reply
-                    reply_message = msgs.dont_link(user_id)
+                    reply_message = msgs.dont_link(user_id, user_name)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
                     # Delete the posted message
                     helpers_telegram.delete_message(chat_id, message_id)

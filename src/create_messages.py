@@ -138,9 +138,9 @@ def banned_topic(banned_topic, header_msg, topic_msg=""):
     return message
 
 
-def dont_link(user_id):
+def dont_link(user_id, user_name):
     message = (
-        f"<a href='tg://user?id={user_id}'>@{user_id}</a> 💨 We're auto-poofing this direct link to a community who has requested they not be linked to directly. We don't like gatekeeping info either, but also want to be good neighbors and respect their moderation wishes. Please DM any invite links in the future. Thank you!"
+        f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨 We're auto-poofing this direct link to a community who has requested they not be linked to directly. We don't like gatekeeping info either, but also want to be good neighbors and respect their moderation wishes. Please DM any invite links in the future. Thank you!"
     )
     return message
 
