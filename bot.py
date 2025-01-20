@@ -82,7 +82,8 @@ def create_globals():
     with open('./mod_topics/dont_link.yml', 'r') as file:
         domains = yaml.safe_load(file)
     dont_link_domains = domains.get('domain_urls', [])
-
+    
+    logging.info("Setting global variables...")
     return banned_words, pattern, banned_data, dont_link_domains
 
 # Ensure thread is started and globals created on app import
@@ -141,6 +142,7 @@ def webhook():
         if text.startswith("/"):
             command = text.split()[0].lower()  # Extract the command
             handle_command(command, chat_id, message_thread_id, message_id, update)
+            return jsonify({"ok": True}), 200
         
         ### Skip the rest of the Bot functions if update is not from the main moderation TG groups
         if str(chat_id) not in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
@@ -152,6 +154,7 @@ def webhook():
             if str(chat_id) in [TIRZHELP_SUPERGROUP_ID,TEST_SUPERGROUP_ID]:
                 welcome_message = msgs.welcome_newbie(new_member)
                 helpers_telegram.send_message(chat_id, welcome_message)
+                return jsonify({"ok": True}), 200
         
         elif "message" in update:
             ### CHECK FOR BANNED TOPICS ###
@@ -165,7 +168,7 @@ def webhook():
                         if any(word.lower() in banned_words for word in topic_list):
                             banned_topic_message = msgs.banned_topic(topic_list, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
-                            break  # Stop after sending one message
+                            return jsonify({"ok": True}), 200
 
             ### AUTO REMOVE LINKED COMMUNITIES TWMNBN ###
             for domain in dont_link_domains:
@@ -177,7 +180,7 @@ def webhook():
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
                     # Delete the posted message
                     helpers_telegram.delete_message(chat_id, message_id)
-                    break  # Stop checking once a match is found            
+                    return jsonify({"ok": True}), 200           
 
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
             amo_patterns = [r"\sL\d{2}.*\?", r"L\s\d{2}.*\?", r"Amo.*L.*\?"]
@@ -186,18 +189,20 @@ def webhook():
             if any(re.search(pattern, text) for pattern in amo_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.amo_L_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
+                return jsonify({"ok": True}), 200
+            
             # Autoreply for QSC mentions in Newbies
             if any(re.search(pattern, text) for pattern in qsc_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 message = msgs.qsc_question()
                 helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
+                return jsonify({"ok": True}), 200
     
             ### AUTO EXTRACT TEST RESULTS ###
             # Respond to uploaded documents in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
                 test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
                 helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
-
-        return jsonify({"ok": True}), 200
+                return jsonify({"ok": True}), 200
 
     except Exception as e:
         # Log the error to check what went wrong
