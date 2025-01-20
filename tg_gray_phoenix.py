@@ -35,15 +35,17 @@ NEW_GROUP_DESCRIPTION = (
 )
 USERS_TO_ADD = [
     '@tirzhelp_bot',
-    '@aksailor',
-    '@boo_7777',
-    '@NordicTurtle',
-    '@tirzepatidehelp',
-    '@stephs2125',
-    '@Ruca2573',
-    '@Litajj',
-    '@delululemonade',
+    '@seekerseventyseven',
+    # '@tirzepatidehelp',
+    # '@delululemonade',
+    # '@stephs2125',
+    # '@boo_7777',
+    # '@aksailor',
+    # '@NordicTurtle',
+    # '@Ruca2573',
+    # '@Litajj',
 ]
+PINNED_TOPIC_NAMES = ["Rules & Guides","Announcements","Newbies"]
 # Define which admin rights you want them to have
 ADMIN_RIGHTS = ChatAdminRights(
     change_info=True,
@@ -192,7 +194,12 @@ async def main():
 
     # Forward all our seeded topic messages and pin what we can before getting throttled
     for topic_name, info in TOPIC_FORWARD_MAP.items():
-        await forward_and_try_pinning_msgs(client, info, topic_name, new_group, source_peer, destination_peer)
+        message_ids = info["messages"]
+        icon_color = info.get("icon_color")
+        icon_emoji_id = info.get("icon_emoji_id")
+
+        new_topic = await create_topic_and_pin_if_needed(client, new_group, topic_name, icon_color, icon_emoji_id)
+        await forward_and_pin_messages(client, source_peer, destination_peer, new_topic, message_ids)
 
     await client.disconnect()
     logging.info(f"All done! New Group at: https://web.telegram.org/a/#-100{new_group.id}_1")
@@ -264,15 +271,24 @@ async def rename_and_lock_general(client, new_group):
         logging.warning("No 'General' topic found to rename/close.")
 
 
-async def forward_and_try_pinning_msgs(client, info, topic_name, new_group, source_peer, destination_peer):
-    message_ids = info["messages"]
-    icon_color = info.get("icon_color")
-    icon_emoji_id = info.get("icon_emoji_id")
+async def create_topic_and_pin_if_needed(
+    client,
+    new_group,
+    topic_name,
+    icon_color=None,
+    icon_emoji_id=None
+):
+    """
+    Creates a forum topic in 'new_group' titled 'topic_name'.
+    If 'topic_name' is in PINNED_TOPIC_NAMES, we also pin the topic.
 
+    Returns the newly created topic object (or None if not found).
+    """
+    # 1) Create the topic
     create_topic_req = CreateForumTopicRequest(
-        channel=new_group, 
+        channel=new_group,
         title=topic_name,
-        icon_color=icon_color, 
+        icon_color=icon_color,
         icon_emoji_id=icon_emoji_id
     )
     await safe_telethon_call(client, create_topic_req)
@@ -280,13 +296,13 @@ async def forward_and_try_pinning_msgs(client, info, topic_name, new_group, sour
 
     logging.info(f"Created topic: {topic_name}")
 
-    # Find the newly created topic
+    # 2) Fetch the current list of topics to find the newly created one
     topics_result = await client(GetForumTopicsRequest(
         channel=new_group,
         offset_date=0,
         offset_id=0,
         offset_topic=0,
-        limit=len(TOPIC_FORWARD_MAP)+5
+        limit=50
     ))
 
     new_topic = None
@@ -296,50 +312,83 @@ async def forward_and_try_pinning_msgs(client, info, topic_name, new_group, sour
             break
 
     if not new_topic:
-        logging.warning("Topic not found, cannot forward.")
-        return
+        logging.warning(f"Could not locate newly created topic '{topic_name}'.")
+        return None
 
-    logging.info(f"Found topic '{topic_name}' with topic_id = {new_topic.id}.")
+    logging.info(f"Found topic '{topic_name}' with ID = {new_topic.id}")
 
-    # anchor message for the topic:
-    top_msg_id = new_topic.top_message  
+    # 3) Optionally pin the topic if it's in our pinned list
+    if topic_name in PINNED_TOPIC_NAMES:
+        logging.info(f"Pinning topic '{topic_name}'...")
+        try:
+            # We only need to set pinned=True (no rename/close),
+            # so usually we can do it in one request:
+            new_topic_pin_req = EditForumTopicRequest(
+                channel=new_group,
+                topic_id=new_topic.id,
+                pinned=True
+            )
+            await safe_telethon_call(client, new_topic_pin_req)
+            await asyncio.sleep(1.0)
+        except Exception as e:
+            logging.warning(f"Failed to pin topic '{topic_name}': {e}")
 
-    # Forward the specified messages into this topic
+    return new_topic
+
+
+async def forward_and_pin_messages(
+    client,
+    source_peer,
+    destination_peer,
+    topic,
+    message_ids
+):
+    """
+    Forwards each message in 'message_ids' from 'source_peer' into
+    the given 'topic' of the destination supergroup. Then pins each
+    forwarded message inside that topic.
+    """
+    # The anchor message that created the topic
+    top_msg_id = topic.top_message
+
     for source_msg_id in message_ids:
+        # Forward a single message
         forward_req = ForwardMessagesRequest(
             from_peer=source_peer,
             id=[int(source_msg_id)],
             to_peer=destination_peer,
-            top_msg_id=top_msg_id,  
+            top_msg_id=top_msg_id,  # places the message in the correct forum topic
             silent=True,
             drop_author=False
         )
         fwd_result = await safe_telethon_call(client, forward_req)
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(2.0)  # small delay to avoid spammy calls
 
         if not fwd_result:
-            logging.warning(f"Forward request for msg #{source_msg_id} returned None (probably flood limit). Skipping.")
+            logging.warning(f"Forward request for message #{source_msg_id} returned None.")
             continue
 
+        # Extract the new message ID from the result's updates
         new_msg_id = None
         for u in fwd_result.updates:
             if isinstance(u, UpdateNewChannelMessage):
                 new_msg_id = u.message.id
                 break
 
-        logging.info(f"Forwarded message #{source_msg_id} (destination msg ID: {new_msg_id})")
-
-        # Optionally pin the new message
         if new_msg_id:
-            pin_request = UpdatePinnedMessageRequest(
+            logging.info(f"Forwarded msg #{source_msg_id} -> new msg ID {new_msg_id}")
+
+            # Now pin the newly forwarded message
+            pin_req = UpdatePinnedMessageRequest(
                 peer=destination_peer,
                 id=new_msg_id,
                 silent=True
             )
-            await safe_telethon_call(client, pin_request)
-            await asyncio.sleep(1.0)
+            await safe_telethon_call(client, pin_req)
+            await asyncio.sleep(2.0)
+            logging.info(f"Pinned message ID {new_msg_id} in topic '{topic.title}'")
         else:
-            logging.warning("No new message ID found in the forward result. Could not pin.")
+            logging.warning(f"No new message ID found for source msg #{source_msg_id}; skipping pin.")
 
 
 async def set_logo(client, pic_path, destination_peer):
