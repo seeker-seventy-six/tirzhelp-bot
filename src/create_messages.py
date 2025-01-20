@@ -68,7 +68,6 @@ Check out any of the other vendors for your first purchase in order to get famil
 """
     return message
 
-
 def lastcall(update, BOT_TOKEN):
     # Get chat member count
     chat_id = update['message']["chat"]["id"]
@@ -115,9 +114,6 @@ def lastcall(update, BOT_TOKEN):
 
     return lastcall_message
 
-
-
-
 def safety():
     """
     Returns a Telegram message about harm reduction with a link to a section in a Google Doc.
@@ -135,7 +131,7 @@ def banned_topic(banned_topic, header_msg, topic_msg=""):
     if 'DNP' in banned_topic:
         topic_msg = "\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
     elif 'Botox' in banned_topic:
-        topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency or active ingredients of Botox (botulinum toxin). Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\nhttps://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/"
+        topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
 
     message = f"""{header_msg}\n\n{banned_topic}\n{topic_msg}"""
 

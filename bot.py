@@ -150,12 +150,12 @@ def webhook():
                 banned_message = data.get('message')
                 banned_topics = data.get('substances')
                 # Check for banned topics
-                for tuple_topic in banned_topics:
-                    for word in tuple_topic:
+                for topic_list in banned_topics:
+                    for word in topic_list:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
                         if re.search(pattern, text.lower()):
-                            # Pass the tuple_topic and header message to the banned_topic function
-                            banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
+                            # Pass the topic_list and header message to the banned_topic function
+                            banned_topic_message = msgs.banned_topic(topic_list, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
 
             # Define patterns for L## Amo and QSC questions
