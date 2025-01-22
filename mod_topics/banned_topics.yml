@@ -8,7 +8,7 @@ DEA_Scheduled_Substance_1:
   substances:
     - ['Heroin', 'diamorphine']
     - ['Methaqualone', 'Quaalude', 'Parest', 'Somnafac', 'Opitimil', 'Mandrax']
-    - ['Methcathinone', 'N-Methylcathinone', 'cat']
+    - ['Methcathinone', 'N-Methylcathinone']
     - ['Methylone', '3,4-Methylenedioxy-N-methylcathinone']
     - ['Methylphenidate', 'Concerta', 'Ritalin', 'Methylin']
     - ['Mescaline', 'Peyote']
@@ -38,7 +38,7 @@ DEA_Scheduled_Substance_2:
     - ['Alfentanil', 'Alfenta']
     - ['Dexedrine', 'Adderall', 'Obetrol']
     - ['Dionin', 'Ethylmorphine']
-    - ['Etorphine HCl', 'M 99', 'M99']
+    - ['Etorphine HCl', 'M99']
     - ['Glutethimide', 'Doriden', 'Dorimide']
     - ['Vyvanse', 'Lisdexamfetamine']
 DEA_Scheduled_Substance_3:
@@ -46,7 +46,7 @@ DEA_Scheduled_Substance_3:
   substances:
     - ['Steroids', 'Anabolic steroids', 'Methandrostenolone', 'Dianabol', 'Metabolina', 'Nerobol', 'Perbolin']
     - ['Buprenorphine', 'Buprenex', 'Temgesic', 'Subutex', 'Suboxone']
-    - ['Ketamine', 'Ketaset', 'Ketalar', 'Special K', 'K']
+    - ['Ketamine', 'Ketaset', 'Ketalar', 'Special K']
     - ['Testosterone', 'Androgel', 'Testim', 'Androderm', 'Testoderm']
     - ['Anabolex', 'Andractim', 'Pesomax', 'Stanolone']
     - ['Carfentanil', 'Wildnil']
