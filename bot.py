@@ -158,7 +158,7 @@ def webhook():
                 # Check for banned topics
                 for tuple_topic in banned_topics:
                     for word in tuple_topic:
-                        pattern = r'\b' + re.escape(word.lower()) + r'\b'
+                        pattern = r'\s' + re.escape(word.lower()) + r'\s'
                         if re.search(pattern, text.lower()):
                             # Pass the tuple_topic and header message to the banned_topic function
                             banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
