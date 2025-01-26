@@ -101,13 +101,15 @@ def lastcall(update, BOT_TOKEN):
 
         # Construct vial donors message
         vial_donors_message = (
-            f"✨ <b>NOTE:</b> Each vial donor is contributing an effective value of ${vdvalue:.2f} "
-            f"towards the group effort by providing a vial and paying for their shipping, which has been accounted for in the calculations. Their adjusted share is lower.\n" 
+            f"\n\n✨ <b>NOTE:</b> Each vial donor is contributing an effective value of ${vdvalue:.2f} "
+            f"towards the group effort by providing a vial and paying for their shipping, which has been accounted for in the calculations. Their adjusted share is lower." 
             if vial_donors else ""
         )
 
         # Construct final message
-        lastcall_message = f"""<b>Hello Researchers! 🧪🔬🌟</b>\n\nThis is your <b>FINAL reminder</b> and last call to decide if you'll be participating in this group test! 🚨 <b>The test will close in 24 hours!</b>\n\nBy staying in this group chat after today, you're committing to: \n1️⃣ Paying your share of the testing costs within 48hrs of when the payment instructions are shared. \n2️⃣ Receiving access to the test results!\n\n<b>Here's the breakdown:</b>  \n- <b>Total testing cost:</b> ${test_cost}  \n- <b>Group size:</b> {member_count} members (including {vial_donors} vial donors)  \n- <b>Estimated cost per non-vial-donor member:</b> ${non_vial_split:.2f}  \n- <b>Estimated cost per vial donor:</b> ${vial_donor_split:.2f}\n\n{vial_donors_message} \nIf you do not wish to participate, please select <b>"Leave Group"</b> from the group chat menu. <i>Archiving the chat won't remove you from the group.</i>\n\nThank you for being a tester helping to make this community better for everyone! 🧪🔍"""
+        lastcall_message = (
+            f"""<b>⚠️ FINAL CALL, Researchers! ⚠️</b>\n\nThis is now the time to confirm your participation in the group test! 🚨 The test closes in <b>24 hours</b>.\n\nRemaining in this group means you'll: \n1️⃣ Pay your share within 48hrs of posted payment instructions. \n2️⃣ Receive access to the test results!\n\n<b>Cost Breakdown:</b>\n- <b>Total cost:</b> ${test_cost} \n- <b>Cost per member:</b> \n  ${non_vial_split:.2f} (non-vial) \n  ${vial_donor_split:.2f} (vial donor){vial_donors_message}\n\nIF YOU WISH TO PARTICIPATE, PLEASE REACT TO THIS MESSAGE ✅. If we don't hear from you, we'll assume you no longer wish to participate and you will be removed once the group test closes💨\n\nThanks for helping improve the peptide testing community! 🧪🔍"""
+        )
 
     except:
         lastcall_message = f"""💡<b>Use the following command to calculate the test group split:</b>\n\n <code>/lastcall cost=600 vialdonors=2 vdvalue=20</code> \n\n(to account for vial donors' effective contributions)"""
