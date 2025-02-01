@@ -144,11 +144,12 @@ def webhook():
         ### AUTOMATED WELCOME MESSAGE FOR NEW MEMBER ###
         if "message" in update and "new_chat_participant" in message:
             new_member = message["new_chat_participant"]
-            if str(chat_id) in [TIRZHELP_SUPERGROUP_ID,TEST_SUPERGROUP_ID]:
+            if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
+                # Here, message_id is the join message's ID.
                 welcome_message = msgs.welcome_newbie(new_member)
-                helpers_telegram.send_message(chat_id, welcome_message)
+                helpers_telegram.send_message(chat_id, welcome_message, reply_to_message_id=message_id)
                 return jsonify({"ok": True}), 200
-        
+                
         elif "message" in update:
             ### CHECK FOR BANNED TOPICS ###
             # Iterate through each banned category and their corresponding substances and messages
