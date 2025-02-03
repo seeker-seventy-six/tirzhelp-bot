@@ -141,8 +141,10 @@ def banned_topic(banned_topic, header_msg, topic_msg=""):
 
 def dont_link(user_id, user_name):
     message = (
-    f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 " 
-    "We're auto-poofing this direct link to a community who has requested they not be linked to directly. \n\nWe don't like gatekeeping info either, but also want to be good neighbors and respect their moderation wishes. Please DM any invite links in the future. Thank you! 🙏"
+        f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 "
+        "We're auto-poofing this direct link as most communities have requested invites be shared only through approved links or not to be directly linked. \n\n"
+        "We don't like gatekeeping info either, but we also want to be good neighbors and respect their moderation wishes. Please DM any invite links instead. \n\n"
+        "You can also check the <a href='https://docs.google.com/document/d/1CvAu42nH0i-VFPN9cLInSkjj7D8F0SBq7FIyqDjhF7M/edit?tab=t.lgryvp324lcd'>Printable Guides: External Resources</a> for the latest approved community invite method if provided. Thank you! 🙏"
     )
     return message
 
