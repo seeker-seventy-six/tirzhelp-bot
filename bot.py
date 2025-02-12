@@ -29,6 +29,7 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 TIRZHELP_SUPERGROUP_ID = '-1002410577414'
 TIRZHELP_TEST_RESULTS_CHANNEL = '48'
 TIRZHELP_NEWBIE_CHANNEL = '1408'
+TIRZHELP_CLOSED_TOPICS = ['1','3','19','63']
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
@@ -125,7 +126,7 @@ def webhook():
         ### EXTRACT TG UPDATE IDs ###
         message = update.get('message', {})
         chat_id = message.get('chat', {}).get('id', None)
-        message_thread_id = message.get("message_thread_id", None)
+        message_thread_id = message.get("message_thread_id", 1)
         message_id = message.get("message_id", None)
         user_id = message.get('from', {}).get('id', None)
         user_name = message.get('from', {}).get('first_name', None)
@@ -166,18 +167,6 @@ def webhook():
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
                             return jsonify({"ok": True}), 200
 
-            ### AUTO REMOVE LINKED COMMUNITIES TWMNBN ###
-            for domain in dont_link_domains:
-                # Create the domain regex pattern to detect the domain in the text
-                pattern = r'\b(?:' + re.escape(domain) + r')\b'
-                if re.search(pattern, text):
-                    # Tag the user and reply
-                    reply_message = msgs.dont_link(user_id, user_name)
-                    helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
-                    # Delete the posted message
-                    helpers_telegram.delete_message(chat_id, message_id)
-                    return jsonify({"ok": True}), 200
-
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
             amo_patterns = [r"\sL\d{2}.*\?", r"L\s\d{2}.*\?", r"Amo.*L.*\?"]
             qsc_patterns = [r"QSC", r"qsc"]
@@ -199,6 +188,20 @@ def webhook():
                 test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
                 helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
                 return jsonify({"ok": True}), 200
+            
+            ### AUTO REMOVE LINKED COMMUNITIES TWMNBN ###
+            for domain in dont_link_domains:
+                # Create the domain regex pattern to detect the domain in the text
+                pattern = r'\b(?:' + re.escape(domain) + r')\b'
+                if re.search(pattern, text):
+                    # Only proceed if the message is NOT in a safe channel
+                    if str(message_thread_id) not in TIRZHELP_CLOSED_TOPICS:
+                        # Tag the user and reply
+                        reply_message = msgs.dont_link(user_id, user_name)
+                        helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
+                        # Delete the posted message
+                        helpers_telegram.delete_message(chat_id, message_id)
+                    return jsonify({"ok": True}), 200
         
         # if none of the bot functions need to run, also return success so update is accounted for
         return jsonify({"ok": True}), 200
