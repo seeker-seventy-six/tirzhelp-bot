@@ -65,7 +65,7 @@ def initialize_announcement_thread():
 
 # Initialize Global variables
 def create_globals():
-    global banned_data, dont_link_domains
+    global banned_data, dont_link_domains, auto_poof_terms
 
     # Get banned topics
     with open('./mod_topics/banned_topics.yml', 'r') as file:
@@ -75,13 +75,18 @@ def create_globals():
     with open('./mod_topics/dont_link.yml', 'r') as file:
         domains = yaml.safe_load(file)
     dont_link_domains = domains.get('domain_urls', [])
+
+    # Get auto poof terms
+    with open('./mod_topics/poof_no_message.yml', 'r') as file:
+        poof_data = yaml.safe_load(file)
+    auto_poof_terms = poof_data.get('auto-poof', [])
     
     logging.info("Setting global variables...")
-    return banned_data, dont_link_domains
+    return banned_data, dont_link_domains, auto_poof_terms
 
 # Ensure thread is started and globals created on app import
 initialize_announcement_thread()
-create_globals()
+banned_data, dont_link_domains, auto_poof_terms = create_globals()
 ### NON WEBHOOK END ###
 
 
@@ -112,7 +117,7 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    global banned_words, pattern, banned_data, dont_link_domains
+    global banned_data, dont_link_domains, auto_poof_terms
     
     # Log raw request data
     raw_data = request.data.decode('utf-8')
@@ -189,7 +194,7 @@ def webhook():
                 helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
                 return jsonify({"ok": True}), 200
             
-            ### AUTO REMOVE LINKED COMMUNITIES TWMNBN ###
+            ### AUTO POOF LINKED COMMUNITIES TWMNBN ###
             for domain in dont_link_domains:
                 # Create the domain regex pattern to detect the domain in the text
                 pattern = r'\b(?:' + re.escape(domain) + r')\b'
@@ -202,6 +207,16 @@ def webhook():
                         # Delete the posted message
                         helpers_telegram.delete_message(chat_id, message_id)
                     return jsonify({"ok": True}), 200
+            
+            ### AUTO POOF MESSAGES WITH SPECIFIC TERMS ###
+            for term in auto_poof_terms:
+                # Using regex with word boundaries to avoid partial matches
+                pattern = re.compile(r'\b' + re.escape(term) + r'\b', re.IGNORECASE)
+                if pattern.search(text):
+                    logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {term}")
+                    helpers_telegram.delete_message(chat_id, message_id)
+                    return jsonify({"ok": True}), 200
+
         
         # if none of the bot functions need to run, also return success so update is accounted for
         return jsonify({"ok": True}), 200
@@ -234,4 +249,3 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
 if __name__ == "__main__":
     # Start the Flask app for web workers
     app.run(host="0.0.0.0", port=8443)
-    

@@ -1,0 +1,22 @@
+name: tirzbot
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - flask
+  - gevent
+  - requests
+  - python-dotenv
+  - gunicorn
+  - pandas
+  - pyyaml
+  - pip
+  - pip:
+      - openai
+      - google-api-python-client
+      - google-auth-httplib2
+      - google-auth-oauthlib
+      - pdf2image
+      - telebot
+      - telethon
