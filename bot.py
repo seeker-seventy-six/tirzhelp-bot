@@ -194,7 +194,7 @@ def webhook():
                 helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
                 return jsonify({"ok": True}), 200
             
-            ### AUTO POOF LINKED COMMUNITIES TWMNBN ###
+            ### AUTO POOF LINKED COMMUNITIES ###
             for domain in dont_link_domains:
                 # Create the domain regex pattern to detect the domain in the text
                 pattern = r'\b(?:' + re.escape(domain) + r')\b'
