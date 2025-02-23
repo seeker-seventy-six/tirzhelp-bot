@@ -124,7 +124,7 @@ def safety():
         f"Check out the Testing section in the <a href='https://docs.google.com/document/d/1LHSXeIgIJFIcE3dsKEUUVyNyH2FT0Ku3ikWfdldg3Lk/edit?tab=t.0#heading=h.iet7p87aatw0'>Guides FAQ</a> for one of our best tools for safety in this community 🛡️🧪",
         f"Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
         f"Check out the history and future <a href='https://www.nature.com/articles/s41392-022-00904-4'>applications of peptides</a> 📝",
-        "Always check your reconstituted peptide's pH level before injecting! 🧪📈 Tirzepatide should fall in the 6-9 pH range. (For subQ injections, 4-11 pH is generally considered 'safe'.) Find any pH 0-14 strips on Amazon.",
+        "Always check your reconstituted peptide's pH level before injecting! 🧪📈 Tirzepatide should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find any pH 0-14 strips on Amazon.",
     ]
     message = f"Did someone say Safety? 👀\n\nIf you haven't already seen this one...\n\n{np.random.choice(links)}"
     return message
