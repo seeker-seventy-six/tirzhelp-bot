@@ -156,7 +156,8 @@ def webhook():
                 welcome_message = msgs.welcome_newbie(new_member)
                 helpers_telegram.send_message(chat_id, welcome_message, reply_to_message_id=message_id)
                 return jsonify({"ok": True}), 200
-                
+        
+        ### ALL OTHER MESSAGES ###
         elif "message" in update:
             ### CHECK FOR BANNED TOPICS ###
             # Iterate through each banned category and their corresponding substances and messages
@@ -174,15 +175,13 @@ def webhook():
                             return jsonify({"ok": True}), 200
 
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
-            # Iterate through all moderated topics in newbies_mod_topics
             if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 for topic, data in newbies_mod_topics.items():
-                    if any(re.search(pattern, text) for pattern in data["patterns"]):
+                    if any(re.search(pattern, text, re.IGNORECASE) for pattern in data["patterns"]):
                         message = data["message"]
                         helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
                         return jsonify({"ok": True}), 200
 
-    
             ### AUTO EXTRACT TEST RESULTS ###
             # Respond to uploaded documents in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
