@@ -65,16 +65,17 @@ def initialize_announcement_thread():
 
 # Initialize Global variables
 def create_globals():
-    global banned_data, dont_link_domains, auto_poof_terms
-
     # Get banned topics
-    with open('./mod_topics/banned_topics.yml', 'r') as file:
-        banned_data = yaml.safe_load(file)
-
+    with open('./mod_topics/moderated_topics.yml', 'r') as file:
+        mod_topics_data = yaml.safe_load(file)
+    banned_data = mod_topics_data.get('Banned_Topics', {})
+    newbies_mod_topics = mod_topics_data.get('Newbies_Auto_Reply', {})
+    
     # Get dont link communities
     with open('./mod_topics/dont_link.yml', 'r') as file:
         domains = yaml.safe_load(file)
     dont_link_domains = domains.get('domain_urls', [])
+    ignore_domains = domains.get('ignore_urls', [])
 
     # Get auto poof terms
     with open('./mod_topics/poof_no_message.yml', 'r') as file:
@@ -82,11 +83,11 @@ def create_globals():
     auto_poof_terms = poof_data.get('auto-poof', [])
     
     logging.info("Setting global variables...")
-    return banned_data, dont_link_domains, auto_poof_terms
+    return banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
 
 # Ensure thread is started and globals created on app import
 initialize_announcement_thread()
-banned_data, dont_link_domains, auto_poof_terms = create_globals()
+banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms = create_globals()
 ### NON WEBHOOK END ###
 
 
@@ -117,7 +118,7 @@ def set_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    global banned_data, dont_link_domains, auto_poof_terms
+    global banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
     
     # Log raw request data
     raw_data = request.data.decode('utf-8')
@@ -173,19 +174,14 @@ def webhook():
                             return jsonify({"ok": True}), 200
 
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
-            amo_patterns = [r"\sL\d{2}.*\?", r"L\s\d{2}.*\?", r"Amo.*L.*\?"]
-            qsc_patterns = [r"QSC", r"qsc"]
-            # Check if the message contains any Amo-related pattern
-            if any(re.search(pattern, text) for pattern in amo_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
-                message = msgs.amo_L_question()
-                helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
-                return jsonify({"ok": True}), 200
-            
-            # Autoreply for QSC mentions in Newbies
-            if any(re.search(pattern, text) for pattern in qsc_patterns) and str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
-                message = msgs.qsc_question()
-                helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
-                return jsonify({"ok": True}), 200
+            # Iterate through all moderated topics in newbies_mod_topics
+            if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
+                for topic, data in newbies_mod_topics.items():
+                    if any(re.search(pattern, text) for pattern in data["patterns"]):
+                        message = data["message"]
+                        helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
+                        return jsonify({"ok": True}), 200
+
     
             ### AUTO EXTRACT TEST RESULTS ###
             # Respond to uploaded documents in Test Results channel
@@ -195,17 +191,33 @@ def webhook():
                 return jsonify({"ok": True}), 200
             
             ### AUTO POOF LINKED COMMUNITIES ###
-            for domain in dont_link_domains:
-                # Create the domain regex pattern to detect the domain in the text
-                pattern = r'\b(?:' + re.escape(domain) + r')\b'
-                if re.search(pattern, text):
-                    # Only proceed if the message is NOT in a safe channel
-                    if str(message_thread_id) not in TIRZHELP_CLOSED_TOPICS:
-                        # Tag the user and reply
-                        reply_message = msgs.dont_link(user_id, user_name)
-                        helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
-                        # Delete the posted message
-                        helpers_telegram.delete_message(chat_id, message_id)
+            # for domain in dont_link_domains:
+            #     # Create the domain regex pattern to detect the domain in the text
+            #     pattern = r'\b(?:' + re.escape(domain) + r')\b'
+            #     if re.search(pattern, text):
+            #         # Only proceed if the message is NOT in a safe channel
+            #         if str(message_thread_id) not in TIRZHELP_CLOSED_TOPICS:
+            #             # Tag the user and reply
+            #             reply_message = msgs.dont_link(user_id, user_name)
+            #             helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
+            #             # Delete the posted message
+            #             helpers_telegram.delete_message(chat_id, message_id)
+            #         return jsonify({"ok": True}), 200
+
+            ### AUTO POOF LINKED COMMUNITIES ###
+            # If the text contains any ignored URL, skip moderation
+            if any(ignore_url in text for ignore_url in ignore_domains):
+                logging.info("Message contains an ignored URL. No moderation needed.")
+                return jsonify({"ok": True}), 200
+            # If the text contains any moderated domain, return a warning message
+            for moderated_domain in dont_link_domains:
+                if moderated_domain in text and str(message_thread_id) not in TIRZHELP_CLOSED_TOPICS:
+                    logging.info(f"Detected moderated domain: {moderated_domain}")
+                    # Tag the user and reply
+                    reply_message = msgs.dont_link(user_id, user_name)
+                    helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
+                    # Delete the posted message
+                    helpers_telegram.delete_message(chat_id, message_id)
                     return jsonify({"ok": True}), 200
             
             ### AUTO POOF MESSAGES WITH SPECIFIC TERMS ###

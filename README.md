@@ -158,3 +158,6 @@ This will stream the logs, allowing you to monitor any issues or errors in real 
 This Heroku app leverages the Telegram Bot API for user interaction and integrates with various Telegram groups and channels. You can easily deploy and manage different environments (dev/prod) using Git branches, and you have full access to error logs via Heroku CLI for troubleshooting.
 
 ---
+
+## Discord Server Backup Template
+https://discord.new/EDzNm6Gzz9S3

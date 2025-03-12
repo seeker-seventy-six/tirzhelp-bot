@@ -36,7 +36,7 @@ NEW_GROUP_DESCRIPTION = (
 USERS_TO_ADD = [
     '@tirzhelp_bot',
     '@seekerseventyseven',
-    # '@tirzepatidehelp',
+    '@tirzepatidehelp',
     # '@delululemonade',
     # '@stephs2125',
     # '@boo_7777',
