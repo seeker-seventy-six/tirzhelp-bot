@@ -65,6 +65,8 @@ def initialize_announcement_thread():
 
 # Initialize Global variables
 def create_globals():
+    global banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
+
     # Get banned topics
     with open('./mod_topics/moderated_topics.yml', 'r') as file:
         mod_topics_data = yaml.safe_load(file)
@@ -87,7 +89,7 @@ def create_globals():
 
 # Ensure thread is started and globals created on app import
 initialize_announcement_thread()
-banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms = create_globals()
+create_globals()
 ### NON WEBHOOK END ###
 
 
@@ -177,6 +179,7 @@ def webhook():
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
             if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 for topic, data in newbies_mod_topics.items():
+                    logging.info(f"Checking topic: {topic}, patterns: {data['patterns']}")
                     if any(re.search(pattern, text, re.IGNORECASE) for pattern in data["patterns"]):
                         message = data["message"]
                         helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
