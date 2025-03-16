@@ -33,6 +33,7 @@ def extract_data_with_openai(file_path, text):
 
     vendor_disambiguations = {
         "ALM": ["Alimo Peptides"],
+        "ACR": ["Aavant"],
         "Amo": ["Amolist", "Amopure", "Amopeptide"],
         "ASC": ["Angel Shanghai Chemical"],
         "CDS": ["Changan District Sheng", "Jenny He"],
