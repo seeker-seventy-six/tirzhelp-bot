@@ -54,7 +54,8 @@ Newbies_Auto_Reply:
     patterns: 
       - "\\sL\\d{2}.*\\?"
       - "L\\s\\d{2}.*\\?"
-      - "\\bAmo.*L.*\\?"
+      - "\\b[aA]mo.*L.*\\?"
+      - "\\b[bB]fflist.*L.*\\?"
 
 Banned_Topics:
   Unsafe_Banned_Substance:
