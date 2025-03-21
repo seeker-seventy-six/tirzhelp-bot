@@ -17,7 +17,7 @@ Newbies_Auto_Reply:
       Check out any of the other vendors for your first purchase in order to get familiar with the nuances and differences of ordering peptides from the gray market. Especially look for vendors who offer credit card options such as Alibaba or PayPal.
     patterns:
       - "\\bQSC\\b"
-      - "\\bqsc\\b"
+      - "\\b[qQ]sc\\b"
   Crypto:
     message: |
       <b>We Do Not Recommend Using Crypto for Your First Purchase</b>

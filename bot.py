@@ -190,20 +190,6 @@ def webhook():
                 test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
                 helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
                 return jsonify({"ok": True}), 200
-            
-            ### AUTO POOF LINKED COMMUNITIES ###
-            # for domain in dont_link_domains:
-            #     # Create the domain regex pattern to detect the domain in the text
-            #     pattern = r'\b(?:' + re.escape(domain) + r')\b'
-            #     if re.search(pattern, text):
-            #         # Only proceed if the message is NOT in a safe channel
-            #         if str(message_thread_id) not in TIRZHELP_CLOSED_TOPICS:
-            #             # Tag the user and reply
-            #             reply_message = msgs.dont_link(user_id, user_name)
-            #             helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
-            #             # Delete the posted message
-            #             helpers_telegram.delete_message(chat_id, message_id)
-            #         return jsonify({"ok": True}), 200
 
             ### AUTO POOF LINKED COMMUNITIES ###
             # If the text contains any ignored URL, skip moderation
