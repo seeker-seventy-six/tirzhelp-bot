@@ -179,8 +179,7 @@ def webhook():
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
             if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
                 for topic, data in newbies_mod_topics.items():
-                    logging.info(f"Checking topic: {topic}, patterns: {data['patterns']}")
-                    if any(re.search(pattern, text, re.IGNORECASE) for pattern in data["patterns"]):
+                    if any(re.search(pattern, text) for pattern in data["patterns"]):
                         message = data["message"]
                         helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
                         return jsonify({"ok": True}), 200

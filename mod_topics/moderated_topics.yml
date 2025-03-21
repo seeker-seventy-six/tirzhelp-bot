@@ -17,6 +17,7 @@ Newbies_Auto_Reply:
       Check out any of the other vendors for your first purchase in order to get familiar with the nuances and differences of ordering peptides from the gray market. Especially look for vendors who offer credit card options such as Alibaba or PayPal.
     patterns:
       - "\\bQSC\\b"
+      - "\\bqsc\\b"
   Crypto:
     message: |
       <b>We Do Not Recommend Using Crypto for Your First Purchase</b>
@@ -29,9 +30,9 @@ Newbies_Auto_Reply:
 
       If you do choose to use crypto, we recommend using a reputable exchange service like Exodus to purchase and swap your crypto. You can start learning about 🌐<a href='https://t.me/+1Msmy1Etat0wMjUx'>how to use crypto here</a>
     patterns:
-      - "\\bcrypto\\b"
-      - "\\bcryptocurrency\\b"
-      - "\\bbitcoin\\b"
+      - "\\b[cC]rypto\\b"
+      - "\\b[cC]ryptocurrency\\b"
+      - "\\b[bB]itcoin\\b"
   Amo:
     message: |
       <b>I see you're asking about what L means?</b>
