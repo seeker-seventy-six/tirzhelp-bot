@@ -34,7 +34,7 @@ def extract_data_with_openai(file_path, text):
     vendor_disambiguations = {
         "ALM": ["Alimo Peptides"],
         "ACR": ["Aavant"],
-        "Amo": ["Amolist", "Amopure", "Amopeptide"],
+        "Amo": ["Amolist", "Amopure", "Amopeptide", "Bfflist"],
         "ASC": ["Angel Shanghai Chemical"],
         "CDS": ["Changan District Sheng", "Jenny He"],
         "GB": ["Guangebio"],
@@ -47,13 +47,14 @@ def extract_data_with_openai(file_path, text):
         "Royal": ["Royal Peptides", "Cantydes"],
         "SBB": ["Shenzhen Biolink Biotechnology"],
         "Skye": ["Skye"],
-        "SNP": ["Nexaph", "Shanghai Nexa Pharma", "SPC"],
+        "SNP": ["Nexaph", "Shanghai Nexa Pharma", "SPC", "Cain"],
+        "SPB": ["Shanghai Synthetic Peptide Biopharmaceutical", "Yuna"],
         "SRY": ["Shanghai Senria Tech", "Shanghai Senria Biotechnology"],
         "SSA": ["Sigma Audley", "Shanghai Teruiop", "Shanghai Sigma Audley"],
-        "TCI": ["Tianjin Cangtu", "HB Cangtu", "Cangtu International"],
+        "TCI": ["Tianjin Cangtu", "HB Cangtu", "Cangtu International", "Cangtu"],
         "Tydes": ["Tydes"],
-        "Uther": ["Uther"],
-        "YC": ["Yiwu Changtu"],
+        "Uther": ["Uther", "Enzo"],
+        "YC": ["Yiwu Changtu", "Changtu"],
         "ZLZ": ["ZLZPeptide"],
         "ZYH": ["Shanghai ZYH Biotech"],
         "ZZT": ["Zhejiang Zhaobo Tech", "Zhaobo Technology"]
@@ -63,9 +64,9 @@ def extract_data_with_openai(file_path, text):
     class TestResult(BaseModel):
         vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the abbreviation key value for this field:\n{vendor_disambiguations}. If no known vendor is found, put UNKNOWN. DO NOT LEAVE BLANK")
         test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY. DO NOT LEAVE BLANK')
-        batch: str = Field(alias="batch", description='If present, the batch, lot, or client sample identifier. If no batch or lot is called out, use the vendor or manufacturer name and the caption info. DO NOT LEAVE BLANK')
+        batch: str = Field(alias="batch", description="If present, the batch, lot, or client sample identifier. If no batch or lot is called out, use the vendor or manufacturer name and the caption info. Peptide Test puts batch info in the 'Client Sample ID' line. Janoshik puts batch info in the 'Sample' and 'Batch' lines. DO NOT LEAVE BLANK")
         peptide: str = Field(alias="peptide", description='Name of the expected compound tested.  DO NOT LEAVE BLANK')
-        expected_mass_mg: float = Field(alias="expected_mass_mg", description='The expected sample amount to be present in the vial. Usually 5, 10, 15, 20, 30, 50, or 60 mg')
+        expected_mass_mg: float = Field(alias="expected_mass_mg", description='The expected sample amount to be present in the vial. Usually 5, 10, 12, 15, 20, 30, 50, or 60 mg')
         mass_mg: float | None = Field(alias="mass_mg", description="The actual mass in mg found by the test; a float number. If not tested fill in the JSON value for null")
         purity_percent: float | None = Field(alias="purity_percent", description="The actual purity in percent found by the test; a float number between 0 and 100. If not tested, fill in the JSON value for null")
         tfa_present: float | None = Field(alias='tfa_present', description="The amount of TFA or trifluoroacetic acid found by the test; a float number between 0 and 100. If 'not detected', fill in 0. If not tested, fill in the JSON value for null")
@@ -133,7 +134,7 @@ def extract_data_with_openai(file_path, text):
     
 
 def generate_parser_instructions(schema, text):
-    instructions = f"Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg, purity_percent, and tfa_present. IF the test results are results for something other than compound mass, purity, or TFA, just reply in plain text 'Unsupported Test'. The user may have also included a <image caption>{text}</image caption>; use <image caption> if it contains additional info that the image does not.\n\nHere is an example schema:\n\n"
+    instructions = f"Extract the values from the provided image as defined in the schema below. Respond only in JSON. If there is more than one sample tested, return a list of JSON objects. If multiple sample test results are found on the image, you do know that all of the field values will be the same except for mass_mg, purity_percent, and tfa_present. IF the test results are results for something other than compound mass, purity, or TFA, just reply in plain text 'Unsupported Test'. The user may have also included a <image caption>{text}</image caption>; use <image caption> if it contains additional info.\n\nHere is an example schema:\n\n"
     example_data = [
         schema(
             vendor="Vendor A",
