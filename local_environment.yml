@@ -13,10 +13,10 @@ dependencies:
   - pyyaml
   - pip
   - pip:
-      - openai
-      - google-api-python-client
-      - google-auth-httplib2
-      - google-auth-oauthlib
-      - pdf2image
-      - telebot
-      - telethon
+    - openai
+    - google-api-python-client
+    - google-auth-httplib2
+    - google-auth-oauthlib
+    - pdf2image
+    - telebot
+    - telethon
