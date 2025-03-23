@@ -35,6 +35,20 @@ TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
 TEST_NEWBIE_CHANNEL = '681'
 
+MOD_ACCOUNTS = [
+    'tirzhelp_bot',
+    'seekerseventysix',
+    'tirzepatidehelp',
+    'delululemonade',
+    'stephs2125',
+    'aksailor',
+    'NordicTurtle',
+    'Ruca2573',
+    'Litajj',
+    'UncleNacho'
+    'ruttheimer'
+]
+
 app = Flask(__name__)
 
 ### NON WEBHOOK ###
@@ -137,8 +151,9 @@ def webhook():
         message_thread_id = message.get("message_thread_id", 1)
         message_id = message.get("message_id", None)
         user_id = message.get('from', {}).get('id', None)
-        user_name = message.get('from', {}).get('first_name', None)
-        text = message.get("text", "").strip()
+        user_firstname = message.get('from', {}).get('first_name', None)
+        username = message.get('from', {}).get('username', None)
+        text = message.get('text', '').strip()
 
         ### HANDLE COMMANDS ###
         if text.startswith("/"):
@@ -177,7 +192,7 @@ def webhook():
                             return jsonify({"ok": True}), 200
 
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
-            if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL]:
+            if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL] and username not in MOD_ACCOUNTS:
                 for topic, data in newbies_mod_topics.items():
                     if any(re.search(pattern, text) for pattern in data["patterns"]):
                         message = data["message"]
@@ -198,10 +213,10 @@ def webhook():
                 return jsonify({"ok": True}), 200
             # If the text contains any moderated domain, return a warning message
             for moderated_domain in dont_link_domains:
-                if moderated_domain in text and str(message_thread_id) not in TIRZHELP_CLOSED_TOPICS:
+                if moderated_domain in text and username not in MOD_ACCOUNTS:
                     logging.info(f"Detected moderated domain: {moderated_domain}")
                     # Tag the user and reply
-                    reply_message = msgs.dont_link(user_id, user_name)
+                    reply_message = msgs.dont_link(user_id, user_firstname)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
                     # Delete the posted message
                     helpers_telegram.delete_message(chat_id, message_id)
@@ -211,7 +226,7 @@ def webhook():
             for term in auto_poof_terms:
                 # Using regex with word boundaries to avoid partial matches
                 pattern = re.compile(r'\b' + re.escape(term) + r'\b', re.IGNORECASE)
-                if pattern.search(text):
+                if pattern.search(text) and username not in MOD_ACCOUNTS:
                     logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {term}")
                     helpers_telegram.delete_message(chat_id, message_id)
                     return jsonify({"ok": True}), 200

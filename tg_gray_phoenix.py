@@ -35,15 +35,16 @@ NEW_GROUP_DESCRIPTION = (
 )
 USERS_TO_ADD = [
     '@tirzhelp_bot',
-    '@seekerseventyseven',
+    '@seekerseventysix',
     '@tirzepatidehelp',
     # '@delululemonade',
     # '@stephs2125',
-    # '@boo_7777',
     # '@aksailor',
     # '@NordicTurtle',
     # '@Ruca2573',
     # '@Litajj',
+    # '@UncleNacho'
+    # '@ruttheimer'
 ]
 PINNED_TOPIC_NAMES = ["Rules & Guides","Announcements","Newbies"]
 # Define which admin rights you want them to have
@@ -61,17 +62,17 @@ ADMIN_RIGHTS = ChatAdminRights(
 
 TOPIC_FORWARD_MAP = {
     "Rules & Guides": {
-        "messages": ['1226','1227'],
+        "messages": ['1226','2075','2074','2084'], 
         "icon_color": 0xFFD700,        # Gold
         "icon_emoji_id": 5350481781306958339         
     },
     "Announcements": {
-        "messages": ['1224'],
+        "messages": ['2076','2077','2078','2079','2080','2081','2082','2083'],
         "icon_color": 0xFF8C00,        # DarkOrange
         "icon_emoji_id": 5377498341074542641
     },
     "Newbies": {
-        "messages": [],
+        "messages": ['2015'],
         "icon_color": 0x009688,        # Material Teal
         "icon_emoji_id": 5377675010259297233
     },
@@ -81,22 +82,22 @@ TOPIC_FORWARD_MAP = {
         "icon_emoji_id": 5316705050389670171
     },
     "Test Results - NO DISCUSSION": {
-        "messages": ['1238','1239'],
+        "messages": ['1238','1239'], 
         "icon_color": 0x9C27B0,        # Material Purple
         "icon_emoji_id": 5373251851074415873
     },
     "Group Test Invites - NO DISCUSSION": {
-        "messages": ['1241','1242'],
+        "messages": ['1241','1242','2085'],
         "icon_color": 0x4CAF50,        # Material Green
         "icon_emoji_id": 5357315181649076022
     },
     "Sources & Testing": {
-        "messages": ['1229','1230','1231'],
+        "messages": ['1229','1230','2085','1231'],
         "icon_color": 0xE91E63,        # Material Pink
         "icon_emoji_id": 5362079447136610876
     },
     "Vendor Promos": {
-        "messages": ['1244'],
+        "messages": ['2086'],
         "icon_color": 0xF08500,        # Orange-ish
         "icon_emoji_id": 5208801655004350721
     },
