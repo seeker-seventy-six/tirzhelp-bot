@@ -102,7 +102,7 @@ TOPIC_FORWARD_MAP = {
         "icon_emoji_id": 5208801655004350721
     },
     "Supplies, Storage, & Labels": {
-        "messages": ['1233','1234'],
+        "messages": ['2089','2090'],
         "icon_color": 0x8BC34A,        # Light Green
         "icon_emoji_id": 5377660214096974712
     },
@@ -111,15 +111,19 @@ TOPIC_FORWARD_MAP = {
         "icon_color": 0x3F51B5,        # Indigo
         "icon_emoji_id": 5411138633765757782
     },
+    "Science": {
+        "messages": ['2092'],
+        "icon_color": 0x673AB7,        # Deep Purple
+        "icon_emoji_id": 5190406357320216268
+    },
     "PenPorium": {
-        "messages": [],
+        "messages": ['1236','2093','2094'],
         "icon_color": 0x795548,        # Brown
         "icon_emoji_id": 5208782954716733247
     },
-    "Science": {
-        "messages": [],
-        "icon_color": 0x673AB7,        # Deep Purple
-        "icon_emoji_id": 5190406357320216268
+    "International": {
+        "messages": ['2096'],
+        "icon_color": 0x607D8B,        # Blue Grey
     },
     "Raffle & Fun": {
         "messages": [],
