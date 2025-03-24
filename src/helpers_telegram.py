@@ -152,11 +152,14 @@ def delete_message(chat_id, message_id):
         response = requests.post(url, json=payload)
 
         if response.status_code != 200:
-            logging.error(f"Telegram API returned an error: {response.text}")
-            response.raise_for_status()  # Raise for non-2xx errors
+            error_desc = response.get("description", "")
+            if "message to delete not found" in error_desc.lower():
+                logging.info(f"Message {message_id} in chat {chat_id} was already deleted or doesn't exist. Skipping.")
+            else:
+                logging.error(f"Telegram API returned an error: {response.text}")
+                response.raise_for_status()  # Raise for non-2xx errors
 
         return response.json()
 
     except requests.exceptions.RequestException as e:
-        logging.error(f"delete_message failed: {e}")
         raise RuntimeError(f"delete_message failed: {e}")
