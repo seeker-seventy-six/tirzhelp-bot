@@ -150,9 +150,10 @@ def delete_message(chat_id, message_id):
             "message_id": message_id
         }
         response = requests.post(url, json=payload)
+        json_response = response.json()
 
         if response.status_code != 200:
-            error_desc = response.get("description", "")
+            error_desc = json_response.get("description", "")
             if "message to delete not found" in error_desc.lower():
                 logging.info(f"Message {message_id} in chat {chat_id} was already deleted or doesn't exist. Skipping.")
             else:
