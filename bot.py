@@ -29,7 +29,8 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 TIRZHELP_SUPERGROUP_ID = '-1002410577414'
 TIRZHELP_TEST_RESULTS_CHANNEL = '48'
 TIRZHELP_NEWBIE_CHANNEL = '1408'
-TIRZHELP_CLOSED_TOPICS = ['1','3','19','63']
+TIRZHELP_CLOSED_CHANNLES = ['1','3','19','63']
+TIRZHELP_IGNORE_AUTOMOD_CHANNELS = ['59','48']
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
@@ -235,10 +236,12 @@ def webhook():
                 # Using regex with word boundaries to avoid partial matches
                 pattern = re.compile(r'\b' + re.escape(term) + r'\b', re.IGNORECASE)
                 if pattern.search(text) and username not in MOD_ACCOUNTS:
+                    if str(message_thread_id) in TIRZHELP_IGNORE_AUTOMOD_CHANNELS:
+                        logging.info(f"Message in chat {chat_id} matched auto-poof term '{term}', but skipping deletion due to exempted channel.")
+                        break  # Skip deletion but stop further term checking
                     logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {term}")
                     helpers_telegram.delete_message(chat_id, message_id)
                     return jsonify({"ok": True}), 200
-
         
         # if none of the bot functions need to run, also return success so update is accounted for
         return jsonify({"ok": True}), 200
@@ -265,13 +268,12 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
     if command in command_dispatcher:
         return command_dispatcher[command]()
     else:
-        return helpers_telegram.send_message(chat_id, msgs.unsupported(), message_thread_id, reply_to_message_id)
+        try:
+            return helpers_telegram.send_message(chat_id, msgs.unsupported(), message_thread_id, reply_to_message_id)
+        except:
+            return helpers_telegram.send_message(chat_id, msgs.unsupported())
 
 
 if __name__ == "__main__":
-    # Delete and reset webhook if ever errors get tangled
-    delete_webhook()
-    set_webhook()
-
     # Start the Flask app for web workers
     app.run(host="0.0.0.0", port=8443)

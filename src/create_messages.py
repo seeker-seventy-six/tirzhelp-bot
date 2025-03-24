@@ -208,5 +208,5 @@ def summarize_test_results(update, BOT_TOKEN):
 
 
 def unsupported():
-    markdown = r"""<code>stop poking me. seriously though. this command doesn't do anything. now clean up your mess.</code>"""
+    markdown = r"""<code>stop poking me. this command doesn't do anything.</code>"""
     return markdown
