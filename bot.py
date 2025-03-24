@@ -131,6 +131,14 @@ def set_webhook():
     response = requests.post(url, json=payload)
     return response.json()
 
+# Delete the webhook
+@app.route('/deletewebhook', methods=['GET'])
+def delete_webhook():
+    url = f"{TELEGRAM_API_URL}/deleteWebhook"
+    payload = {"url": f"{WEBHOOK_URL}"}
+    response = requests.post(url, json=payload)
+    return response.json()
+
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -261,5 +269,9 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
 
 
 if __name__ == "__main__":
+    # Delete and reset webhook if ever errors get tangled
+    delete_webhook()
+    set_webhook()
+
     # Start the Flask app for web workers
     app.run(host="0.0.0.0", port=8443)
