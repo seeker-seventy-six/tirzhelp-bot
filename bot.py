@@ -211,9 +211,13 @@ def webhook():
             ### AUTO EXTRACT TEST RESULTS ###
             # Respond to uploaded documents in Test Results channel
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
-                test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
-                helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
-                return jsonify({"ok": True}), 200
+                try:
+                    test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
+                    helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
+                    return jsonify({"ok": True}), 200
+                except:
+                    helpers_telegram.send_message(chat_id, "🚫 Unsupported file format received. Please check your file is a .pdf, .png, or .jpeg and retry.", message_thread_id)
+                    return jsonify({"ok": True}), 200
 
             ### AUTO POOF LINKED COMMUNITIES ###
             # If the text contains any ignored URL, skip moderation
