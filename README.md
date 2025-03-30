@@ -1,5 +1,5 @@
 # 🤖 TirzHelpBot
-*A Telegram Bot API Heroku App for r/TirzepatideHelp*
+*A Telegram Bot API Heroku App for Stairway to Gray (aka r/TirzepatideHelp)*
 
 This is a Flask-based application that integrates with the Telegram Bot API. It allows you to interact with Telegram supergroups and handle commands from users. The bot is set up with a webhook to process incoming updates and respond accordingly.
 
@@ -7,13 +7,26 @@ Once the bot is deployed to Heroku and added as a member to a Telegram supergrou
 
 ## Features
 
-- **User Login Verification**: Verifies if a user is a member of a specific Telegram supergroup using the `login` route.
 - **Webhook Handling**: Listens to incoming updates and processes commands like `/newbie`, `/lastcall`, and `/safety`.
 - **Automatic Welcome**: Welcomes new users when they join specific supergroups.
-- **Banned Topic Filtering**: Filters messages for banned topics and alerts the user if a topic is found.
-- **Document Summarization**: Summarizes test results from uploaded documents in the designated test results channels.
+- **Banned Topic Filtering**: Filters messages for banned topics and alerts the user if a topic is found. It can also auto-delete messages for certain terms organized by yaml files.
+- **Automated Messages**: Can automatically respond to certain terms or regex patterns with predefined messages for certain terms organized by yaml files.
+- **Test Results Extraction**: Extract any document (pdf) or image uploaded to Test Results channel and upload the extracted data to a Google Spreadsheet automatically.
+
+## Environment Setup
+
+Before deploying, create a `.env-dev` and `.env-prod` file with the following environment variables for each bot environment. If developing on the existing bot, these can be found on the Heroku Dashboard > [Application Name] > Settings > Config Vars:
+
+```
+BOT_TOKEN=your-telegram-bot-token
+WEBHOOK_URL=https://your-heroku-app-url/webhook
+ENVIRONMENT=[PROD or DEV]
+OPENAI_TOKEN=your-openai-token
+GOOGLE_SERVICE_ACCOUNT_FILE=your-google-developer-app-token
+```
 
 ## Deployment
+*Only if setting up a new bot*
 
 The app is deployed on Heroku and uses the `deploy_bot.sh` script to deploy the application to different environments (dev and prod) based on the Git branch. 
 
@@ -22,14 +35,6 @@ The app is deployed on Heroku and uses the `deploy_bot.sh` script to deploy the 
 - **Heroku Account**: You need a Heroku account to deploy and manage the app.
 - **Telegram Bot API Token**: You need to generate a bot token from [BotFather](https://core.telegram.org/bots#botfather) on Telegram.
 
-### Environment Setup
-
-Before deploying, create a `.env-dev` and `.env-prod` file with the following environment variables for each bot environment:
-
-```
-BOT_TOKEN=your-telegram-bot-token
-WEBHOOK_URL=https://your-heroku-app-url/webhook
-```
 
 ### Deploying the App
 
@@ -62,7 +67,7 @@ To set up automated deployments:
 2. **Merge Requests**:
    - Whenever changes are merged into the selected branch (e.g., `main` or `dev`), Heroku will automatically deploy the app.
 
-## Webhook Setup
+### Webhook Setup
 
 After deployment, you need to set the webhook URL for the Telegram Bot API.
 
@@ -76,52 +81,10 @@ This command sets the webhook URL for your bot to the Heroku app's URL.
 
 ## Bot Functionality
 
-### **1. `/login` Route**
-
-This route is used to verify if a user is part of a specific supergroup.
-
-- **Request**: 
-  ```
-  GET /login?user_id=<user_id>
-  ```
-- **Response**: 
-  - `200 OK` if the user is a member of the supergroup.
-  - `403 Forbidden` if the user is not a member.
-
-The function uses the helper `helpers_telegram.is_user_in_supergroup(user_id)` to check the user’s membership in the supergroup.
-
-### **2. `/setwebhook` Route**
-
-Sets the webhook for your bot with the provided `WEBHOOK_URL`.
-
-- **Request**: 
-  ```
-  GET /setwebhook
-  ```
-- **Response**: 
-  - Success response with the status of the webhook setup.
-
-This route triggers a POST request to Telegram's API to set the webhook for your bot.
-
-### **3. `/webhook` Route**
-
-Handles incoming messages and updates sent to the bot. This is the main endpoint where Telegram will send updates.
-
-- **Request**: 
-  ```
-  POST /webhook
-  ```
-- **Processing**:
-  - If a new member joins the group, it sends an automatic welcome message in #Welcome channel.
-  - It processes commands such as `/newbie`, `/lastcall`, and `/safety`.
-  - Automatically responds to banned topics (e.g., "DNP" for Dinitrophenol) in all channels.
-  - Summarizes test results if documents or photos are uploaded in the specified #Test Results channel.
-  - Automatically posts an hourly Newbie Announcement in Newbies channel.
-
 ### **Commands**
 
-- `/newbie`: Sends a welcome message to new users.
-- `/lastcall`: Sends a last call message (based on `lastcall` function).
+- `/newbie`: Sends a welcome message manually.
+- `/lastcall`: Sends a last call message for group tests (based on `lastcall` function).
 - `/safety`: Sends a safety message (based on `safety` function).
 
 ## Debugging with Heroku CLI
@@ -143,14 +106,14 @@ This will open a browser window where you can log in to your Heroku account.
 To view the live logs of your app, run:
 
 ```bash
-heroku logs --tail
+heroku logs --tail --app "[app name]"
 ```
 
 This will stream the logs, allowing you to monitor any issues or errors in real time.
 
 ### **Common Errors**
 
-- **Missing Environment Variables**: Ensure your `.env` file contains the correct variables (`BOT_TOKEN`, `WEBHOOK_URL`).
+- **Missing Environment Variables**: Ensure your `.env-dev` and `.env-main` files contains the correct variables (`BOT_TOKEN`, `WEBHOOK_URL`, etc.). (NOTE: If developing on the existing bot, these can be found on the Heroku under Dashboard > [Application Name] > Settings > Config Vars)
 - **Webhook Issues**: If your webhook is not working, check if the URL is correctly set by inspecting the logs.
 
 ## Conclusion
