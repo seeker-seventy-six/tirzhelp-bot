@@ -14,13 +14,11 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
-load_dotenv()
+load_dotenv('.env-dev')
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
 
-# In helpers_openai.py
-conversation_history = []
 
 ai_personas = [
     {
@@ -103,6 +101,7 @@ ai_personas = [
 ]
 
 ai_index = 0  # Global index tracker
+conversation_history = []
 
 def pick_next_ai():
     global ai_index
@@ -110,7 +109,7 @@ def pick_next_ai():
     ai_index = (ai_index + 1) % len(ai_personas)  # Wrap around
     return persona
 
-def generate_ai_conversation(previous_messages=None):
+def generate_ai_conversation():
     global conversation_history
 
     # Story setup (system prompt)
@@ -353,5 +352,6 @@ def convert_first_page_to_image(pdf_path, output_name="first_page.png"):
 
 
 if __name__=='__main__':
-    test_result = extract_data_with_openai('./historic_test_results/5042221709662466859.jpg',"")
-    print(test_result)
+    # test_result = extract_data_with_openai('./historic_test_results/5042221709662466859.jpg',"")
+    # print(test_result)
+    print(generate_ai_conversation())

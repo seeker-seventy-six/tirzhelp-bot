@@ -69,9 +69,8 @@ def run_ai_conversation_loop():
             time.sleep(180)
 
             logging.info("🎭 Starting new AI exchange round...")
-            # Generate 10-message exchange (5 each)
-            messages = generate_ai_conversation(previous_messages)
-            previous_messages = messages  # Carry context into next round
+            # Generate one message (conversation history is tracked internally)
+            messages = generate_ai_conversation()
 
             if ENVIRONMENT == 'PROD':
                 for msg in messages[-10:]:
@@ -86,6 +85,7 @@ def run_ai_conversation_loop():
             logging.error(f"💥 AI roleplay thread error: {e}")
 
 def start_ai_roleplay_thread():
+    logging.info("Starting murder mystery roleplay...")
     thread = threading.Thread(target=run_ai_conversation_loop, daemon=True)
     thread.start()
     
