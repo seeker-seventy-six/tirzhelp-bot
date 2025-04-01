@@ -135,9 +135,21 @@ def generate_ai_conversation():
         f"Suspect's theory: {persona['theory']}.\n"
         f"Suspect's speech style: {persona['speech_style']}.\n"
         f"Suspect's catchphrase: {persona['catchphrase']}.\n"
-        f"Include the signature speech style and vibe of the suspect.\n"
-        "State for the record who you are interviewing and why. Clearly summarize the mystery up to this point in 2-3 sentences.\n"
-        "Begin the interview."
+        "State for the record who you are interviewing and why.\n"
+        "Output should be an Investigation Summary then followed by exactly 10 lines of alternating dialogue (5 from TirzHelpBot, 5 from the suspect), formatted like a script.\n"
+        "Each line must begin with the speaker name and a colon, with no narration or stage directions.\n\n"
+        "Format:\n\n"
+        "Investigation Summary: Clearly summarize the mystery up to this point in 2-3 sentences.\n"
+        "TirzHelpBot: [TirzHelpBot's line]\n"
+        "Suspect Name: [Suspect's line]\n"
+        "TirzHelpBot: [TirzHelpBot's line]\n"
+        "Suspect Name: [Suspect's line]\n"
+        "TirzHelpBot: [TirzHelpBot's line]\n"
+        "Suspect Name: [Suspect's line]\n"
+        "TirzHelpBot: [TirzHelpBot's line]\n"
+        "Suspect Name: [Suspect's line]\n"
+        "TirzHelpBot: [TirzHelpBot's line]\n"
+        "Suspect Name: [Suspect's line]\n"
     )
 
     # Build message chain
@@ -170,12 +182,14 @@ def parse_script_lines(script_text):
     parsed = []
 
     for line in lines:
-        if ":" in line:
+        if line.startswith("Investigation Summary:"):
+            parsed.append(f"<b>Investigation Summary</b>\n{line[len('Investigation Summary:'):].strip()}")
+        elif ":" in line:
             speaker, message = line.split(":", 1)
             speaker = speaker.strip()
             message = message.strip()
             if speaker and message:
-                parsed.append({"speaker": speaker, "text": message})
+                parsed.append(f"<b>{speaker}<b>: {message}")
 
     return parsed
 
