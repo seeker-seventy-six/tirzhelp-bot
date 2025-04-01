@@ -62,10 +62,8 @@ def run_ai_conversation_loop():
 
     while True:
         try:
-            # Wait until next full hour
-            now = datetime.datetime.now()
-            sleep_duration = 3600 - (now.minute * 60 + now.second)
-            time.sleep(30)
+            # Wait 30 mins
+            time.sleep(1800)
 
             logging.info("🎭 Starting new AI exchange round...")
             # Generate one message (conversation history is tracked internally)
@@ -79,12 +77,12 @@ def run_ai_conversation_loop():
                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, TIRZHELP_GENERAL_CHANNEL)
                 for msg in exchange:
                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL)
-                    time.sleep(5)
+                    time.sleep(10)
             else:
                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
                 for msg in exchange:
                     helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
-                    time.sleep(5)
+                    time.sleep(10)
 
         except Exception as e:
             logging.error(f"💥 AI roleplay thread error: {e}")
@@ -92,9 +90,12 @@ def run_ai_conversation_loop():
     # After the loop exits
     summary = generate_final_summary()
     if ENVIRONMENT == 'PROD':
+        helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', TIRZHELP_GENERAL_CHANNEL)
         helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
     else:
+        helpers_telegram.send_image(TEST_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg')
         helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
+        
 
 def start_ai_roleplay_thread():
     logging.info("Starting murder mystery roleplay...")

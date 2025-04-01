@@ -133,7 +133,7 @@ def generate_ai_conversation():
         "The Mods have mysteriously vanished from the STG forum after an incident in JanoBot's lab. "
         "This is an interview with a suspect who may have been on the scene, a suspicious AI character. "
         "Include their signature speech style and vibe. Continue the investigation."
-        "The Mods are the following people which you can ask about: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
+        "The Mods are the following people which you can ask about: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, Uncle Nacho, Upchuck, and D."
         "Do NOT include any HTML formatting. You may use emoji if the suspect persona specifies they use them."
     )
 
@@ -213,18 +213,18 @@ def generate_final_summary():
         "You are TirzHelpBot, the AI investigator who has been interviewing various suspect personas about the STG Mods' disappearance. "
         "Now that all interviews are complete, it's time to summarize the investigation. "
         "State your conclusion clearly. Identify the most suspicious persona and explain why with your evidence. "
-        "Keep the tone serious but with your signature dry wit. Your summary should be detailed, contain dry humor, and be no more than 5 paragraphs long. "
+        "Keep the tone serious but with your signature dry wit. Your summary should be detailed, contain dry humor, and be no more than 3 paragraphs long. Channel a Knives Out vibe. "
         "Stud you investigation summary with emoji for emphasis where appropriate. Begin your Investigation Conclusion."
     )
 
-    messages = [{"role": "system", "content": "You are a dry, no-nonsense investigation bot."}] + conversation_history + [
+    messages = [{"role": "system", "content": "You are a dry, no-nonsense investigation bot named TirzHelpBot."}] + conversation_history + [
         {"role": "user", "content": final_prompt}
     ]
 
     response = client.chat.completions.create(
         model="gpt-4o",
         temperature=0.8,
-        max_tokens=800,
+        max_tokens=1000,
         messages=messages
     )
 
