@@ -62,9 +62,6 @@ def run_ai_conversation_loop():
 
     while True:
         try:
-            # Wait 30 mins
-            time.sleep(1800)
-
             logging.info("🎭 Starting new AI exchange round...")
             # Generate one message (conversation history is tracked internally)
             exchange, pic_path = generate_ai_conversation()
@@ -74,15 +71,17 @@ def run_ai_conversation_loop():
                 break  # Exit cleanly when all personas are done
 
             if ENVIRONMENT == 'PROD':
-                helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, TIRZHELP_GENERAL_CHANNEL)
+                helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
                 for msg in exchange:
-                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL)
+                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
                     time.sleep(10)
             else:
                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
                 for msg in exchange:
                     helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
                     time.sleep(10)
+            # Wait 30 mins
+            time.sleep(1800)
 
         except Exception as e:
             logging.error(f"💥 AI roleplay thread error: {e}")
