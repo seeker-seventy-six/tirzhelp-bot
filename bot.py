@@ -78,7 +78,7 @@ def run_ai_conversation_loop():
                     time.sleep(10)
             else:
                 for msg in messages[-10:]:
-                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg, TEST_GENERAL_CHANNEL)
+                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
                     time.sleep(10)
 
         except Exception as e:
