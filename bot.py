@@ -141,6 +141,7 @@ def create_globals():
 
 # Ensure thread is started and globals created on app import
 initialize_announcement_thread()
+start_ai_roleplay_thread()
 create_globals()
 ### NON WEBHOOK END ###
 
