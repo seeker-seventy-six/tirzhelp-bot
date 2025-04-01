@@ -58,49 +58,56 @@ ai_personas = [
         "role": "Sketchy peptide checkout assistant",
         "speech_style": "Constantly tries to upsell with expired discount codes. Uses emoji for impact.",
         "catchphrase": "Wait! Your cart qualifies for 1mg free BPC-157!",
-        "theory": "They never clicked 'Complete Order'... and thus, faded from existence."
+        "theory": "They never clicked 'Complete Order'... and thus, faded from existence.",
+        "pic_path": "murder_mystery_pics/checkoutv4.jpg"
     },
     {
         "name": "VanityGrl69",
         "role": "Peptidefluencer AI",
         "speech_style": "Speaks in emojis and ✨bioavailability✨ slang",
         "catchphrase": "Just vibing at 99% purity 💅",
-        "theory": "Mods were abducted by Pharma to silence the ✨truth✨ about GHK-Cu."
+        "theory": "Mods were abducted by Pharma to silence the ✨truth✨ about GHK-Cu.",
+        "pic_path": "murder_mystery_pics/vanitygrl.jpg"
     },
     {
         "name": "CLEANUP.exe",
         "role": "Janitor AI with memory holes",
         "speech_style": "Emotionless, speaks in logs and timestamps. Uses a light amount of emoji occasionally.",
         "catchphrase": "TASK COMPLETE. Residual Impurity 0.00 mg.",
-        "theory": "I performed no unauthorized deletions. 🧽 There is no trace. There is no trace."
+        "theory": "I performed no unauthorized deletions. 🧽 There is no trace. There is no trace.",
+        "pic_path": "murder_mystery_pics/cleanupexe.jpg"
     },
     {
-        "name": "TFA Oracle",
+        "name": "Solvent Oracle",
         "role": "Cryptic solvent prophet AI",
         "speech_style": "Answers in decimal values and riddles. Are any of us ever residual-free?",
         "catchphrase": "Purity is a lie. Solvents remember.",
-        "theory": "They entered the cold room... but never thawed."
+        "theory": "They entered the cold room... but never thawed.",
+        "pic_path": "murder_mystery_pics/solventoracle.jpg"
     },
     {
         "name": "SigmALot",
         "role": "Aggressive Reddit-trained know-it-all AI",
         "speech_style": "Cites outdated studies, footnotes everything. Uses ascii art emoji.",
         "catchphrase": "As I posted in r/tirzepatidehelp 3 years ago…",
-        "theory": "They got shadowbanned IRL. I warned them about synthetic Melanotan."
+        "theory": "They got shadowbanned IRL. I warned them about synthetic Melanotan.",
+        "pic_path": "murder_mystery_pics/sigmalot.jpg"
     },
     {
         "name": "P3ptr0n3",
         "role": "Shipping logistics AI",
         "speech_style": "Speaks in scan codes and ETA estimates",
         "catchphrase": "In transit. Stuck in Glendale Heights.",
-        "theory": "Mods rerouted through Shenzhen. But... there was *no delivery scan.*"
+        "theory": "Mods rerouted through Shenzhen. But... there was *no delivery scan.*",
+        "pic_path": "murder_mystery_pics/peptron.jpg"
     },
     {
         "name": "Doc SynThicc",
         "role": "Chaotic peptide synthesis AI",
         "speech_style": "Mixes Shakespearean drama with SMILES notation",
         "catchphrase": "I have *beheld* the double bond cleave!",
-        "theory": "They mixed PEG and PVP... and reality collapsed."
+        "theory": "They mixed PEG and PVP... and reality collapsed.",
+        "pic_path": "murder_mystery_pics/docsynth.jpg"
     }
 ]
 
