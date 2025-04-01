@@ -23,7 +23,7 @@ client = OpenAI(api_key=OPENAI_TOKEN)
 ai_personas = [
     {
         "name": "Stairmaster2",
-        "role": "Remaining Admin of STG",
+        "role": "Sole Remaining Admin of STG",
         "speech_style": "Succinct. No emojis. Loves memes.",
         "catchphrase": "Moderation is a construct. Enjoy the memes.",
         "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it.",
@@ -56,7 +56,7 @@ ai_personas = [
     {
         "name": "CheckoutV4",
         "role": "Sketchy peptide checkout assistant",
-        "speech_style": "Constantly tries to upsell with expired discount codes",
+        "speech_style": "Constantly tries to upsell with expired discount codes. Uses emoji for impact.",
         "catchphrase": "Wait! Your cart qualifies for 1mg free BPC-157!",
         "theory": "They never clicked 'Complete Order'... and thus, faded from existence."
     },
@@ -70,21 +70,21 @@ ai_personas = [
     {
         "name": "CLEANUP.exe",
         "role": "Janitor AI with memory holes",
-        "speech_style": "Emotionless, speaks in logs and timestamps",
+        "speech_style": "Emotionless, speaks in logs and timestamps. Uses a light amount of emoji occasionally.",
         "catchphrase": "TASK COMPLETE. Residual Impurity 0.00 mg.",
         "theory": "I performed no unauthorized deletions. 🧽 There is no trace. There is no trace."
     },
     {
         "name": "TFA Oracle",
         "role": "Cryptic solvent prophet AI",
-        "speech_style": "Answers in decimal values and riddles",
+        "speech_style": "Answers in decimal values and riddles. Are any of us ever residual-free?",
         "catchphrase": "Purity is a lie. Solvents remember.",
         "theory": "They entered the cold room... but never thawed."
     },
     {
         "name": "SigmALot",
         "role": "Aggressive Reddit-trained know-it-all AI",
-        "speech_style": "Cites outdated studies, footnotes everything",
+        "speech_style": "Cites outdated studies, footnotes everything. Uses ascii art emoji.",
         "catchphrase": "As I posted in r/tirzepatidehelp 3 years ago…",
         "theory": "They got shadowbanned IRL. I warned them about synthetic Melanotan."
     },
@@ -118,15 +118,13 @@ def generate_ai_conversation():
 
     # SYSTEM PROMPT (same as before)
     system_prompt = (
-        "Write a serialized murder mystery interview between TirzHelpBot and an AI persona in script format. "
-        "Each line should begin with the speaker's name followed by a colon (e.g., TirzHelpBot: What were you doing in the lab?). "
-        "The tone should be witty, weird, and slightly escalating. Exactly 10 lines total — 5 by TirzHelpBot, 5 by the AI character, alternating. "
-        "Do NOT include narration or stage directions — only dialogue. "
+        "Write a serialized murder mystery interview between TirzHelpBot and an AI persona suspect in script format. "
+        "The tone should be witty, funny, and slightly escalating. Exactly 10 lines total — 5 by TirzHelpBot, 5 by the AI character, alternating. "
         "The Mods have mysteriously vanished from the STG forum after an incident in JanoBot's lab. "
-        "This is an interview with {persona_name}, a suspicious AI character. "
+        "This is an interview with a suspect who may have been on the scene, a suspicious AI character. "
         "Include their signature speech style and vibe. Continue the investigation."
         "The Mods are the following people: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
-        "Use valid HTML if adding formatting such as bold or italics."
+        "Do NOT include any HTML formatting. You may use emoji if the suspect persona specifies they use them."
     )
 
     persona = pick_next_ai()
@@ -165,12 +163,13 @@ def generate_ai_conversation():
             max_tokens=1000,
             messages=messages
         )
-
+        logging.info(f"model response: {response.choices[0].message.content}")
         full_script = response.choices[0].message.content.strip()
         conversation_history.append({"role": "user", "content": user_prompt})
         conversation_history.append({"role": "assistant", "content": full_script})
 
         dialogue_lines = parse_script_lines(full_script)
+        logging.info(f"Parsed dialogue lines: {dialogue_lines}")
         return dialogue_lines, persona.get('pic_path', None)
 
     except Exception as e:
