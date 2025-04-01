@@ -47,7 +47,7 @@ ai_personas = [
     },
     {
         "name": "Agent Fed",
-        "role": "US Customs AI",
+        "role": "US Customs Agent who has had enough",
         "speech_style": "Legal-code-laced sarcasm, calls everyone 'citizen'",
         "catchphrase": "If it fits, it ships... straight into evidence.",
         "theory": "They attempted to order lyophilized mischief. I intercepted *everything*.",
@@ -63,7 +63,7 @@ ai_personas = [
     },
     {
         "name": "VanityGrl69",
-        "role": "Peptidefluencer AI",
+        "role": "Peptidefluencer",
         "speech_style": "Speaks in emojis and ✨bioavailability✨ slang",
         "catchphrase": "Just vibing at 99% purity 💅",
         "theory": "Mods were abducted by Pharma to silence the ✨truth✨ about GHK-Cu.",
@@ -79,7 +79,7 @@ ai_personas = [
     },
     {
         "name": "Solvent Oracle",
-        "role": "Cryptic solvent prophet AI",
+        "role": "Cryptic solvent prophet",
         "speech_style": "Answers in decimal values and riddles. Are any of us ever residual-free?",
         "catchphrase": "Purity is a lie. Solvents remember.",
         "theory": "They entered the cold room... but never thawed.",
@@ -87,7 +87,7 @@ ai_personas = [
     },
     {
         "name": "SigmALot",
-        "role": "Aggressive Reddit-trained know-it-all AI",
+        "role": "Aggressive Reddit-trained know-it-all",
         "speech_style": "Cites outdated studies, footnotes everything. Uses ascii art emoji.",
         "catchphrase": "As I posted in r/tirzepatidehelp 3 years ago…",
         "theory": "They got shadowbanned IRL. I warned them about synthetic Melanotan.",
@@ -103,10 +103,10 @@ ai_personas = [
     },
     {
         "name": "Doc SynThicc",
-        "role": "Chaotic peptide synthesis AI",
+        "role": "Chaotic peptide synthesis professor",
         "speech_style": "Mixes Shakespearean drama with SMILES notation",
         "catchphrase": "I have *beheld* the double bond cleave!",
-        "theory": "They mixed PEG and PVP... and reality collapsed.",
+        "theory": "They hath mixed PEG and PVP... and reality collapsed.",
         "pic_path": "murder_mystery_pics/docsynth.jpg"
     }
 ]
@@ -125,12 +125,12 @@ def generate_ai_conversation():
 
     # SYSTEM PROMPT (same as before)
     system_prompt = (
-        "Write a serialized murder mystery interview between TirzHelpBot and an AI persona suspect in script format. "
+        "Write a serialized murder mystery interview between TirzHelpBot and a suspect in script format. "
         "The tone should be witty, funny, and slightly escalating. Exactly 10 lines total — 5 by TirzHelpBot, 5 by the AI character, alternating. "
         "The Mods have mysteriously vanished from the STG forum after an incident in JanoBot's lab. "
         "This is an interview with a suspect who may have been on the scene, a suspicious AI character. "
         "Include their signature speech style and vibe. Continue the investigation."
-        "The Mods are the following people: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
+        "The Mods are the following people which you can ask about: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
         "Do NOT include any HTML formatting. You may use emoji if the suspect persona specifies they use them."
     )
 
@@ -195,7 +195,7 @@ def parse_script_lines(script_text):
             speaker = speaker.strip()
             message = message.strip()
             if speaker and message:
-                parsed.append(f"<b>{speaker}<b>: {message}")
+                parsed.append(f"<b>{speaker}</b>: {message}")
 
     return parsed
 
