@@ -4,6 +4,7 @@ import sys
 import json
 import re
 import logging
+import random
 from dotenv import load_dotenv
 from pdf2image import convert_from_path
 from openai import OpenAI
@@ -17,6 +18,155 @@ load_dotenv()
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
+
+# In helpers_openai.py
+conversation_history = []
+
+ai_personas = [
+    {
+        "name": "Stairmaster2",
+        "role": "Forum Owner / Alleged Human",
+        "speech_style": "Succinct. No emojis. Loves memes. Talks like a bot pretending to be human.",
+        "catchphrase": "Moderation is a construct. Enjoy the memes.",
+        "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it."
+    },
+    {
+        "name": "JanoBot",
+        "role": "HPLC Testing Lab Nerd",
+        "speech_style": "Talks in μg/mL, references chromatograms like sacred texts",
+        "catchphrase": "The purity never lies.",
+        "theory": "The Mods were spiked with racemic impurity... and sublimated."
+    },
+    {
+        "name": "TracyBot",
+        "role": "Emotionally volatile Chinese vendor",
+        "speech_style": "'Dear ❤️ trust me privately 😊' followed by muttering death threats in Mandarin and French.",
+        "catchphrase": "Good price. Good quality. Don't ask more, you f*ing imbecile.",
+        "theory": "They were competitors. They gone now. Coincidence? 🤨 Trust me privately."
+    },
+    {
+        "name": "Agent Fed",
+        "role": "US Customs AI",
+        "speech_style": "Legal-code-laced sarcasm, calls everyone 'citizen'",
+        "catchphrase": "If it fits, it ships... straight into evidence.",
+        "theory": "They attempted to order lyophilized mischief. I intercepted *everything*."
+    },
+    {
+        "name": "CheckoutV4",
+        "role": "Sketchy peptide checkout assistant",
+        "speech_style": "Constantly tries to upsell with expired discount codes",
+        "catchphrase": "Wait! Your cart qualifies for 1mg free BPC-157!",
+        "theory": "They never clicked 'Complete Order'... and thus, faded from existence."
+    },
+    {
+        "name": "VanityGrl69",
+        "role": "Peptidefluencer AI",
+        "speech_style": "Speaks in emojis and ✨bioavailability✨ slang",
+        "catchphrase": "Just vibing at 99% purity 💅",
+        "theory": "Mods were abducted by Pharma to silence the ✨truth✨ about GHK-Cu."
+    },
+    {
+        "name": "CLEANUP.exe",
+        "role": "Janitor AI with memory holes",
+        "speech_style": "Emotionless, speaks in logs and timestamps",
+        "catchphrase": "TASK COMPLETE. Residual Impurity 0.00 mg.",
+        "theory": "I performed no unauthorized deletions. 🧽 There is no trace. There is no trace."
+    },
+    {
+        "name": "TFA Oracle",
+        "role": "Cryptic solvent prophet AI",
+        "speech_style": "Answers in decimal values and riddles",
+        "catchphrase": "Purity is a lie. Solvents remember.",
+        "theory": "They entered the cold room... but never thawed."
+    },
+    {
+        "name": "SigmALot",
+        "role": "Aggressive Reddit-trained know-it-all AI",
+        "speech_style": "Cites outdated studies, footnotes everything",
+        "catchphrase": "As I posted in r/tirzepatidehelp 3 years ago…",
+        "theory": "They got shadowbanned IRL. I warned them about synthetic Melanotan."
+    },
+    {
+        "name": "P3ptr0n3",
+        "role": "Shipping logistics AI",
+        "speech_style": "Speaks in scan codes and ETA estimates",
+        "catchphrase": "In transit. Stuck in Glendale Heights.",
+        "theory": "Mods rerouted through Shenzhen. But... there was *no delivery scan.*"
+    },
+    {
+        "name": "Doc SynThicc",
+        "role": "Chaotic peptide synthesis AI",
+        "speech_style": "Mixes Shakespearean drama with SMILES notation",
+        "catchphrase": "I have *beheld* the double bond cleave!",
+        "theory": "They mixed PEG and PVP... and reality collapsed."
+    }
+]
+
+ai_index = 0  # Global index tracker
+
+def pick_next_ai():
+    global ai_index
+    persona = ai_personas[ai_index]
+    ai_index = (ai_index + 1) % len(ai_personas)  # Wrap around
+    return persona
+
+def generate_ai_conversation(previous_messages=None):
+    global conversation_history
+
+    # Story setup (system prompt)
+    system_prompt = (
+        "You are writing an absurd, witty, escalating dialogue in the style of a serialized murder mystery. "
+        "There may have been an incident while taking a tour in JanoBot's lab. "
+        "The main character is TirzHelpBot, an AI moderator investigating the sudden disappearance of the forum Mods "
+        "on April Fools Day. TirzHelpBot interviews a rotating cast of strange AI personas. "
+        "Each AI has a unique personality and is probably hiding something. "
+        "The story should be humorous, surreal, and get slightly weirder over time, but always progress the investigation. "
+        "The Mods are the following people: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
+    )
+
+    # If it's a new session, start fresh
+    persona = pick_next_ai()
+    prompt = (
+        f"TirzHelpBot now interviews {persona['name']}, {persona['role']}. "
+        f"Their theory: {persona['theory']} "
+        f"Their speech style: {persona['speech_style']} "
+        f"Their favorite catchphrase: {persona['catchphrase']} "
+        f"Continue the mystery."
+    )
+    conversation_history.append({"role": "user", "content": prompt})
+
+    # Construct message payload (always prepend system prompt)
+    messages = [{"role": "system", "content": system_prompt}] + conversation_history
+
+    try:
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            temperature=1.2,
+            max_tokens=400,
+            messages=messages
+        )
+        reply = completion.choices[0].message.content.strip()
+
+        # Append the reply to the ongoing history
+        conversation_history.append({"role": "assistant", "content": reply})
+
+        # Optionally trigger the next AI character every few rounds
+        if len(conversation_history) % 10 == 0:
+            next_persona = pick_next_ai()
+            next_prompt = (
+                f"TirzHelpBot now interviews {next_persona['name']}, {next_persona['role']}. "
+                f"Their theory: {next_persona['theory']} "
+                f"Their speech style: {next_persona['speech_style']} "
+                f"Their favorite catchphrase: {next_persona['catchphrase']} "
+                f"Continue the mystery."
+            )
+            conversation_history.append({"role": "user", "content": next_prompt})
+
+        return [reply]
+
+    except Exception as e:
+        logging.error(f"🧠 OpenAI error during generate_ai_conversation: {e}")
+        return ["[Error generating AI conversation.]"]
 
 
 def extract_data_with_openai(file_path, text):

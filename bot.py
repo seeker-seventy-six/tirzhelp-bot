@@ -13,6 +13,7 @@ import logging
 sys.path.append('./src')
 from src import create_messages as msgs
 from src import helpers_telegram 
+from src.helpers_openai import generate_ai_conversation
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -29,12 +30,14 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 TIRZHELP_SUPERGROUP_ID = '-1002410577414'
 TIRZHELP_TEST_RESULTS_CHANNEL = '48'
 TIRZHELP_NEWBIE_CHANNEL = '1408'
+TIRZHELP_GENERAL_CHANNEL = '13'
 TIRZHELP_CLOSED_CHANNLES = ['1','3','19','63']
 TIRZHELP_IGNORE_AUTOMOD_CHANNELS = ['59','48']
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
 TEST_NEWBIE_CHANNEL = '681'
+TEST_GENERAL_CHANNEL = '1'
 
 MOD_ACCOUNTS = [
     'tirzhelp_bot',
@@ -53,6 +56,40 @@ MOD_ACCOUNTS = [
 app = Flask(__name__)
 
 ### NON WEBHOOK ###
+
+def run_ai_conversation_loop():
+    logging.info("🔁 Starting AI murder mystery roleplay thread...")
+    previous_messages = []
+
+    while True:
+        try:
+            # Wait until next full hour
+            now = datetime.datetime.now()
+            sleep_duration = 3600 - (now.minute * 60 + now.second)
+            time.sleep(180)
+
+            logging.info("🎭 Starting new AI exchange round...")
+            # Generate 10-message exchange (5 each)
+            messages = generate_ai_conversation(previous_messages)
+            previous_messages = messages  # Carry context into next round
+
+            if ENVIRONMENT == 'PROD':
+                for msg in messages[-10:]:
+                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL)
+                    time.sleep(10)
+            else:
+                for msg in messages[-10:]:
+                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg, TEST_GENERAL_CHANNEL)
+                    time.sleep(10)
+
+        except Exception as e:
+            logging.error(f"💥 AI roleplay thread error: {e}")
+
+def start_ai_roleplay_thread():
+    thread = threading.Thread(target=run_ai_conversation_loop, daemon=True)
+    thread.start()
+    
+
 # Function to send periodic announcements
 def start_periodic_announcement():
     while True:
