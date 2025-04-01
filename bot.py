@@ -13,7 +13,7 @@ import logging
 sys.path.append('./src')
 from src import create_messages as msgs
 from src import helpers_telegram 
-from src.helpers_openai import generate_ai_conversation
+from src.helpers_openai import generate_ai_conversation, generate_final_summary
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -65,25 +65,36 @@ def run_ai_conversation_loop():
             # Wait until next full hour
             now = datetime.datetime.now()
             sleep_duration = 3600 - (now.minute * 60 + now.second)
-            time.sleep(sleep_duration)
+            time.sleep(30)
 
             logging.info("🎭 Starting new AI exchange round...")
             # Generate one message (conversation history is tracked internally)
             exchange, pic_path = generate_ai_conversation()
 
+            if exchange is None:
+                logging.info("🔚 All interviews complete. Ending loop.")
+                break  # Exit cleanly when all personas are done
+
             if ENVIRONMENT == 'PROD':
                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, TIRZHELP_GENERAL_CHANNEL)
                 for msg in exchange:
                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL)
-                    time.sleep(10)
+                    time.sleep(5)
             else:
                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
                 for msg in exchange:
                     helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
-                    time.sleep(10)
+                    time.sleep(5)
 
         except Exception as e:
             logging.error(f"💥 AI roleplay thread error: {e}")
+
+    # After the loop exits
+    summary = generate_final_summary()
+    if ENVIRONMENT == 'PROD':
+        helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
+    else:
+        helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
 
 def start_ai_roleplay_thread():
     logging.info("Starting murder mystery roleplay...")

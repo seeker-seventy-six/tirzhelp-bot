@@ -116,9 +116,12 @@ conversation_history = []
 
 def pick_next_ai():
     global ai_index
+    if ai_index >= len(ai_personas):
+        return None  # Signal we're done
     persona = ai_personas[ai_index]
-    ai_index = (ai_index + 1) % len(ai_personas)  # Wrap around
+    ai_index += 1
     return persona
+
 
 def generate_ai_conversation():
     global conversation_history
@@ -135,6 +138,10 @@ def generate_ai_conversation():
     )
 
     persona = pick_next_ai()
+    if not persona:
+        logging.info("✅ All AI personas have been interviewed.")
+        return None, None  # Tell the caller we’re done
+    
     user_prompt = (
         f"TirzHelpBot is now interviewing {persona['name']} ({persona['role']}).\n"
         f"Suspect's theory: {persona['theory']}.\n"
@@ -198,6 +205,31 @@ def parse_script_lines(script_text):
                 parsed.append(f"<b>{speaker}</b>: {message}")
 
     return parsed
+
+def generate_final_summary():
+    global conversation_history
+
+    final_prompt = (
+        "You are TirzHelpBot, the AI investigator who has been interviewing various suspect personas about the STG Mods' disappearance. "
+        "Now that all interviews are complete, it's time to summarize the investigation. "
+        "State your conclusion clearly. Identify the most suspicious persona and explain why with your evidence. "
+        "Keep the tone serious but with your signature dry wit. Your summary should be detailed, contain dry humor, and be no more than 5 paragraphs long. "
+        "Stud you investigation summary with emoji for emphasis where appropriate. Begin your Investigation Conclusion."
+    )
+
+    messages = [{"role": "system", "content": "You are a dry, no-nonsense investigation bot."}] + conversation_history + [
+        {"role": "user", "content": final_prompt}
+    ]
+
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        temperature=0.8,
+        max_tokens=800,
+        messages=messages
+    )
+
+    msg = response.choices[0].message.content.strip()
+    return msg
 
 
 def extract_data_with_openai(file_path, text):
