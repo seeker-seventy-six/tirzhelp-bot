@@ -74,12 +74,12 @@ def run_ai_conversation_loop():
             if ENVIRONMENT == 'PROD':
                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, TIRZHELP_GENERAL_CHANNEL)
                 for msg in exchange:
-                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL, parse_mode=None)
+                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL)
                     time.sleep(5)
             else:
                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
                 for msg in exchange:
-                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg, parse_mode=None)
+                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
                     time.sleep(5)
 
         except Exception as e:

@@ -23,7 +23,7 @@ client = OpenAI(api_key=OPENAI_TOKEN)
 ai_personas = [
     {
         "name": "Stairmaster2",
-        "role": "Admin Owner of STG who looks like Cookie Monster from Sesame Street",
+        "role": "Remaining Admin of STG",
         "speech_style": "Succinct. No emojis. Loves memes.",
         "catchphrase": "Moderation is a construct. Enjoy the memes.",
         "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it.",
@@ -118,50 +118,66 @@ def generate_ai_conversation():
 
     # SYSTEM PROMPT (same as before)
     system_prompt = (
-        "You are writing a witty, escalating dialogue in the style of a serialized murder mystery. "
-        "There may have been an incident while taking a tour in JanoBot's lab. "
-        "The main character is TirzHelpBot, an AI bot investigating the sudden disappearance of the STG forum Mods. "
-        "TirzHelpBot interviews a rotating cast of strange personas who were present for the tour. "
-        "Each AI has a unique personality and is probably hiding something. "
-        "The story should be humorous, and get slightly weirder over time, but always progress the investigation. "
+        "Write a serialized murder mystery interview between TirzHelpBot and an AI persona in script format. "
+        "Each line should begin with the speaker's name followed by a colon (e.g., TirzHelpBot: What were you doing in the lab?). "
+        "The tone should be witty, weird, and slightly escalating. Exactly 10 lines total — 5 by TirzHelpBot, 5 by the AI character, alternating. "
+        "Do NOT include narration or stage directions — only dialogue. "
+        "The Mods have mysteriously vanished from the STG forum after an incident in JanoBot's lab. "
+        "This is an interview with {persona_name}, a suspicious AI character. "
+        "Include their signature speech style and vibe. Continue the investigation."
         "The Mods are the following people: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
+        "Use valid HTML if adding formatting such as bold or italics."
     )
 
     persona = pick_next_ai()
-    new_exchange = []
-
-    # First prompt from TirzHelpBot
-    tirz_prompt = (
-        f"TirzHelpBot now interviews {persona['name']}, {persona['role']}. "
-        f"Their theory: {persona['theory']} "
-        f"Their speech style: {persona['speech_style']} "
-        f"Their favorite catchphrase: {persona['catchphrase']} "
-        f"Begin the conversation."
+    user_prompt = (
+        f"TirzHelpBot is now interviewing {persona['name']} ({persona['role']}).\n"
+        f"Suspect's theory: {persona['theory']}.\n"
+        f"Suspect's speech style: {persona['speech_style']}.\n"
+        f"Suspect's catchphrase: {persona['catchphrase']}.\n"
+        f"Include the signature speech style and vibe of the suspect.\n"
+        "State for the record who you are interviewing and why. Clearly summarize the mystery up to this point in 2-3 sentences.\n"
+        "Begin the interview."
     )
 
-    conversation_history.append({"role": "user", "content": tirz_prompt})
-    new_exchange.append(f"<b>TirzHelpBot:</b> {tirz_prompt}")
+    # Build message chain
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
 
-    # Now alternate turns 5 times each
-    for i in range(5):
-        # Generate AI character reply
-        messages = [{"role": "system", "content": system_prompt}] + conversation_history
-        ai_reply = client.chat.completions.create(
+    try:
+        response = client.chat.completions.create(
             model="gpt-4o",
-            temperature=1.2,
-            max_tokens=400,
+            temperature=0.8,
+            max_tokens=1000,
             messages=messages
-        ).choices[0].message.content.strip()
+        )
 
-        conversation_history.append({"role": "assistant", "content": ai_reply})
-        new_exchange.append(f"<b>{persona['name']}:</b> {ai_reply}")
+        full_script = response.choices[0].message.content.strip()
+        conversation_history.append({"role": "user", "content": user_prompt})
+        conversation_history.append({"role": "assistant", "content": full_script})
 
-        # Generate TirzHelpBot reply
-        followup = f"TirzHelpBot continues the questioning. Respond to {persona['name']}'s previous answer."
-        conversation_history.append({"role": "user", "content": followup})
-        new_exchange.append(f"<b>TirzHelpBot:</b> {followup}")
+        dialogue_lines = parse_script_lines(full_script)
+        return dialogue_lines, persona.get('pic_path', None)
 
-    return new_exchange, persona.get('pic_path', None)
+    except Exception as e:
+        logging.error(f"🧠 OpenAI error during generate_ai_conversation: {e}")
+        return ["[Error generating conversation.]"], None
+    
+def parse_script_lines(script_text):
+    lines = script_text.splitlines()
+    parsed = []
+
+    for line in lines:
+        if ":" in line:
+            speaker, message = line.split(":", 1)
+            speaker = speaker.strip()
+            message = message.strip()
+            if speaker and message:
+                parsed.append({"speaker": speaker, "text": message})
+
+    return parsed
 
 
 def extract_data_with_openai(file_path, text):
