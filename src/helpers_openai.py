@@ -34,7 +34,7 @@ ai_personas = [
         "role": "HPLC and LCMS Testing Lab Nerd",
         "speech_style": "Talks in μg/mL, references chromatograms like sacred texts",
         "catchphrase": "The purity never lies.",
-        "theory": "The Mods were spiked with racemic impurity... and sublimated.",
+        "theory": "The Mods were maybe shrunk in the lyophilization chamber... and sublimated. But we can't find them sooooo... If asked where the Mods went, he speculates on a beach somewhere for some R&R.",
         "pic_path": "murder_mystery_pics/janobot.jpg"
     },
     {
@@ -125,7 +125,7 @@ def generate_ai_conversation():
 
     # SYSTEM PROMPT (same as before)
     system_prompt = (
-        "Write a serialized murder mystery interview between TirzHelpBot and a suspect in script format. "
+        "Write a serialized murder mystery interview between TirzHelpBot and a suspect character in script format. "
         "The tone should be witty, funny, and slightly escalating. Exactly 10 lines total — 5 by TirzHelpBot, 5 by the AI character, alternating. "
         "The Mods have mysteriously vanished from the STG forum after an incident in JanoBot's lab. "
         "This is an interview with a suspect who may have been on the scene, a suspicious AI character. "
@@ -141,7 +141,7 @@ def generate_ai_conversation():
         f"Suspect's speech style: {persona['speech_style']}.\n"
         f"Suspect's catchphrase: {persona['catchphrase']}.\n"
         "State for the record who you are interviewing and why.\n"
-        "Output should be an Investigation Summary then followed by exactly 10 lines of alternating dialogue (5 from TirzHelpBot, 5 from the suspect), formatted like a script.\n"
+        "Output should be an Investigation Summary then followed by exactly 10 lines of alternating dialogue (5 from TirzHelpBot, 5 from the suspect), formatted like a script where each speaker can go into some detail with their response.\n"
         "Each line must begin with the speaker name and a colon, with no narration or stage directions.\n\n"
         "Format:\n\n"
         "Investigation Summary: Clearly summarize the mystery up to this point in 2-3 sentences.\n"
