@@ -59,7 +59,6 @@ app = Flask(__name__)
 
 def run_ai_conversation_loop():
     logging.info("🔁 Starting AI murder mystery roleplay thread...")
-    previous_messages = []
 
     while True:
         try:
@@ -70,15 +69,17 @@ def run_ai_conversation_loop():
 
             logging.info("🎭 Starting new AI exchange round...")
             # Generate one message (conversation history is tracked internally)
-            messages = generate_ai_conversation()
+            messages, pic_path = generate_ai_conversation()
 
             if ENVIRONMENT == 'PROD':
                 for msg in messages[-10:]:
-                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL)
+                    helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, TIRZHELP_GENERAL_CHANNEL)
+                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, TIRZHELP_GENERAL_CHANNEL, parse_mode=None)
                     time.sleep(10)
             else:
                 for msg in messages[-10:]:
-                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
+                    helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
+                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg, parse_mode=None)
                     time.sleep(10)
 
         except Exception as e:

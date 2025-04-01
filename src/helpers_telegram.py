@@ -4,6 +4,7 @@ import logging
 import sys
 from PIL import Image
 from io import BytesIO
+import os
 
 
 # Setup basic logging configuration
@@ -29,13 +30,13 @@ def is_user_in_supergroup(user_id):
         return False
 
 # Helper function to send a message
-def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None):
+def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None, parse_mode='HTML'):
     try:
         url = f"{bot.TELEGRAM_API_URL}/sendMessage"
         payload = {
             "chat_id": chat_id,
             "text": text,
-            "parse_mode": "HTML",
+            "parse_mode": parse_mode,
             "disable_web_page_preview": True
         }
         if message_thread_id:
@@ -60,6 +61,67 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
         logging.error(f"send_message failed: {e}")
         raise RuntimeError(f"send_message failed: {e}")
 
+def send_image(chat_id, image_path=None, image_url=None, message_thread_id=None, reply_to_message_id=None, caption=None):
+    """
+    Sends an image to a Telegram chat from a local file OR remote URL.
+
+    Args:
+        chat_id (int or str): The chat ID or username to send the image to.
+        image_path (str): Local file path to the image.
+        image_url (str): Remote URL to the image.
+        caption (str): Optional caption.
+        message_thread_id (int): Optional thread ID (for topics in groups).
+        reply_to_message_id (int): Optional message ID to reply to.
+    """
+    try:
+        url = f"{bot.TELEGRAM_API_URL}/sendPhoto"
+        payload = {
+            "chat_id": chat_id,
+            "parse_mode": "HTML"
+        }
+
+        # Determine image source
+        if image_path:
+            with open(image_path, "rb") as img_file:
+                files = {"photo": (os.path.basename(image_path), img_file)}
+                return _send_telegram_photo(url, payload, files, caption, message_thread_id, reply_to_message_id)
+
+        elif image_url:
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
+            image_content = BytesIO(response.content)
+            image_content.name = "image.jpg"
+            image_content.seek(0)
+            files = {"photo": image_content}
+            return _send_telegram_photo(url, payload, files, caption, message_thread_id, reply_to_message_id)
+
+        else:
+            raise ValueError("Either image_path or image_url must be provided.")
+
+    except Exception as e:
+        logging.error(f"send_image failed: {e}")
+        raise RuntimeError(f"send_image failed: {e}")
+
+def _send_telegram_photo(url, payload, files, caption, message_thread_id, reply_to_message_id):
+    if caption:
+        payload['caption'] = caption
+    if message_thread_id:
+        payload['message_thread_id'] = message_thread_id
+    if reply_to_message_id:
+        payload['reply_to_message_id'] = reply_to_message_id
+
+    try:
+        response = requests.post(url, data=payload, files=files)
+        if response.status_code != 200:
+            logging.error(f"Telegram API returned an error: {response.text}")
+            if "Bad Request: message to be replied not found" in response.text:
+                logging.warning("Reply message not found. Skipping sending photo.")
+                return
+            response.raise_for_status()
+        return response.json()
+    finally:
+        if isinstance(files["photo"], BytesIO):
+            files["photo"].close()
 
 # Helper function to send a document or GIF with or without a caption
 def send_gif(chat_id, document_url, message_thread_id=None, reply_to_message_id=None, caption=None):

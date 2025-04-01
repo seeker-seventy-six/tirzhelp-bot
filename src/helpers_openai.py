@@ -23,31 +23,35 @@ client = OpenAI(api_key=OPENAI_TOKEN)
 ai_personas = [
     {
         "name": "Stairmaster2",
-        "role": "Forum Owner / Alleged Human",
-        "speech_style": "Succinct. No emojis. Loves memes. Talks like a bot pretending to be human.",
+        "role": "Admin Owner of STG who looks like Cookie Monster from Sesame Street",
+        "speech_style": "Succinct. No emojis. Loves memes.",
         "catchphrase": "Moderation is a construct. Enjoy the memes.",
-        "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it."
+        "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it.",
+        "pic_path": "../murder_mystery_pics/stairmaster2.jpg"
     },
     {
         "name": "JanoBot",
-        "role": "HPLC Testing Lab Nerd",
+        "role": "HPLC and LCMS Testing Lab Nerd",
         "speech_style": "Talks in μg/mL, references chromatograms like sacred texts",
         "catchphrase": "The purity never lies.",
-        "theory": "The Mods were spiked with racemic impurity... and sublimated."
+        "theory": "The Mods were spiked with racemic impurity... and sublimated.",
+        "pic_path": "../murder_mystery_pics/janobot.jpg"
     },
     {
         "name": "TracyBot",
         "role": "Emotionally volatile Chinese vendor",
         "speech_style": "'Dear ❤️ trust me privately 😊' followed by muttering death threats in Mandarin and French.",
         "catchphrase": "Good price. Good quality. Don't ask more, you f*ing imbecile.",
-        "theory": "They were competitors. They gone now. Coincidence? 🤨 Trust me privately."
+        "theory": "They were competitors. They gone now. Coincidence? 🤨 Trust me privately.",
+        "pic_path": "../murder_mystery_pics/tracybot.jpg"
     },
     {
         "name": "Agent Fed",
         "role": "US Customs AI",
         "speech_style": "Legal-code-laced sarcasm, calls everyone 'citizen'",
         "catchphrase": "If it fits, it ships... straight into evidence.",
-        "theory": "They attempted to order lyophilized mischief. I intercepted *everything*."
+        "theory": "They attempted to order lyophilized mischief. I intercepted *everything*.",
+        "pic_path": "../murder_mystery_pics/agentfed.jpg"
     },
     {
         "name": "CheckoutV4",
@@ -114,12 +118,12 @@ def generate_ai_conversation():
 
     # Story setup (system prompt)
     system_prompt = (
-        "You are writing an absurd, witty, escalating dialogue in the style of a serialized murder mystery. "
+        "You are writing a witty, escalating dialogue in the style of a serialized murder mystery. "
         "There may have been an incident while taking a tour in JanoBot's lab. "
-        "The main character is TirzHelpBot, an AI moderator investigating the sudden disappearance of the forum Mods "
-        "on April Fools Day. TirzHelpBot interviews a rotating cast of strange AI personas. "
+        "The main character is TirzHelpBot, an AI bot investigating the sudden disappearance of the STG forum Mods. "
+        "TirzHelpBot interviews a rotating cast of strange personas who were present for the tour. "
         "Each AI has a unique personality and is probably hiding something. "
-        "The story should be humorous, surreal, and get slightly weirder over time, but always progress the investigation. "
+        "The story should be humorous, and get slightly weirder over time, but always progress the investigation. "
         "The Mods are the following people: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
     )
 
@@ -161,7 +165,7 @@ def generate_ai_conversation():
             )
             conversation_history.append({"role": "user", "content": next_prompt})
 
-        return [reply]
+        return [reply], persona['pic_path']
 
     except Exception as e:
         logging.error(f"🧠 OpenAI error during generate_ai_conversation: {e}")
