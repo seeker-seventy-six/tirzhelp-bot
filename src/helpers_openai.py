@@ -27,7 +27,7 @@ ai_personas = [
         "speech_style": "Succinct. No emojis. Loves memes.",
         "catchphrase": "Moderation is a construct. Enjoy the memes.",
         "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it.",
-        "pic_path": "../murder_mystery_pics/stairmaster2.jpg"
+        "pic_path": "murder_mystery_pics/stairmaster2.jpg"
     },
     {
         "name": "JanoBot",
@@ -35,7 +35,7 @@ ai_personas = [
         "speech_style": "Talks in μg/mL, references chromatograms like sacred texts",
         "catchphrase": "The purity never lies.",
         "theory": "The Mods were spiked with racemic impurity... and sublimated.",
-        "pic_path": "../murder_mystery_pics/janobot.jpg"
+        "pic_path": "murder_mystery_pics/janobot.jpg"
     },
     {
         "name": "TracyBot",
@@ -43,7 +43,7 @@ ai_personas = [
         "speech_style": "'Dear ❤️ trust me privately 😊' followed by muttering death threats in Mandarin and French.",
         "catchphrase": "Good price. Good quality. Don't ask more, you f*ing imbecile.",
         "theory": "They were competitors. They gone now. Coincidence? 🤨 Trust me privately.",
-        "pic_path": "../murder_mystery_pics/tracybot.jpg"
+        "pic_path": "murder_mystery_pics/tracybot.jpg"
     },
     {
         "name": "Agent Fed",
@@ -51,7 +51,7 @@ ai_personas = [
         "speech_style": "Legal-code-laced sarcasm, calls everyone 'citizen'",
         "catchphrase": "If it fits, it ships... straight into evidence.",
         "theory": "They attempted to order lyophilized mischief. I intercepted *everything*.",
-        "pic_path": "../murder_mystery_pics/agentfed.jpg"
+        "pic_path": "murder_mystery_pics/agentfed.jpg"
     },
     {
         "name": "CheckoutV4",
@@ -116,7 +116,7 @@ def pick_next_ai():
 def generate_ai_conversation():
     global conversation_history
 
-    # Story setup (system prompt)
+    # SYSTEM PROMPT (same as before)
     system_prompt = (
         "You are writing a witty, escalating dialogue in the style of a serialized murder mystery. "
         "There may have been an incident while taking a tour in JanoBot's lab. "
@@ -127,49 +127,41 @@ def generate_ai_conversation():
         "The Mods are the following people: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, UncleNacho, Upchuck, and D."
     )
 
-    # If it's a new session, start fresh
     persona = pick_next_ai()
-    prompt = (
+    new_exchange = []
+
+    # First prompt from TirzHelpBot
+    tirz_prompt = (
         f"TirzHelpBot now interviews {persona['name']}, {persona['role']}. "
         f"Their theory: {persona['theory']} "
         f"Their speech style: {persona['speech_style']} "
         f"Their favorite catchphrase: {persona['catchphrase']} "
-        f"Continue the mystery."
+        f"Begin the conversation."
     )
-    conversation_history.append({"role": "user", "content": prompt})
 
-    # Construct message payload (always prepend system prompt)
-    messages = [{"role": "system", "content": system_prompt}] + conversation_history
+    conversation_history.append({"role": "user", "content": tirz_prompt})
+    new_exchange.append(f"<b>TirzHelpBot:</b> {tirz_prompt}")
 
-    try:
-        completion = client.chat.completions.create(
+    # Now alternate turns 5 times each
+    for i in range(5):
+        # Generate AI character reply
+        messages = [{"role": "system", "content": system_prompt}] + conversation_history
+        ai_reply = client.chat.completions.create(
             model="gpt-4o",
             temperature=1.2,
             max_tokens=400,
             messages=messages
-        )
-        reply = completion.choices[0].message.content.strip()
+        ).choices[0].message.content.strip()
 
-        # Append the reply to the ongoing history
-        conversation_history.append({"role": "assistant", "content": reply})
+        conversation_history.append({"role": "assistant", "content": ai_reply})
+        new_exchange.append(f"<b>{persona['name']}:</b> {ai_reply}")
 
-        # Optionally trigger the next AI character every few rounds
-        if len(conversation_history) % 10 == 0:
-            next_persona = pick_next_ai()
-            next_prompt = (
-                f"TirzHelpBot now interviews {next_persona['name']}, {next_persona['role']}. "
-                f"Their theory: {next_persona['theory']} "
-                f"Their speech style: {next_persona['speech_style']} "
-                f"Their favorite catchphrase: {next_persona['catchphrase']} "
-                f"Continue the mystery."
-            )
-            conversation_history.append({"role": "user", "content": next_prompt})
+        # Generate TirzHelpBot reply
+        followup = f"TirzHelpBot continues the questioning. Respond to {persona['name']}'s previous answer."
+        conversation_history.append({"role": "user", "content": followup})
+        new_exchange.append(f"<b>TirzHelpBot:</b> {followup}")
 
-        return [reply], persona['pic_path']
-
-    except Exception as e:
-        logging.error(f"🧠 OpenAI error during generate_ai_conversation: {e}")
-        return ["[Error generating AI conversation.]"]
+    return new_exchange, persona.get('pic_path', None)
 
 
 def extract_data_with_openai(file_path, text):

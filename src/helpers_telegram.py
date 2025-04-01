@@ -43,6 +43,8 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
             payload['message_thread_id'] = message_thread_id
         if reply_to_message_id:
             payload['reply_to_message_id'] = reply_to_message_id
+        if not parse_mode:
+            payload.pop('parse_mode', None)
 
         response = requests.post(url, json=payload)
         if response.status_code != 200:
