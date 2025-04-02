@@ -57,49 +57,48 @@ app = Flask(__name__)
 
 ### NON WEBHOOK ###
 
-def run_ai_conversation_loop():
-    logging.info("🔁 Starting AI murder mystery roleplay thread...")
+# def run_ai_conversation_loop():
+#     logging.info("🔁 Starting AI murder mystery roleplay thread...")
 
-    while True:
-        try:
-            logging.info("🎭 Starting new AI exchange round...")
-            # Generate one message (conversation history is tracked internally)
-            exchange, pic_path = generate_ai_conversation()
+#     while True:
+#         try:
+#             logging.info("🎭 Starting new AI exchange round...")
+#             # Generate one message (conversation history is tracked internally)
+#             exchange, pic_path = generate_ai_conversation()
 
-            if exchange is None:
-                logging.info("🔚 All interviews complete. Ending loop.")
-                break  # Exit cleanly when all personas are done
+#             if exchange is None:
+#                 logging.info("🔚 All interviews complete. Ending loop.")
+#                 break  # Exit cleanly when all personas are done
 
-            if ENVIRONMENT == 'PROD':
-                helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
-                for msg in exchange:
-                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
-                    time.sleep(10)
-            else:
-                helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
-                for msg in exchange:
-                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
-                    time.sleep(10)
-            # Wait 30 mins
-            time.sleep(1800)
+#             if ENVIRONMENT == 'PROD':
+#                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
+#                 for msg in exchange:
+#                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
+#                     time.sleep(10)
+#             else:
+#                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
+#                 for msg in exchange:
+#                     helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
+#                     time.sleep(10)
+#             # Wait 30 mins
+#             time.sleep(1800)
 
-        except Exception as e:
-            logging.error(f"💥 AI roleplay thread error: {e}")
+#         except Exception as e:
+#             logging.error(f"💥 AI roleplay thread error: {e}")
 
-    # After the loop exits
-    summary = generate_final_summary()
-    if ENVIRONMENT == 'PROD':
-        helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', TIRZHELP_GENERAL_CHANNEL)
-        helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
-    else:
-        helpers_telegram.send_image(TEST_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg')
-        helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
+#     # After the loop exits
+#     summary = generate_final_summary()
+#     if ENVIRONMENT == 'PROD':
+#         helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', TIRZHELP_GENERAL_CHANNEL)
+#         helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
+#     else:
+#         helpers_telegram.send_image(TEST_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg')
+#         helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
         
-
-def start_ai_roleplay_thread():
-    logging.info("Starting murder mystery roleplay...")
-    thread = threading.Thread(target=run_ai_conversation_loop, daemon=True)
-    thread.start()
+# def start_ai_roleplay_thread():
+#     logging.info("Starting murder mystery roleplay...")
+#     thread = threading.Thread(target=run_ai_conversation_loop, daemon=True)
+#     thread.start()
     
 
 # Function to send periodic announcements
@@ -152,8 +151,8 @@ def create_globals():
     return banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
 
 # Ensure thread is started and globals created on app import
+# start_ai_roleplay_thread()
 initialize_announcement_thread()
-start_ai_roleplay_thread()
 create_globals()
 ### NON WEBHOOK END ###
 
