@@ -10,7 +10,7 @@ domain_urls:
   - "t.me/SNPcomm"
   - "etsy.com/listing/1878053687" # GalacticGizmos
 ignore_urls:
-  - "https://discord.gg/B6y2UzkRat" # STG Server
-  - "https://discord.gg/m4DQTAXAM4" # STG Server
-  - "https://discord.gg/7m2XhYu4ug" # STG Testing Server
-  - "https://discord.gg/B9A4tjYchG" # STG Testing Server
+  - "discord.gg/B6y2UzkRat" # STG Server
+  - "discord.gg/m4DQTAXAM4" # STG Server
+  - "discord.gg/7m2XhYu4ug" # STG Testing Server
+  - "discord.gg/B9A4tjYchG" # STG Testing Server
