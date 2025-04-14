@@ -44,7 +44,7 @@ MOD_ACCOUNTS = [
     'seekerseventysix',
     'tirzepatidehelp',
     'delululemonade',
-    'stephs2125',
+    'Steph_S_1975',
     'aksailor',
     'NordicTurtle',
     'Ruca2573',
