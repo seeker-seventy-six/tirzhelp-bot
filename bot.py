@@ -224,8 +224,9 @@ def webhook():
         ### Skip the rest of the Bot functions if update is not from the main moderation TG groups
         if str(chat_id) not in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
             return jsonify({"ok": True}), 200  # Exit after handling the command for non-target groups
-
+            
         ### AUTOMATED WELCOME MESSAGE FOR NEW MEMBER ###
+        # Check for "new_chat_participant" in the Message update
         if "message" in update and "new_chat_participant" in message:
             new_member = message["new_chat_participant"]
             if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
@@ -233,6 +234,21 @@ def webhook():
                 welcome_message = msgs.welcome_newbie(new_member)
                 helpers_telegram.send_message(chat_id, welcome_message, reply_to_message_id=message_id)
                 return jsonify({"ok": True}), 200
+
+        # Check for "new_chat_member" in the ChatMemberUpdated update
+        if "chat_member" in update:
+            chat_member_update = update["chat_member"]
+            chat_id = chat_member_update.get("chat", {}).get("id")
+            new_member = chat_member_update.get("new_chat_member", {}).get("user")
+            new_status = chat_member_update.get("new_chat_member", {}).get("status")
+            old_status = chat_member_update.get("old_chat_member", {}).get("status")
+
+            # Check if the user has joined the group
+            if new_status == "member" and old_status in ["left", "kicked"]:
+                if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
+                    welcome_message = msgs.welcome_newbie(new_member.get("id"))
+                    helpers_telegram.send_message(chat_id, welcome_message)
+                    return jsonify({"ok": True}), 200
         
         ### ALL OTHER MESSAGES ###
         elif "message" in update:
