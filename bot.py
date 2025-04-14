@@ -226,15 +226,6 @@ def webhook():
             return jsonify({"ok": True}), 200  # Exit after handling the command for non-target groups
             
         ### AUTOMATED WELCOME MESSAGE FOR NEW MEMBER ###
-        # Check for "new_chat_participant" in the Message update
-        if "message" in update and "new_chat_participant" in message:
-            new_member = message["new_chat_participant"]
-            if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
-                # Here, message_id is the join message's ID.
-                welcome_message = msgs.welcome_newbie(new_member)
-                helpers_telegram.send_message(chat_id, welcome_message, reply_to_message_id=message_id)
-                return jsonify({"ok": True}), 200
-
         # Check for "new_chat_member" in the ChatMemberUpdated update
         if "chat_member" in update:
             chat_member_update = update["chat_member"]
@@ -249,6 +240,13 @@ def webhook():
                     welcome_message = msgs.welcome_newbie(new_member.get("id"))
                     helpers_telegram.send_message(chat_id, welcome_message)
                     return jsonify({"ok": True}), 200
+        # Check for "new_chat_participant" in the Message update
+        if "message" in update and "new_chat_participant" in message:
+            if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
+                # Here, message_id is the join message's ID.
+                welcome_message = msgs.welcome_newbie(message["new_chat_participant"])
+                helpers_telegram.send_message(chat_id, welcome_message, reply_to_message_id=message_id)
+                return jsonify({"ok": True}), 200
         
         ### ALL OTHER MESSAGES ###
         elif "message" in update:
