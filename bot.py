@@ -13,7 +13,6 @@ import logging
 sys.path.append('./src')
 from src import create_messages as msgs
 from src import helpers_telegram 
-from src.helpers_openai import generate_ai_conversation, generate_final_summary
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -177,7 +176,10 @@ def login():
 @app.route('/setwebhook', methods=['GET'])
 def set_webhook():
     url = f"{TELEGRAM_API_URL}/setWebhook"
-    payload = {"url": f"{WEBHOOK_URL}"}
+    payload = {
+        "url": f"{WEBHOOK_URL}",
+        "allowed_updates": ["message", "edited_message", "channel_post", "edited_channel_post", "inline_query", "callback_query", "chat_member", "my_chat_member"]
+    }
     response = requests.post(url, json=payload)
     return response.json()
 
@@ -328,5 +330,25 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
 
 
 if __name__ == "__main__":
-    # Start the Flask app for web workers
-    app.run(host="0.0.0.0", port=8443)
+    import argparse
+
+    # Create argument parser
+    parser = argparse.ArgumentParser(description="Manage Telegram bot webhooks.")
+    parser.add_argument("--delete-webhook", action="store_true", help="Delete the current webhook.")
+    parser.add_argument("--set-webhook", action="store_true", help="Set the webhook.")
+    
+    args = parser.parse_args()
+
+    # Handle delete-webhook
+    if args.delete_webhook:
+        delete_response = delete_webhook()
+        logging.info(f"Delete Webhook Response: {delete_response}")
+
+    # Handle set-webhook
+    elif args.set_webhook:
+        set_response = set_webhook()
+        logging.info(f"Set Webhook Response: {set_response}")
+
+    # If no arguments, start the Flask app
+    else:
+        app.run(host="0.0.0.0", port=8443)
