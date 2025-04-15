@@ -228,12 +228,13 @@ def webhook():
         ### AUTOMATED WELCOME MESSAGE FOR NEW MEMBER ###
         # Check for "new_chat_member" in the ChatMemberUpdated update
         if "chat_member" in update:
+            logging.info("New chat member update detected!")
             chat_member_update = update["chat_member"]
             chat_id = chat_member_update.get("chat", {}).get("id")
             new_member = chat_member_update.get("new_chat_member", {}).get("user")
             new_status = chat_member_update.get("new_chat_member", {}).get("status")
             old_status = chat_member_update.get("old_chat_member", {}).get("status")
-
+            logging.info(f"New member status: {new_status}, Old member status: {old_status}")
             # Check if the user has joined the group
             if new_status == "member" and old_status in ["left", "kicked"]:
                 if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
