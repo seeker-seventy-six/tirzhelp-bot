@@ -18,11 +18,11 @@ def welcome_newbie(new_user):
     Formats a welcome message for newbies.
     """
     wiki = "<a href='https://www.stairwaytogray.com/'>📖 Community Intro</a>"
-    guides = "<a href='https://t.me/c/2410577414/3/157'>📚 Rules & Guides Channel</a>"
+    guides = "<a href='https://t.me/c/2410577414/3/51643'>📚 Rules & Guides Channel</a>"
     mention = f"<a href='tg://user?id={new_user['id']}'>@{new_user.get('username', new_user['first_name'])}</a> " if new_user!='' else new_user
     welcome_message = (
-        f"{mention} Welcome to the Telegram community for Stairway to Gray! 🎉 \n\nYou've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more ✨🐰\n\n",
-        f"Before jumping in, we've gathered answers to the most common newbie questions in our <b>Gray 101</b> guide and <b>Rules & Guides channel</b> linked below:\n\n{wiki}\n{guides}\n\n",
+        f"{mention} Welcome to the Telegram community for Stairway to Gray! 🎉 \n\nYou've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more ✨🐰\n\n"
+        f"Before jumping in, we've gathered answers to the most common newbie questions in our <b>Gray 101</b> guide and <b>Rules & Guides channel</b> linked below:\n\n{wiki}\n{guides}\n\n"
         f"Once you've read thru these guides, feel free to post follow-up questions in the <i>Newbies</i> channel and further explore the <i>Rules & Guides</i> channel. We're here to help and happy to have you join us! 😊"
     )
     return welcome_message
@@ -31,8 +31,8 @@ def welcome_newbie(new_user):
 def newbie_announcement():
     message = (
         "🚨 Here's your hourly Newbie Announcement 🚨\n\n"
-        "Looking to learn about gray tirzepatide and don't know where to start? 🙋‍♂️🙋‍♀️\n\n"
-        "<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Start with the wiki here 🌐</a> \n\n"
+        "Looking to learn about gray GLP-1s and don't know where to start? 🙋‍♂️🙋‍♀️\n\n"
+        "<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Start with the Gray 101 Guide here 🌐</a> \n\n"
         "<b>Who are we?</b> We're a community of folks trying to get healthy by making the peptide gray market safer and more accessible. 🫶💪\n\n"
         "Welcome to the gray space! Let's get this research started..."
     )
@@ -102,14 +102,14 @@ def safety():
 
 def banned_topic(banned_topic, header_msg, topic_msg=""):
     if 'DNP' in banned_topic:
-        topic_msg = "\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
+        topic_msg = "\nThis is a highly dangerous mitochondrial decoupler.\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
     elif 'Botox' in banned_topic:
         topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
-
+    elif 'BAM15' in banned_topic:
+        topic_msg = "\nThis is a dangerous mitochondrial uncoupler."
+    
     message = f"""{header_msg}\n\n{banned_topic}\n{topic_msg}"""
-
     return message
-
 
 def dont_link(user_id, user_name):
     message = (
@@ -212,5 +212,5 @@ def summarize_test_results(update, BOT_TOKEN):
 
 
 def unsupported():
-    markdown = r"""<code>stop poking me. this command doesn't do anything.</code>"""
+    markdown = r"""<code>tehehe stop poking me. this command doesn't do anything.</code>"""
     return markdown
