@@ -102,14 +102,14 @@ def safety():
 
 def banned_topic(banned_topic, header_msg, topic_msg=""):
     if 'DNP' in banned_topic:
-        topic_msg = "\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
+        topic_msg = "\nThis is a highly dangerous mitochondrial decoupler.\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
     elif 'Botox' in banned_topic:
         topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
-
+    elif 'BAM15' in banned_topic:
+        topic_msg = "\nThis is a dangerous mitochondrial uncoupler."
+    
     message = f"""{header_msg}\n\n{banned_topic}\n{topic_msg}"""
-
     return message
-
 
 def dont_link(user_id, user_name):
     message = (
