@@ -120,6 +120,17 @@ def dont_link(user_id, user_name):
     )
     return message
 
+def dont_link_group_test(user_id, user_name):
+    message = (
+    f"<a href='tg://user?id={user_id}'>@{user_name}</a> 🚨 "
+    "STG has moved group testing support to the new testing server STGTS on Discord. You can find that here, along with mods and group support to help you in your testing journey!\n\n"
+    "https://discord.gg/B9A4tjYchG \n\n"
+    "While the most important thing is that members test what they buy for safety, please be aware that the TG private chat testing groups will no longer have mod support if something goes wrong."
+    "Please join those TG organized group chats at your own risk. 🙏\n\n"
+    "To post your group test here, either copy the discord #looking-for-group-test THREAD link <a href='https://discord.com/channels/1351746139325595748/1359204768983289856/1361058059895570503'>(learn how here)</a>"
+    "or post the discord channel name of your OPEN group test they can join from the <a href='https://discord.com/channels/1351746139325595748/1352074864906735687'>#start-join-leave-test-groups</a> channel"
+    )
+    return message
 
 def summarize_test_results(update, BOT_TOKEN):
     message = update["message"]

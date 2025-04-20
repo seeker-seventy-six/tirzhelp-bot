@@ -28,6 +28,7 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 # TELEGRAM IDS
 TIRZHELP_SUPERGROUP_ID = '-1002410577414'
 TIRZHELP_TEST_RESULTS_CHANNEL = '48'
+TIRZHELP_GROUP_TEST_CHANNEL = '59'
 TIRZHELP_NEWBIE_CHANNEL = '1408'
 TIRZHELP_GENERAL_CHANNEL = '13'
 TIRZHELP_CLOSED_CHANNLES = ['1','3','19','63']
@@ -35,6 +36,7 @@ TIRZHELP_IGNORE_AUTOMOD_CHANNELS = ['59','48']
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
+TEST_GROUP_TEST_CHANNEL = '1240'
 TEST_NEWBIE_CHANNEL = '681'
 TEST_GENERAL_CHANNEL = '1'
 
@@ -293,14 +295,22 @@ def webhook():
             if any(ignore_url in text for ignore_url in ignore_domains):
                 logging.info("Message contains an ignored URL. No moderation needed.")
                 return jsonify({"ok": True}), 200
+            
+            # Flag t.me/ links in group test cvhannel
+            group_test_threads = [TIRZHELP_GENERAL_CHANNEL, TEST_GENERAL_CHANNEL]
+            if "t.me/" in text and str(message_thread_id) in group_test_threads: # and username not in MOD_ACCOUNTS
+                logging.info(f"Detected t.me/ link in group test thread")
+                reply_message = msgs.dont_link_group_test(user_id, user_firstname)
+                helpers_telegram.send_message(chat_id, reply_message, message_thread_id, reply_to_message_id=message_id)
+                helpers_telegram.delete_message(chat_id, message_id)
+                return jsonify({"ok": True}), 200
+
             # If the text contains any moderated domain, return a warning message
             for moderated_domain in dont_link_domains:
                 if moderated_domain in text and username not in MOD_ACCOUNTS:
                     logging.info(f"Detected moderated domain: {moderated_domain}")
-                    # Tag the user and reply
                     reply_message = msgs.dont_link(user_id, user_firstname)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
-                    # Delete the posted message
                     helpers_telegram.delete_message(chat_id, message_id)
                     return jsonify({"ok": True}), 200
         
