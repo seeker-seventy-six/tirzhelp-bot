@@ -246,13 +246,13 @@ def webhook():
             if str(message_thread_id) not in [TIRZHELP_IGNORE_AUTOMOD_CHANNELS, TEST_IGNORE_AUTOMOD_CHANNELS]:
                 for _, data in auto_poof_topics.items():
                     banned_message = data.get('message')
-                    banned_topics = data.get('patterns')
-                    for word in banned_topics:
+                    banned_patterns = data.get('patterns')
+                    for word in banned_patterns:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()) and username not in MOD_ACCOUNTS: 
-                            banned_topic_message = msgs.banned_topic(word, banned_message, user=message.get('from', {}))
-                            helpers_telegram.send_message(chat_id, banned_topic_message, 1)
-                            logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {word}")
+                        if re.search(pattern, text.lower()): # and username not in MOD_ACCOUNTS
+                            full_banned_message = msgs.banned_topic(pattern, banned_message, user=message.get('from', {}))
+                            helpers_telegram.send_message(chat_id, full_banned_message)
+                            logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for pattern: {pattern}")
                             helpers_telegram.delete_message(chat_id, message_id)
                             return jsonify({"ok": True}), 200
 
