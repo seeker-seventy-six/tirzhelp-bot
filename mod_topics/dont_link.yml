@@ -7,6 +7,7 @@ domain_urls:
   - "thinksteroids.com"
   - "docs.google.com/spreadsheets/d/1v9IPC5hpRfM1-DrMmbMsYv34TLAoadn8BXuotoxZyhM" # PTDS
   - "discord.gg"
+  - "t.me/+"
   - "t.me/SNPcomm"
   - "etsy.com/listing/1878053687" # GalacticGizmos
 ignore_urls:

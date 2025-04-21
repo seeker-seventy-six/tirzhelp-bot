@@ -100,7 +100,12 @@ def safety():
     message = f"Did someone say Safety? 👀\n\nIf you haven't already seen this one...\n\n{np.random.choice(links)}"
     return message
 
-def banned_topic(banned_topic, header_msg, topic_msg=""):
+def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
+    if user:
+        mention = f"<a href='tg://user?id={user['id']}'>@{user.get('username', user['first_name'])}</a> "
+    else:
+        mention = ""
+
     if 'DNP' in banned_topic:
         topic_msg = "\nThis is a highly dangerous mitochondrial decoupler.\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
     elif 'Botox' in banned_topic:
@@ -108,7 +113,7 @@ def banned_topic(banned_topic, header_msg, topic_msg=""):
     elif 'BAM15' in banned_topic:
         topic_msg = "\nThis is a dangerous mitochondrial uncoupler."
     
-    message = f"""{header_msg}\n\n{banned_topic}\n{topic_msg}"""
+    message = f"""{mention}{header_msg}\n\n{banned_topic}\n{topic_msg}"""
     return message
 
 def dont_link(user_id, user_name):
@@ -122,13 +127,13 @@ def dont_link(user_id, user_name):
 
 def dont_link_group_test(user_id, user_name):
     message = (
-    f"<a href='tg://user?id={user_id}'>@{user_name}</a> 🚨 "
-    "STG has moved group testing support to the new testing server STGTS on Discord. You can find that here, along with mods and group support to help you in your testing journey!\n\n"
+    f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 Ope! "
+    "STG has moved group testing support to the new testing server STGTS on Discord. You can find that linked below, along with mods and group support to help you in your testing journey!\n\n"
     "https://discord.gg/B9A4tjYchG \n\n"
-    "While the most important thing is that members test what they buy for safety, please be aware that the TG private chat testing groups will no longer have mod support if something goes wrong."
-    "Please join those TG organized group chats at your own risk. 🙏\n\n"
-    "To post your group test here, either copy the discord #looking-for-group-test THREAD link <a href='https://discord.com/channels/1351746139325595748/1359204768983289856/1361058059895570503'>(learn how here)</a>"
-    "or post the discord channel name of your OPEN group test they can join from the <a href='https://discord.com/channels/1351746139325595748/1352074864906735687'>#start-join-leave-test-groups</a> channel"
+    "While the most important thing is that members test what they buy for safety, please be aware that TG private chat testing groups will no longer have mod support if something goes wrong. "
+    "Please join TG organized groups at your own risk. 🙏\n\n"
+    "To post your group test here, either copy the discord # looking-for-group-test THREAD link <a href='https://discord.com/channels/1351746139325595748/1359204768983289856/1361058059895570503'>(learn how here)</a>"
+    ", or post the discord channel name of your OPEN group test so folks can join from the <a href='https://discord.com/channels/1351746139325595748/1352074864906735687'>#start-join-leave-test-groups</a> channel"
     )
     return message
 

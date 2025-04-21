@@ -112,3 +112,25 @@ Banned_Topics:
       - ['Anabolex', 'Andractim', 'Pesomax', 'Stanolone']
       - ['Carfentanil', 'Wildnil']
       - ['Tributane', 'Embutramide']
+
+Auto_Poof_Topics:
+  SNP:
+    message: |
+      Just a quick heads-up 👀 SNP was removed from the STG vendor spreadsheet earlier this year, and we no longer correspond with their leadership. 
+      
+      As such, STG does not support third-party (3P) testing or assist with issues related to SNP orders or test results. DM an STG Mod if you have any questions about this. 🙏
+      
+      If you're seeking support for SNP products, their own community offers both 3P and vendor-paid (2.5P) testing options — feel free to reach out to them directly with any questions.
+    patterns:
+      - 'snp'
+      - 'nexa'
+      - 'nexaph'
+      - 'nexaphh'
+      - 'nexap'
+      - 'nex'
+      - 'shanghai nexa pharma'
+      - 'shanghai nexaph pharma'
+      - 'shanghai nexapharma'
+      - 'shanghai nexapharmaceutical'
+      - 'shanghai nexapharmaceuticals'
+      - 'cain'

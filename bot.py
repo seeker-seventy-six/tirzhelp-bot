@@ -32,13 +32,13 @@ TIRZHELP_GROUP_TEST_CHANNEL = '59'
 TIRZHELP_NEWBIE_CHANNEL = '1408'
 TIRZHELP_GENERAL_CHANNEL = '13'
 TIRZHELP_CLOSED_CHANNLES = ['1','3','19','63']
-TIRZHELP_IGNORE_AUTOMOD_CHANNELS = ['59','48']
+TIRZHELP_IGNORE_AUTOMOD_CHANNELS = [TIRZHELP_GROUP_TEST_CHANNEL,TIRZHELP_TEST_RESULTS_CHANNEL]
 
 TEST_SUPERGROUP_ID = '-1002334662710'
 TEST_TEST_RESULTS_CHANNEL = '367'
 TEST_GROUP_TEST_CHANNEL = '1240'
 TEST_NEWBIE_CHANNEL = '681'
-TEST_GENERAL_CHANNEL = '1'
+TEST_IGNORE_AUTOMOD_CHANNELS = [TEST_GROUP_TEST_CHANNEL,TEST_TEST_RESULTS_CHANNEL]
 
 MOD_ACCOUNTS = [
     'tirzhelp_bot',
@@ -129,27 +129,23 @@ def initialize_announcement_thread():
 
 # Initialize Global variables
 def create_globals():
-    global banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
+    global banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_topics
 
     # Get banned topics
     with open('./mod_topics/moderated_topics.yml', 'r') as file:
         mod_topics_data = yaml.safe_load(file)
     banned_data = mod_topics_data.get('Banned_Topics', {})
     newbies_mod_topics = mod_topics_data.get('Newbies_Auto_Reply', {})
+    auto_poof_topics = mod_topics_data.get('Auto_Poof_Topics', {})
     
     # Get dont link communities
     with open('./mod_topics/dont_link.yml', 'r') as file:
         domains = yaml.safe_load(file)
     dont_link_domains = domains.get('domain_urls', [])
     ignore_domains = domains.get('ignore_urls', [])
-
-    # Get auto poof terms
-    with open('./mod_topics/poof_no_message.yml', 'r') as file:
-        poof_data = yaml.safe_load(file)
-    auto_poof_terms = poof_data.get('auto-poof', [])
     
     logging.info("Setting global variables...")
-    return banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
+    return banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_topics
 
 # Ensure thread is started and globals created on app import
 # start_ai_roleplay_thread()
@@ -196,7 +192,7 @@ def delete_webhook():
 # Handle incoming updates
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    global banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_terms
+    global banned_data, newbies_mod_topics, dont_link_domains, ignore_domains, auto_poof_topics
     
     # Log raw request data
     raw_data = request.data.decode('utf-8')
@@ -247,24 +243,26 @@ def webhook():
         elif "message" in update:
 
             ### AUTO POOF MESSAGES WITH SPECIFIC TERMS ###
-            for term in auto_poof_terms:
-                # Using regex with word boundaries to avoid partial matches
-                pattern = re.compile(r'\b' + re.escape(term) + r'\b', re.IGNORECASE)
-                if pattern.search(text) and username not in MOD_ACCOUNTS:
-                    if str(message_thread_id) in TIRZHELP_IGNORE_AUTOMOD_CHANNELS:
-                        logging.info(f"Message in chat {chat_id} matched auto-poof term '{term}', but skipping deletion due to exempted channel.")
-                        break  # Skip deletion but stop further term checking
-                    logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {term}")
-                    helpers_telegram.delete_message(chat_id, message_id)
-                    return jsonify({"ok": True}), 200
-                
+            if str(message_thread_id) not in [TIRZHELP_IGNORE_AUTOMOD_CHANNELS, TEST_IGNORE_AUTOMOD_CHANNELS]:
+                for _, data in auto_poof_topics.items():
+                    banned_message = data.get('message')
+                    banned_topics = data.get('patterns')
+                    for word in banned_topics:
+                        pattern = r'\b' + re.escape(word.lower()) + r'\b'
+                        if re.search(pattern, text.lower()): #  and username not in MOD_ACCOUNTS
+                            banned_topic_message = msgs.banned_topic(word, banned_message, user=message.get('from', {}))
+                            helpers_telegram.send_message(chat_id, banned_topic_message, 1)
+                            logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {word}")
+                            helpers_telegram.delete_message(chat_id, message_id)
+                            return jsonify({"ok": True}), 200
+
             ### CHECK FOR BANNED TOPICS ###
             for _, data in banned_data.items():
                 banned_message = data.get('message')
                 banned_topics = data.get('substances')
                 for tuple_topic in banned_topics:
                     for word in tuple_topic:
-                        pattern = r'\s' + re.escape(word.lower()) + r'\s'
+                        pattern = r'\b' + re.escape(word.lower()) + r'\b'
                         if re.search(pattern, text.lower()):
                             # Pass the tuple_topic and header message to the banned_topic function
                             banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
@@ -296,9 +294,9 @@ def webhook():
                 logging.info("Message contains an ignored URL. No moderation needed.")
                 return jsonify({"ok": True}), 200
             
-            # Flag t.me/ links in group test cvhannel
-            group_test_threads = [TIRZHELP_GENERAL_CHANNEL, TEST_GENERAL_CHANNEL]
-            if "t.me/" in text and str(message_thread_id) in group_test_threads: # and username not in MOD_ACCOUNTS
+            # Flag t.me/ links in group test channel
+            group_test_threads = [TIRZHELP_GROUP_TEST_CHANNEL, TEST_GROUP_TEST_CHANNEL]
+            if "t.me/" in text and str(message_thread_id) in group_test_threads: # and username not in MOD_ACCOUNTS 
                 logging.info(f"Detected t.me/ link in group test thread")
                 reply_message = msgs.dont_link_group_test(user_id, user_firstname)
                 helpers_telegram.send_message(chat_id, reply_message, message_thread_id, reply_to_message_id=message_id)
@@ -307,7 +305,7 @@ def webhook():
 
             # If the text contains any moderated domain, return a warning message
             for moderated_domain in dont_link_domains:
-                if moderated_domain in text and username not in MOD_ACCOUNTS:
+                if moderated_domain in text: # and username not in MOD_ACCOUNTS
                     logging.info(f"Detected moderated domain: {moderated_domain}")
                     reply_message = msgs.dont_link(user_id, user_firstname)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
