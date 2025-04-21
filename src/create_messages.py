@@ -111,7 +111,7 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
     elif 'Botox' in banned_topic:
         topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
     elif 'BAM15' in banned_topic:
-        topic_msg = "\nThis is a dangerous mitochondrial uncoupler."
+        topic_msg = "\nThis is a dangerous mitochondrial decoupler."
     
     message = f"""{mention}{header_msg}\n\n{banned_topic}\n{topic_msg}"""
     return message

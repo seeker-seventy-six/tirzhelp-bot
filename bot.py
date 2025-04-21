@@ -249,7 +249,7 @@ def webhook():
                     banned_topics = data.get('patterns')
                     for word in banned_topics:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()): #  and username not in MOD_ACCOUNTS
+                        if re.search(pattern, text.lower()) and username not in MOD_ACCOUNTS: 
                             banned_topic_message = msgs.banned_topic(word, banned_message, user=message.get('from', {}))
                             helpers_telegram.send_message(chat_id, banned_topic_message, 1)
                             logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for term: {word}")
@@ -264,7 +264,6 @@ def webhook():
                     for word in tuple_topic:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
                         if re.search(pattern, text.lower()):
-                            # Pass the tuple_topic and header message to the banned_topic function
                             banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
                             return jsonify({"ok": True}), 200
@@ -296,7 +295,7 @@ def webhook():
             
             # Flag t.me/ links in group test channel
             group_test_threads = [TIRZHELP_GROUP_TEST_CHANNEL, TEST_GROUP_TEST_CHANNEL]
-            if "t.me/" in text and str(message_thread_id) in group_test_threads: # and username not in MOD_ACCOUNTS 
+            if "t.me/" in text and str(message_thread_id) in group_test_threads and username not in MOD_ACCOUNTS: 
                 logging.info(f"Detected t.me/ link in group test thread")
                 reply_message = msgs.dont_link_group_test(user_id, user_firstname)
                 helpers_telegram.send_message(chat_id, reply_message, message_thread_id, reply_to_message_id=message_id)
@@ -305,7 +304,7 @@ def webhook():
 
             # If the text contains any moderated domain, return a warning message
             for moderated_domain in dont_link_domains:
-                if moderated_domain in text: # and username not in MOD_ACCOUNTS
+                if moderated_domain in text and username not in MOD_ACCOUNTS:
                     logging.info(f"Detected moderated domain: {moderated_domain}")
                     reply_message = msgs.dont_link(user_id, user_firstname)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
