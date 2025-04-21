@@ -249,8 +249,8 @@ def webhook():
                     banned_patterns = data.get('patterns')
                     for word in banned_patterns:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()): # and username not in MOD_ACCOUNTS
-                            full_banned_message = msgs.banned_topic(pattern, banned_message, user=message.get('from', {}))
+                        if re.search(pattern, text.lower()) and username not in MOD_ACCOUNTS: 
+                            full_banned_message = msgs.banned_topic(word, banned_message, user=message.get('from', {}))
                             helpers_telegram.send_message(chat_id, full_banned_message)
                             logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for pattern: {pattern}")
                             helpers_telegram.delete_message(chat_id, message_id)
