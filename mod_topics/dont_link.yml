@@ -9,7 +9,6 @@ domain_urls:
   - "discord.gg"
   - "t.me/+"
   - "t.me/SNPcomm"
-  - "etsy.com/listing/1878053687" # GalacticGizmos
 ignore_urls:
   - "discord.gg/B6y2UzkRat" # STG Server
   - "discord.gg/m4DQTAXAM4" # STG Server

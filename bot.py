@@ -4,6 +4,7 @@ import threading
 import time
 import datetime
 import re
+import unicodedata
 import os
 import sys
 import yaml
@@ -243,16 +244,18 @@ def webhook():
         elif "message" in update:
 
             ### AUTO POOF MESSAGES WITH SPECIFIC TERMS ###
-            if str(message_thread_id) not in [TIRZHELP_IGNORE_AUTOMOD_CHANNELS, TEST_IGNORE_AUTOMOD_CHANNELS]:
+            normalized_text = unicodedata.normalize("NFKC", text)
+            if str(message_thread_id) not in TIRZHELP_IGNORE_AUTOMOD_CHANNELS+TEST_IGNORE_AUTOMOD_CHANNELS: #  and username not in MOD_ACCOUNTS
                 for _, data in auto_poof_topics.items():
                     banned_message = data.get('message')
                     banned_patterns = data.get('patterns')
                     for word in banned_patterns:
-                        pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()) and username not in MOD_ACCOUNTS: 
+                        pattern = rf"\b{re.escape(word)}\b"
+                        logging.debug(f"Trying pattern: {pattern} on text: {repr(normalized_text)}")
+                        if re.search(pattern, normalized_text, re.IGNORECASE):
                             full_banned_message = msgs.banned_topic(word, banned_message, user=message.get('from', {}))
                             helpers_telegram.send_message(chat_id, full_banned_message)
-                            logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for pattern: {pattern}")
+                            logging.info(f"Auto-poofing message {message_id} in chat {chat_id} for pattern: {word}")
                             helpers_telegram.delete_message(chat_id, message_id)
                             return jsonify({"ok": True}), 200
 
@@ -263,7 +266,7 @@ def webhook():
                 for tuple_topic in banned_topics:
                     for word in tuple_topic:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()):
+                        if re.search(pattern, text.lower()) and username not in MOD_ACCOUNTS:
                             banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
                             return jsonify({"ok": True}), 200
@@ -288,11 +291,6 @@ def webhook():
                     return jsonify({"ok": True}), 200
 
             ### AUTO POOF LINKED COMMUNITIES ###
-            # If the text contains any ignored URL, skip moderation
-            if any(ignore_url in text for ignore_url in ignore_domains):
-                logging.info("Message contains an ignored URL. No moderation needed.")
-                return jsonify({"ok": True}), 200
-            
             # Flag t.me/ links in group test channel
             group_test_threads = [TIRZHELP_GROUP_TEST_CHANNEL, TEST_GROUP_TEST_CHANNEL]
             if "t.me/" in text and str(message_thread_id) in group_test_threads and username not in MOD_ACCOUNTS: 
@@ -302,15 +300,20 @@ def webhook():
                 helpers_telegram.delete_message(chat_id, message_id)
                 return jsonify({"ok": True}), 200
 
+            # If the text contains any ignored URL, skip moderation
+            if any(ignore_url in text for ignore_url in ignore_domains):
+                logging.info("Message contains an ignored URL. No moderation needed.")
+                return jsonify({"ok": True}), 200
+            
             # If the text contains any moderated domain, return a warning message
             for moderated_domain in dont_link_domains:
-                if moderated_domain in text and username not in MOD_ACCOUNTS:
+                if moderated_domain in text:
                     logging.info(f"Detected moderated domain: {moderated_domain}")
                     reply_message = msgs.dont_link(user_id, user_firstname)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
                     helpers_telegram.delete_message(chat_id, message_id)
                     return jsonify({"ok": True}), 200
-        
+            
         # if none of the bot functions need to run, also return success so update is accounted for
         return jsonify({"ok": True}), 200
 
