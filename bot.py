@@ -50,8 +50,8 @@ MOD_ACCOUNTS = [
     'NordicTurtle',
     'Ruca2573',
     'Litajj',
-    'UncleNacho'
-    'ruttheimer'
+    'UncleNacho',
+    'ruttheimer',
 ]
 
 app = Flask(__name__)
