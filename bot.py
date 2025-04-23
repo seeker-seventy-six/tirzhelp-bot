@@ -245,13 +245,12 @@ def webhook():
 
             ### AUTO POOF MESSAGES WITH SPECIFIC TERMS ###
             normalized_text = unicodedata.normalize("NFKC", text)
-            if str(message_thread_id) not in TIRZHELP_IGNORE_AUTOMOD_CHANNELS+TEST_IGNORE_AUTOMOD_CHANNELS: #  and username not in MOD_ACCOUNTS
+            if str(message_thread_id) not in TIRZHELP_IGNORE_AUTOMOD_CHANNELS+TEST_IGNORE_AUTOMOD_CHANNELS and username not in MOD_ACCOUNTS: 
                 for _, data in auto_poof_topics.items():
                     banned_message = data.get('message')
                     banned_patterns = data.get('patterns')
                     for word in banned_patterns:
                         pattern = rf"\b{re.escape(word)}\b"
-                        logging.debug(f"Trying pattern: {pattern} on text: {repr(normalized_text)}")
                         if re.search(pattern, normalized_text, re.IGNORECASE):
                             full_banned_message = msgs.banned_topic(word, banned_message, user=message.get('from', {}))
                             helpers_telegram.send_message(chat_id, full_banned_message)
