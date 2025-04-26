@@ -306,7 +306,7 @@ def webhook():
             
             # If the text contains any moderated domain, return a warning message
             for moderated_domain in dont_link_domains:
-                if moderated_domain in text:
+                if moderated_domain in text  and username not in MOD_ACCOUNTS:
                     logging.info(f"Detected moderated domain: {moderated_domain}")
                     reply_message = msgs.dont_link(user_id, user_firstname)
                     helpers_telegram.send_message(chat_id, reply_message, message_thread_id)
