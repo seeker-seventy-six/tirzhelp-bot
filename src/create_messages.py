@@ -32,10 +32,10 @@ def newbie_announcement():
     message = (
         "🚨 New here? Start here! 🚨\n\n"
         "Curious about gray market GLP-1s but not sure where to begin? We've got you covered 🙌\n\n"
-        "Start with our 101 intro guide: <a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101 🌐</a>\n"
-        "Read the Rules & Guides channel: <a hfref='https://t.me/c/2410577414/3/51643'>Rules & Guides 📚</a>\n\n"
+        "Start with our 101 intro guide:\n<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101 🌐</a>\n"
+        "Read the Rules & Guides channel:\n<a href='https://t.me/c/2410577414/3/51643'>Rules & Guides 📚</a>\n\n"
         "<b>Who are we?</b> We're a community focused on making the peptide gray market safer, more transparent, and easier to navigate. 🧪💬\n\n"
-        "⚠️ <b>Safety Tip:</b> Never trust unsolicited DMs from anyone trying to sell you something. Unfortunately, there are many impersonator scammers in this space. Always double-check a vendor's contact info via the spreadsheet or their official community.\n\n"
+        "⚠️ <b>Safety Tip:</b> Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor spreadsheet or vendor's community.\n\n"
     )
     return message
 
