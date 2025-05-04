@@ -29,13 +29,20 @@ def welcome_newbie(new_user):
 
 
 def newbie_announcement():
+    safety_tip = np.random.choice([
+        "Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor spreadsheet or vendor's community.",
+        "Check your reconstituted peptide's pH level before injecting! 🧪📈 GLP-1s should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find pH strips on Amazon.",
+        "Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
+        "We don't actively recommend single vial vendors in this community because they cannot be tested and therefore lack the same level of accountability for quality control as kits. If you choose to use a single vial vendor, please do so at your own risk and thoroughly research.",
+        "Vendor COAs are 🧻 - they can be biased due to cherry-picking. Use them only to verify what the vendor *claims* to be selling. To mitigate risk, third-party (3P) test your actual order!"
+    ])
     message = (
         "🚨 New here? Start here! 🚨\n\n"
         "Curious about gray market GLP-1s but not sure where to begin? We've got you covered 🙌\n\n"
         "Start with our 101 intro guide:\n<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101 🌐</a>\n"
         "Read the Rules & Guides channel:\n<a href='https://t.me/c/2410577414/3/51643'>Rules & Guides 📚</a>\n\n"
         "<b>Who are we?</b> We're a community focused on making the peptide gray market safer, more transparent, and easier to navigate. 🧪💬\n\n"
-        "⚠️ <b>Safety Tip:</b> Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor spreadsheet or vendor's community.\n\n"
+        f"⚠️ <b>Safety Tip:</b> {safety_tip}"
     )
     return message
 

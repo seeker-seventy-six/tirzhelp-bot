@@ -326,7 +326,7 @@ def webhook():
 def handle_command(command, chat_id, message_thread_id, reply_to_message_id, update):
     command_dispatcher = {
         "/newbie": lambda: helpers_telegram.send_message(
-            chat_id, msgs.welcome_newbie(''), message_thread_id, reply_to_message_id
+            chat_id, msgs.newbie_announcement(), message_thread_id, reply_to_message_id
         ),
         "/lastcall": lambda: helpers_telegram.send_message(
             chat_id, msgs.lastcall(update, BOT_TOKEN), message_thread_id, reply_to_message_id
