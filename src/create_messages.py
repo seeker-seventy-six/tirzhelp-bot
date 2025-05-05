@@ -40,7 +40,7 @@ def newbie_announcement():
         "🚨 New here? Start here! 🚨\n\n"
         "Curious about gray market GLP-1s but not sure where to begin? We've got you covered 🙌\n\n"
         "1) Start with the Rules & Guides channel:\n<a href='https://t.me/c/2410577414/3/51643'>Rules & Guides 📚</a>\n\n"
-        "2) Read our intro guide:\n<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101 🌐</a>\n"
+        "2) Read our intro guide:\n<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101 🌐</a>\n\n"
         "<b>Who are we?</b> We're a community focused on making the peptide gray market safer to navigate and provide community support and connection. 🧪🫂💬\n\n"
         f"⚠️ <b>Safety Tip:</b> {safety_tip}"
     )
