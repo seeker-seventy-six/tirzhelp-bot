@@ -103,24 +103,45 @@ app = Flask(__name__)
 #     thread.start()
     
 
-# Function to send periodic announcements
 def start_periodic_announcement():
     while True:
         try:
+            # Get UTC time and convert to EST (fixed UTC-5 offset)
+            now_utc = datetime.datetime.utcnow()
+            now_est = now_utc + datetime.timedelta(hours=-5)
+            est_hour = now_est.hour
+            est_minute = now_est.minute
+
+            # Determine if we should send an announcement at this time
+            should_send = False
+
+            if 3 <= est_hour < 5:
+                logging.info("Skipping announcement: between 3AM and 5AM EST")
+            elif (0 <= est_hour < 3 or 5 <= est_hour < 7):
+                # Only send at :00 during these hours
+                if est_minute == 0:
+                    should_send = True
+            else:
+                # All other hours: send at :00 and :30
+                if est_minute in [0, 30]:
+                    should_send = True
+
+            if should_send:
+                message = msgs.newbie_announcement()
+                if ENVIRONMENT == 'PROD':
+                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, message, TIRZHELP_NEWBIE_CHANNEL)
+                    logging.info("Made newbie announcement")
+                elif ENVIRONMENT == 'DEV':
+                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
+                    logging.info("Made newbie announcement")
+
+            # Sleep until the next half-hour mark
             now = datetime.datetime.now()
-            # Calculate how much time is left until the next hour
-            seconds_until_next_hour = 3600 - (now.minute * 60 + now.second)
-            # Wait until the next full hour
-            time.sleep(seconds_until_next_hour)
-            # Replace with your message sending logic
-            message = msgs.newbie_announcement()
-            if ENVIRONMENT=='PROD':
-                helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, message, TIRZHELP_NEWBIE_CHANNEL)
-                logging.info("Made newbie announcement")
-            # else:
-            #     helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
+            seconds_until_next_half_hour = (30 - now.minute % 30) * 60 - now.second
+            time.sleep(seconds_until_next_half_hour)
+
         except Exception as e:
-            print(f"Error in announcement thread: {e}")
+            logging.error(f"Error in announcement thread: {e}")
 
 # Initialize the periodic announcement thread
 def initialize_announcement_thread():
