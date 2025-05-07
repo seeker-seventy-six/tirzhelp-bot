@@ -131,9 +131,9 @@ def start_periodic_announcement():
                 if ENVIRONMENT == 'PROD':
                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, message, TIRZHELP_NEWBIE_CHANNEL)
                     logging.info("Made newbie announcement")
-                elif ENVIRONMENT == 'DEV':
-                    helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
-                    logging.info("Made newbie announcement")
+                # elif ENVIRONMENT == 'DEV':
+                #     helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
+                #     logging.info("Made newbie announcement")
 
             # Sleep until the next half-hour mark
             now = datetime.datetime.now()
