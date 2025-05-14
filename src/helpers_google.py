@@ -23,9 +23,9 @@ credentials = Credentials.from_service_account_info(credentials_info, scopes=SCO
 service = build('sheets', 'v4', credentials=credentials)
 
 # Define your spreadsheet ID
-SPREADSHEET_ID = '1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y'  # Found in the URL of your spreadsheet
-RANGE_NAME = "raw_data!A:M"  # Adjust as per your sheet structure
-SPREADSHEET_COLS = ["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "TFA", "Test Lab", "File Name", "Lab URL", "Test Key", "Test Task"]
+SPREADSHEET_ID = '1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'  # Found in the URL of your spreadsheet https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ
+RANGE_NAME = "raw_data!A:N"  # Adjust as per your sheet structure
+SPREADSHEET_COLS = ["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "TFA", "Endotoxin", "Test Lab", "File Name", "Lab URL", "Test Key", "Test Task"]
 
 
 # Function to append data to Google Sheets

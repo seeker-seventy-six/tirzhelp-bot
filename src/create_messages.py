@@ -32,7 +32,7 @@ def newbie_announcement():
     safety_tip = np.random.choice([
         "Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor spreadsheet or vendor's community.",
         "Check your reconstituted peptide's pH level before injecting! 🧪📈 GLP-1s should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find pH strips on Amazon.",
-        "Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
+        "Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
         "We don't actively recommend single vial vendors in this community because they cannot be tested and therefore lack the same level of accountability for quality control as kits. If you choose to use a single vial vendor, please do so at your own risk and thoroughly research.",
         "Vendor COAs are 🧻 - they can be biased due to cherry-picking. Use them only to verify what the vendor *claims* to be selling. To mitigate risk, third-party (3P) test your actual order!"
     ])
@@ -100,8 +100,7 @@ def safety():
     Returns a Telegram message about harm reduction with a link to a section in a Google Doc.
     """
     links = [ 
-        f"Check out the Testing section in the <a href='https://docs.google.com/document/d/1LHSXeIgIJFIcE3dsKEUUVyNyH2FT0Ku3ikWfdldg3Lk/edit?tab=t.0#heading=h.iet7p87aatw0'>Guides FAQ</a> for one of our best tools for safety in this community 🛡️🧪",
-        f"Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
+        f"Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
         f"Check out the history and future <a href='https://www.nature.com/articles/s41392-022-00904-4'>applications of peptides</a> 📝",
         "Always check your reconstituted peptide's pH level before injecting! 🧪📈 Tirzepatide should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find any pH 0-14 strips on Amazon.",
     ]
@@ -186,6 +185,7 @@ def summarize_test_results(update, BOT_TOKEN):
                 + [sample.mass_mg]
                 + [sample.purity_percent]
                 + [sample.tfa_present]
+                + [sample.endotoxin]
                 + [sample.test_lab]
                 + [local_path.split('/')[-1]]
                 + [sample.test_link]
@@ -200,7 +200,7 @@ def summarize_test_results(update, BOT_TOKEN):
         # Initialize the message text
         message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
 
-        raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1S6OucgSjVmgWXWwGeBH31mxdtfkfH4u3omGQpLEWy-Y/edit?usp=sharing'>you can find the raw data here</a>"
+        raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'>you can find the raw data here</a>"
 
         # Iterate through each group and append stats to the message
         for expected_mass, stats in grouped_stats.items():
