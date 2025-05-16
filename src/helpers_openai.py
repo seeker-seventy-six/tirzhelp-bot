@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
-load_dotenv('.env-dev')
+load_dotenv()
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
@@ -258,6 +258,7 @@ def extract_data_with_openai(file_path, text):
         "GYC": ["Nantong Guangyuan Pharma"],
         "HYB": ["Hangzhou Youngpeptide Biotechnology"],
         "Innotech": ["Innotech"],
+        "LSPL": ["Ava"],
         "MSCI": ["M-Science"],
         "PDNM": ["Reliable Peptide", "Reliable Place", "Chris Labs"],
         "Pepstack": ["Pepstack", "Lemon Juice"],
@@ -279,6 +280,7 @@ def extract_data_with_openai(file_path, text):
         "Uther": ["Uther"],
         "YC": ["Yiwu Changtu"],
         "YoYo": ["YoYo Peptide", "BSF"],
+        "ZYL": ["ZhouYan Labs"],
         "ZLZ": ["ZLZPeptide"],
         "ZYH": ["Shanghai ZYH Biotechnology"],
         "ZZT": ["Zhejiang Zhaobo Tech", "Zhaobo Technology"]
@@ -328,7 +330,7 @@ def extract_data_with_openai(file_path, text):
                     "type": "image_url",
                     "image_url": {
                         "url":  f"data:image/jpeg;base64,{base64_image}"
-                    },
+                        },
                     },
                 ]
             }
@@ -430,6 +432,6 @@ def convert_first_page_to_image(pdf_path, output_name="first_page.png"):
 
 
 if __name__=='__main__':
-    # test_result = extract_data_with_openai('./historic_test_results/5042221709662466859.jpg',"")
-    # print(test_result)
-    print(generate_ai_conversation())
+    test_result = extract_data_with_openai('./historic_test_results/4985884030935347022.jpg',"")
+    print(test_result)
+    # print(generate_ai_conversation())

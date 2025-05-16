@@ -4,7 +4,12 @@ from datetime import datetime
 import pandas as pd
 import json
 import os
+import sys
+import logging
 from dotenv import load_dotenv
+
+# Setup basic logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
 load_dotenv()
@@ -68,9 +73,10 @@ def calculate_statistics(vendor_name, peptide):
     ).execute()
     values = result.get("values", [])
     df = pd.DataFrame(values[1:], columns=values[0])
+    logging.info(f"Vendor: {vendor_name}, Peptide: {peptide}")
 
     # Process columns
-    df['Test Date'] = pd.to_datetime(df['Test Date'])
+    df['Test Date'] = pd.to_datetime(df['Test Date'], errors='coerce')
     df['Expected Mass mg'] = pd.to_numeric(df['Expected Mass mg'], errors='coerce')
     df['Mass mg'] = pd.to_numeric(df['Mass mg'], errors='coerce')
     df['Purity %'] = pd.to_numeric(df['Purity %'], errors='coerce')
@@ -101,3 +107,8 @@ def calculate_statistics(vendor_name, peptide):
         }
 
     return group_stats
+
+
+if __name__ == "__main__":
+    grouped_data = calculate_statistics("ACR", "Tirzepatide")
+    print(grouped_data)
