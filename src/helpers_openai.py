@@ -288,7 +288,11 @@ def extract_data_with_openai(file_path, text):
 
     # Create the schema
     class TestResult(BaseModel):
-        vendor: str = Field(alias="vendor", description=f"Vendor name of the tested peptide sometimes called manufacturer. Here is a list of most common vendors and their abbreviation. Use the abbreviation key value for this field:\n{vendor_disambiguations}. If no known vendor is found, put UNKNOWN. DO NOT LEAVE BLANK")
+        vendor: str = Field(alias="vendor", description="Vendor name of the tested peptide (sometimes called manufacturer). "
+        "Use the abbreviation as the key for this field.\n"
+        "Here is a list of the vendor abbreviations with the names each go by for reference:\n"
+        + "\n".join([f"{abbr}: {', '.join(names)}" for abbr, names in vendor_disambiguations.items()]) +
+        "\nIf no known vendor is found, use UNKNOWN. DO NOT LEAVE BLANK.")
         test_date: str = Field(alias="test_date", description='Date test was performed as MM/DD/YYYY. Sometimes called Analysis conducted. DO NOT LEAVE BLANK')
         batch: str = Field(alias="batch", description="If present, the batch, lot, or client sample identifier. If no batch or lot is called out, use the vendor or manufacturer name and the caption info. Peptide Test puts batch info in the 'Client Sample ID' line. Janoshik puts batch info in the 'Sample' and 'Batch' lines. Often contains a cap color. DO NOT LEAVE BLANK")
         peptide: str = Field(alias="peptide", description='Name of the expected compound tested. DO NOT LEAVE BLANK')
