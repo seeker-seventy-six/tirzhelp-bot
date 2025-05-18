@@ -194,14 +194,12 @@ def summarize_test_results(update, BOT_TOKEN):
             )
             helpers_google.append_to_sheet(data_row)
 
-        # Calculate statistics
+        raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'>🌐 You can find the raw data here</a>"
         if sample.mass_mg:
             grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
             logging.info(f"Grouped stats: {grouped_stats}")
             # Initialize the message text
             message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
-
-            raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'>you can find the raw data here</a>"
 
             # Iterate through each group and append stats to the message
             for expected_mass, stats in grouped_stats.items():
@@ -229,20 +227,20 @@ def summarize_test_results(update, BOT_TOKEN):
 
             # Clean up
             os.remove(local_path)
-            logging.info(f"Message: {message_text}")
+            logging.info(f"Message: {message_text + raw_data_url}")
             return message_text + raw_data_url
         
         elif sample.endotoxin:
             message_text = (
-                f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
+                f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()}</b>\n\n"
                 f"🔹 <b>Endotoxin Level:</b> {sample.endotoxin}\n\n"
-                f"<i>Note:</i> Endotoxin is measured in EU (Endotoxin Units). For tirzepatide, <b><10 EU/mg</b> is the recommended threshold from FDA-registered API standards.\n"
+                f"<i>Note:</i> Endotoxin is measured in EU (Endotoxin Units). For tirzepatide, <b>&lt;10 EU/mg</b> is the recommended threshold from FDA-registered API standards.\n"
                 f"• Janoshik reports EU per vial → divide by Y mg to get EU/mg\n"
                 f"• TrustPointe reports EU/mL → divide by (Y mg ÷ 2mL) to get EU/mg\n"
                 f"<a href='https://www.stairwaytogray.com/posts/testing/testing-101/#endotoxin'>More details in the Testing 101 Guide 🔬</a>\n\n"
             )
             os.remove(local_path)
-            logging.info(f"Message: {message_text}")
+            logging.info(f"Message: {message_text + raw_data_url}")
             return message_text + raw_data_url
         
         else:
@@ -251,7 +249,7 @@ def summarize_test_results(update, BOT_TOKEN):
                 f"🔹<a href='https://www.stairwaytogray.com/posts/testing/testing-101/#how-do-i-read-my-test-results'>How Do I Read My Test Results? Check out the Testing 101 Guide 🔬</a>\n\n"
             )
             os.remove(local_path)
-            logging.info(f"Message: {message_text}")
+            logging.info(f"Message: {message_text + raw_data_url}")
             return message_text + raw_data_url
     
     else:

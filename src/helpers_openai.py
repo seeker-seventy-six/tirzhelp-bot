@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
-load_dotenv()
+load_dotenv('.env-dev')
 
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
@@ -318,11 +318,11 @@ def extract_data_with_openai(file_path, text):
 
     # Send image and instructions to openai gpt model
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        max_tokens=2000,
-        temperature=0,
+        model="o4-mini-2025-04-16", # gpt-4o-mini
+        # max_tokens=2000,
+        max_completion_tokens=2000,
         messages=[
-            {"role": "system", "content": "You are an expert data extraction assistant who is provided data extraction instructions and an image and you return the extracted data as instructed."},
+            {"role": "system", "content": "You are an expert data extraction assistant who is provided data extraction instructions, an image and sometimes text that contains the data. You return the extracted data as instructed."},
             {
                 "role": "user",
                 "content": [
@@ -345,17 +345,25 @@ def extract_data_with_openai(file_path, text):
     logging.info(f"model response: {json_response}")
     
     if "Unsupported Test" not in json_response:
-        match = re.search(r'```json\n(.*?)\n```', json_response, re.DOTALL)
-        if not match:
-            raise ValueError("JSON content not found in the response")
-        json_content = match.group(1)
-    
-        # Parse the JSON content into a Python dictionary
+        # Try to extract JSON from a ```json ... ``` block
+        match = re.search(r"```json\n(.*?)\n```", json_response, re.DOTALL)
+        
+        if match:
+            json_content = match.group(1).strip()
+        else:
+            # Fallback: treat response as direct JSON
+            json_content = json_response.strip()
+
+        # Try to parse the content
         try:
             parsed_json = json.loads(json_content)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON format: {e}")
-        
+            raise ValueError(f"Invalid JSON format: {e}\nContent: {json_content}")
+
+        # Ensure it's a list of dicts (you can adapt this if you allow a single object)
+        if not isinstance(parsed_json, list):
+            raise ValueError("Expected a list of test result objects")
+
         # Convert each JSON object into a TestResult instance
         test_results = [TestResult(**result) for result in parsed_json]
         return test_results
@@ -436,6 +444,7 @@ def convert_first_page_to_image(pdf_path, output_name="first_page.png"):
 
 
 if __name__=='__main__':
-    test_result = extract_data_with_openai('./historic_test_results/4985884030935347022.jpg',"")
+    # test_result = extract_data_with_openai('./historic_test_results/4985884030935347022.jpg',"")
+    test_result = extract_data_with_openai('./historic_test_results/Test Report #63488.png',"")
     print(test_result)
     # print(generate_ai_conversation())
