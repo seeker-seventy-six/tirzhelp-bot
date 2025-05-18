@@ -195,41 +195,64 @@ def summarize_test_results(update, BOT_TOKEN):
             helpers_google.append_to_sheet(data_row)
 
         # Calculate statistics
-        grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
-        logging.info(f"Grouped stats: {grouped_stats}")
-        # Initialize the message text
-        message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
+        if sample.mass_mg:
+            grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
+            logging.info(f"Grouped stats: {grouped_stats}")
+            # Initialize the message text
+            message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
 
-        raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'>you can find the raw data here</a>"
+            raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'>you can find the raw data here</a>"
 
-        # Iterate through each group and append stats to the message
-        for expected_mass, stats in grouped_stats.items():
-            icon_status_mass = (
-                "🟢" if stats['mass_diff_percent'] <= 5 else # more stringent USP standard
-                "🟡" if stats['mass_diff_percent'] <= 10 else # USP <905> & USP <797>
-                "🔴" if stats['mass_diff_percent'] > 10 else
-                "⚪"
-            )
-            icon_status_purity = (
-                "🟢" if stats['std_purity'] <= 2 else # from API tirz COA for FDA registered manufacturer 
-                "🟡" if stats['std_purity'] <= 4 else # arbitrary doubled
-                "🔴" if stats['std_purity'] > 4 else 
-                "⚪"
-            )
-            message_text += (
-                f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
-                f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
-                f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
-                f"   • # Vials Tested: {stats['test_count']}\n"
-                f"   • Typical Deviation Tested Mass (Std Dev): ±{stats['std_mass']:.1f} mg\n"
-                f"   {icon_status_mass} <b>±{stats['mass_diff_percent']:.1f}% : % Std Dev of Potency</b>\n"
-                f"   {icon_status_purity} <b>±{stats['std_purity']:.1f}% : % Std Dev of Purity</b>\n\n"
-            )
+            # Iterate through each group and append stats to the message
+            for expected_mass, stats in grouped_stats.items():
+                icon_status_mass = (
+                    "🟢" if stats['mass_diff_percent'] <= 5 else # more stringent USP standard
+                    "🟡" if stats['mass_diff_percent'] <= 10 else # USP <905> & USP <797>
+                    "🔴" if stats['mass_diff_percent'] > 10 else
+                    "⚪"
+                )
+                icon_status_purity = (
+                    "🟢" if stats['std_purity'] <= 2 else # from API tirz COA for FDA registered manufacturer 
+                    "🟡" if stats['std_purity'] <= 4 else # arbitrary doubled
+                    "🔴" if stats['std_purity'] > 4 else 
+                    "⚪"
+                )
+                message_text += (
+                    f"🔹 <b>Expected Mass: {expected_mass} mg</b>\n"
+                    f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
+                    f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
+                    f"   • # Vials Tested: {stats['test_count']}\n"
+                    f"   • Typical Deviation Tested Mass (Std Dev): ±{stats['std_mass']:.1f} mg\n"
+                    f"   {icon_status_mass} <b>±{stats['mass_diff_percent']:.1f}% : % Std Dev of Potency</b>\n"
+                    f"   {icon_status_purity} <b>±{stats['std_purity']:.1f}% : % Std Dev of Purity</b>\n\n"
+                )
 
-        # Clean up
-        os.remove(local_path)
-        logging.info(f"Message: {message_text}")
-        return message_text + raw_data_url
+            # Clean up
+            os.remove(local_path)
+            logging.info(f"Message: {message_text}")
+            return message_text + raw_data_url
+        
+        elif sample.endotoxin:
+            message_text = (
+                f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
+                f"🔹 <b>Endotoxin Level:</b> {sample.endotoxin}\n\n"
+                f"<i>Note:</i> Endotoxin is measured in EU (Endotoxin Units). For tirzepatide, <b><10 EU/mg</b> is the recommended threshold from FDA-registered API standards.\n"
+                f"• Janoshik reports EU per vial → divide by Y mg to get EU/mg\n"
+                f"• TrustPointe reports EU/mL → divide by (Y mg ÷ 2mL) to get EU/mg\n"
+                f"<a href='https://www.stairwaytogray.com/posts/testing/testing-101/#endotoxin'>More details in the Testing 101 Guide 🔬</a>\n\n"
+            )
+            os.remove(local_path)
+            logging.info(f"Message: {message_text}")
+            return message_text + raw_data_url
+        
+        else:
+            message_text = (
+                f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()}</b>\n\n"
+                f"🔹<a href='https://www.stairwaytogray.com/posts/testing/testing-101/#how-do-i-read-my-test-results'>How Do I Read My Test Results? Check out the Testing 101 Guide 🔬</a>\n\n"
+            )
+            os.remove(local_path)
+            logging.info(f"Message: {message_text}")
+            return message_text + raw_data_url
     
     else:
         return "😳🚧 Oops! We cannot parse this test result. This test type may not be supported yet, but we're working on supporting more test types soon!"
