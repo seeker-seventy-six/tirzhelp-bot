@@ -126,9 +126,10 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
 def dont_link(user_id, user_name):
     message = (
         f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 "
-        "We're auto-poofing this direct link as most communities have requested invites be shared only through approved links or not to be directly linked. \n\n"
-        "We want to be good neighbors and respect their moderation wishes. Please DM any invite links instead. \n\n"
-        "You can also check the <a href='https://docs.google.com/document/d/1CvAu42nH0i-VFPN9cLInSkjj7D8F0SBq7FIyqDjhF7M/edit?tab=t.lgryvp324lcd'>Printable Guides: External Resources</a> for the latest approved community invite method if provided. Thank you! 🙏"
+        "We're auto-poofing this direct link as most communities have requested invites be shared only through approved links or not to be directly linked.\n\n"
+        "If this was an order form, we also auto-poof these for newbie safety. Newbies should ask around here for experiences with the vendor.\n\n"
+        "Please DM these kinds of links instead, but be vigilant as a newbie receiving DMs.\n\n"
+        "You can check the <a href='https://docs.google.com/document/d/1CvAu42nH0i-VFPN9cLInSkjj7D8F0SBq7FIyqDjhF7M/edit?tab=t.lgryvp324lcd'>Printable Guides: External Resources</a> for the latest approved community invite method if they've provided one, the <a href='https://t.me/c/2410577414/37/389306'>Supply Vendors Spreasheet</a>, or the <a href='https://t.me/c/2410577414/3/51651'>Vendor Spreadhseet</a>. Thank you! 🙏"
     )
     return message
 
