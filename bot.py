@@ -105,7 +105,7 @@ app = Flask(__name__)
 #     thread.start()
     
 
-def start_periodic_announcement():
+def start_periodic_announcement(frequency_minutes=60):
     while True:
         try:
             # Get UTC time and convert to EST (fixed UTC-5 offset)
@@ -119,13 +119,13 @@ def start_periodic_announcement():
 
             if 3 <= est_hour < 5:
                 logging.info("Skipping announcement: between 3AM and 5AM EST")
-            elif (0 <= est_hour < 3 or 5 <= est_hour < 7):
-                # Only send at :00 during these hours
+            elif est_hour in range(0, 3) or est_hour in range(5, 7):
+                # During 12AM–3AM and 5AM–7AM EST, only send at :00
                 if est_minute == 0:
                     should_send = True
             else:
-                # All other hours: send at :00 and :30
-                if est_minute in [0, 30]:
+                # All other hours: send based on frequency
+                if est_minute % frequency_minutes == 0:
                     should_send = True
 
             if should_send:
@@ -137,13 +137,14 @@ def start_periodic_announcement():
                 #     helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
                 #     logging.info("Made newbie announcement")
 
-            # Sleep until the next half-hour mark
+            # Sleep until the next frequency boundary (e.g. :00 or :30)
             now = datetime.datetime.now()
-            seconds_until_next_half_hour = (30 - now.minute % 30) * 60 - now.second
-            time.sleep(seconds_until_next_half_hour)
+            seconds_until_next_tick = (frequency_minutes - (now.minute % frequency_minutes)) * 60 - now.second
+            time.sleep(seconds_until_next_tick)
 
         except Exception as e:
             logging.error(f"Error in announcement thread: {e}")
+
 
 # Initialize the periodic announcement thread
 def initialize_announcement_thread():
