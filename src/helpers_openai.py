@@ -311,7 +311,7 @@ def extract_data_with_openai(file_path, text):
         endotoxin: str | None = Field(alias='endotoxin', description="The amount of endotoxin or EU found by the test; a float number. Extract the value AND the unit; EU or EU/mL. If 'not detected', fill in 0. If not tested, fill in the JSON value for null")
         test_lab: str = Field(alias="test_lab", description="The lab name who tested the sample. Pull the lab name from the name in the url or letterhead logo. DO NOT LEAVE BLANK")
         test_link: str = Field(alias="test_link", description="If test_lab is Peptide Test use https://coa.trustpointeanalytics.com/. If test_lab is Janoshik use https://janoshik.com/verify/. If test_lab is Chromate use https://chromate.org/")
-        test_task: str = Field(alias="test_task", description="If present, extract the Task #. If no Task # is present use NA. Janoshik uses Task # at the top left. Chromate uses Report # at the bottom right of the image. Peptide Test does NOT use Task #.")
+        test_task: str = Field(alias="test_task", description="If present, extract the Task #. If no Task # is present use NA. Janoshik uses Task # at the top left. Chromate uses Report # at the bottom right of the image. Peptide Test uses sample ID that starts with 'SPL-'.")
         test_key: str = Field(alias="test_key", description="If present, extract the Verification Key or Unique Key. If no Key is present use NA. Janoshik puts their Key at the bottom of the image in a gray rectangle. Peptide Test puts their Verification Key at the top right of the image. Chromate puts their Access Code at the bottom right of the image.")
 
 
