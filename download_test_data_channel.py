@@ -3,11 +3,10 @@ from dotenv import load_dotenv
 from telethon.sync import TelegramClient
 from telethon.tl.types import MessageMediaDocument, MessageMediaPhoto
 
-
 # Load environment variables
 load_dotenv('.env-dev')
 
-# Replace these with your info
+# Telegram API credentials
 api_id = os.getenv("APP_ID")
 api_hash = os.getenv("APP_API_HASH")
 phone = os.getenv("PHONE")
@@ -32,20 +31,38 @@ async def main():
     entity = await client.get_entity(target_chat)
 
     async for message in client.iter_messages(entity):
+        # This original logic worked for you, keeping as-is:
         if message.reply_to_msg_id != target_topic_id:
-            continue  # skip messages not in the desired topic
+            continue
 
-        if message.media and (isinstance(message.media, (MessageMediaPhoto, MessageMediaDocument))):
+        if message.media and isinstance(message.media, (MessageMediaPhoto, MessageMediaDocument)):
             try:
-                file_path = await message.download_media(file=DOWNLOAD_DIR)
-                print(f"✅ Downloaded: {file_path}")
+                # Build base filename from message ID
+                base_name = str(message.id)
+                if message.file and message.file.name:
+                    base_name += f"_{message.file.name}"
+                elif isinstance(message.media, MessageMediaPhoto):
+                    base_name += ".jpg"
+                else:
+                    base_name += ".file"
+
+                full_path = os.path.join(DOWNLOAD_DIR, base_name)
+
+                if not os.path.exists(full_path):
+                    await message.download_media(file=full_path)
+                    print(f"✅ Downloaded: {full_path}")
+
+                    # Save caption/message as .txt (if any)
+                    if message.message:
+                        text_path = os.path.splitext(full_path)[0] + ".txt"
+                        with open(text_path, "w", encoding="utf-8") as f:
+                            f.write(message.message)
+                        print(f"📝 Saved metadata: {text_path}")
+
             except Exception as e:
                 print(f"❌ Failed to download message {message.id}: {e}")
 
-
 if __name__ == '__main__':
-    # Check if the script is being run directly
     print("Starting download...")
-    # Start the client and run the main function
     with client:
         client.loop.run_until_complete(main())
