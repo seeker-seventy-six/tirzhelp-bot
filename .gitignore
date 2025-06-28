@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 historic_test_results/*
 my_session*
+session_name.session
