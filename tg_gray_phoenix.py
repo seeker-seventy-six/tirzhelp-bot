@@ -53,8 +53,19 @@ NEW_GROUP_TITLE = "Stairway to Gray 🐦‍🔥🐦‍🔥"
 NEW_GROUP_DESCRIPTION = "We help people with tirzepatide in the peptide community\nhttps://www.stairwaytogray.com"
 
 USERS_TO_ADD = [
-    '@tirzhelp_bot', 
-    '@seekerseventysix',
+    'tirzhelp_bot',
+    'seekerseventysix',
+    'tirzepatidehelp',
+    'delululemonade',
+    'Steph_S_1975',
+    'aksailor',
+    'NordicTurtle',
+    'Ruca2573',
+    'Litajj',
+    'UncleNacho',
+    'ruttheimer',
+    'QuestyQuestyQuesty',
+    'popcornturkey',
 ]
 
 PINNED_TOPIC_NAMES = [
@@ -320,7 +331,7 @@ async def set_logo(client, path, peer):
 async def add_admins(client, peer):
     for user in USERS_TO_ADD:
         try:
-            ent = await client.get_entity(user)
+            ent = await client.get_entity('@'+user)
             try:
                 await client(InviteToChannelRequest(channel=peer, users=[ent]))
             except UserAlreadyParticipantError:
