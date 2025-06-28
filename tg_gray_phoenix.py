@@ -49,7 +49,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # Constants
 SOURCE_SUPERGROUP_ID = -1002334662710
-NEW_GROUP_TITLE = "GrayPhoenix::TestGroup" + ""
+NEW_GROUP_TITLE = "Stairway to Gray 🐦‍🔥🐦‍🔥" 
 NEW_GROUP_DESCRIPTION = "We help people with tirzepatide in the peptide community\nhttps://www.stairwaytogray.com"
 
 USERS_TO_ADD = [
@@ -263,8 +263,6 @@ async def create_topic_and_pin_if_needed(
     if topic_name in PINNED_TOPIC_NAMES:
         logging.info(f"Pinning topic '{topic_name}'...")
         try:
-            # We only need to set pinned=True (no rename/close),
-            # so usually we can do it in one request:
             new_topic_pin_req = EditForumTopicRequest(
                 channel=new_group,
                 topic_id=new_topic.id,
@@ -306,6 +304,7 @@ async def migrate_messages(client, src_peer, dst_peer, src_topic_id, dst_topic, 
         if new_id and src_mid in pin_set:
             await safe(client, UpdatePinnedMessageRequest(peer=dst_peer, id=new_id, silent=True))
             logging.info(f"📌 pinned src#{src_mid} → dst#{new_id}")
+            await asyncio.sleep(5.0)
 
 async def rename_and_lock_general(client, group):
     res = await client(GetForumTopicsRequest(channel=group, offset_date=0, offset_id=0, offset_topic=0, limit=10))
