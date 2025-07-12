@@ -57,7 +57,7 @@ USERS_TO_ADD = [
     'seekerseventysix',
     'tirzepatidehelp',
     'delululemonade',
-    'Steph_S_1975',
+    'Steph_752501',
     'aksailor',
     'NordicTurtle',
     'Ruca2573',
