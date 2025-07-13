@@ -257,6 +257,7 @@ def extract_data_with_openai(file_path, text):
         "GB": ["Guangebio"],
         "GP": ["Guruite Biotechnology Co", "Great Peptide"],
         "GYC": ["Nantong Guangyuan Pharma"],
+        "HK": ["HK Peptide"],
         "HYB": ["Hangzhou Youngpeptide Biotechnology"],
         "Innotech": ["Innotech"],
         "JEC": ["JCE", "Jinan Elitepeptide Chemical Co", "Jinan Elitepeptide"],
