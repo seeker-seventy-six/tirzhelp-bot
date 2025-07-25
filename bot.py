@@ -54,7 +54,7 @@ MOD_ACCOUNTS = [
     'UncleNacho',
     'ruttheimer',
     'QuestyQuestyQuesty',
-    'popcornturkey',
+    'justaturkey',
 ]
 
 app = Flask(__name__)

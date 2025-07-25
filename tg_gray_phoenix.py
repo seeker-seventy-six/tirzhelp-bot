@@ -65,7 +65,7 @@ USERS_TO_ADD = [
     'UncleNacho',
     'ruttheimer',
     'QuestyQuestyQuesty',
-    'popcornturkey',
+    'justaturkey',
 ]
 
 PINNED_TOPIC_NAMES = [
