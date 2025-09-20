@@ -12,7 +12,7 @@ domain_urls:
   - "t.me/+"
   - "t.me/SNPcomm"
 ignore_urls:
-  - "discord.gg/fc7ceryPUe" # STG Server
-  - "discord.gg/m4DQTAXAM4" # STG Server
+  - "discord.gg/WszTsF5s" # STG Server 2.0
+  - "discord.gg/VssDZhcZ" # STG Server 3.0
   - "discord.gg/7m2XhYu4ug" # STG Testing Server
   - "discord.gg/dpPHCqrjFx" # STG Testing Server
