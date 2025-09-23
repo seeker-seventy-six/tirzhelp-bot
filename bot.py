@@ -105,7 +105,11 @@ app = Flask(__name__)
 #     thread.start()
     
 
-def start_periodic_announcement(frequency_minutes=60):
+def start_periodic_announcement(frequency_minutes=180):
+    """
+    Post the newbie announcement on a clean N-minute cadence (e.g., every 180 minutes),
+    while preserving existing quiet-hours rule (skip 3:00–4:59 AM Eastern).
+    """
     while True:
         try:
             # Get UTC time and convert to EST (fixed UTC-5 offset)
@@ -124,8 +128,9 @@ def start_periodic_announcement(frequency_minutes=60):
                 if est_minute == 0:
                     should_send = True
             else:
-                # All other hours: send based on frequency
-                if est_minute % frequency_minutes == 0:
+               # All other hours: fire on every N-minute boundary (e.g., 180)
+                total_minutes = est_hour * 60 + est_minute
+                if total_minutes % frequency_minutes == 0:
                     should_send = True
 
             if should_send:
@@ -137,13 +142,25 @@ def start_periodic_announcement(frequency_minutes=60):
                 #     helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
                 #     logging.info("Made newbie announcement")
 
-            # Sleep until the next frequency boundary (e.g. :00 or :30)
-            now = datetime.datetime.now()
-            seconds_until_next_tick = (frequency_minutes - (now.minute % frequency_minutes)) * 60 - now.second
-            time.sleep(seconds_until_next_tick)
+            # Sleep until the next frequency boundary (e.g. next multiple of N)
+            now_utc = datetime.datetime.utcnow()
+            now_est = now_utc + datetime.timedelta(hours=-5)
+            total_now = now_est.hour * 60 + now_est.minute
+
+            # Minutes remaining to the next boundary (e.g., next multiple of N)
+            minutes_to_next = (frequency_minutes - (total_now % frequency_minutes)) % frequency_minutes
+            
+            if minutes_to_next == 0:
+                # We're exactly on a boundary; schedule the *next* one.
+                minutes_to_next = frequency_minutes
+
+            # Convert to seconds and align to the next minute start
+            seconds_until_next_tick = minutes_to_next * 60 - now_est.second
+            time.sleep(max(1, seconds_until_next_tick))
 
         except Exception as e:
             logging.error(f"Error in announcement thread: {e}")
+            time.sleep(60)
 
 
 # Initialize the periodic announcement thread
