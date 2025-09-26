@@ -86,13 +86,19 @@ Banned_Topics:
   DEA_Scheduled_Substance_3:
     message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing your peptides for controlled substance contaminates. 🚫"
     substances:
-      - ['Steroids', 'Anabolic steroids', 'Methandrostenolone', 'Dianabol', 'Metabolina', 'Nerobol', 'Perbolin']
+      - ['Steroids', 'Anabolic steroids', 'Methandrostenolone', 'Dianabol', 'Metabolina', 'Nerobol', 'Perbolin', 'Oils', 'AAS']
       - ['Buprenorphine', 'Buprenex', 'Temgesic', 'Subutex', 'Suboxone']
       - ['Ketamine', 'Ketaset', 'Ketalar', 'Special K']
-      - ['Testosterone', 'Androgel', 'Testim', 'Androderm', 'Testoderm']
+      - ['Testosterone', 'Androgel', 'Testim', 'Androderm', 'Testoderm', 'TRT']
       - ['Anabolex', 'Andractim', 'Pesomax', 'Stanolone']
       - ['Carfentanil', 'Wildnil']
       - ['Tributane', 'Embutramide']
+  FDCA_Substance:
+    message: "🚫 Reminder: Discussion of substances that fall under Under U.S. law (FDCA, 21 U.S.C. §333(e)) is not allowed. Our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about these substances be taken elsewhere. 🚫"
+    substances:
+      - ['hGH', 'human growth hormone', 'somatropin', 'somatrem', 'gh']
+      - ['Genotropin', 'Norditropin', 'Humatrope', 'Saizen', 'Omnitrope', 'Zomacton', 'Nutropin', 'Serostim']
+
 
 Auto_Poof_Topics:
   SNP:
