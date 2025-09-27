@@ -324,17 +324,17 @@ def webhook():
 
             ### WHEN DOC OR PHOTO POSTED IN TEST RESULTS CHANNEL 
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
-                # Skip Discord bridge for bot messages but allow test results extraction
-                is_bot_message = username == 'tirzhelp_bot'
-                # AUTO EXTRACT TEST RESULTS
+                # AUTO EXTRACT TEST RESULTS (always run)
                 try:
                     test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
                     helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
-                except:
+                    logging.info("Test results extraction completed successfully")
+                except Exception as e:
+                    logging.error(f"Test results extraction failed: {e}")
                     helpers_telegram.send_message(chat_id, "🚫 Unsupported file format received. Please check your file is a .pdf, .png, or .jpeg and retry.", message_thread_id)
                 
                 # DISCORD BRIDGE - TELEGRAM TO DISCORD (skip for bot messages)
-                if str(chat_id) == TIRZHELP_SUPERGROUP_ID and not is_bot_message:
+                if str(chat_id) == TIRZHELP_SUPERGROUP_ID:
                     try:
                         file_id = None
                         filename = None
