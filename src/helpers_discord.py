@@ -54,6 +54,11 @@ class DiscordBridge(discord.Client):
                         message_thread_id=TELEGRAM_TOPIC_ID,
                         caption=f"📎 {attachment.filename}"
                     )
+                    
+                    # Manually trigger test results extraction for test results channel
+                    if TELEGRAM_TOPIC_ID == '48':
+                        from src.helpers_test_results import extract_test_results_from_image
+                        extract_test_results_from_image(attachment.url, TELEGRAM_CHAT_ID, TELEGRAM_TOPIC_ID)
             
             # Extract and send images from links if no attachments
             if not message.attachments and has_content:
@@ -107,8 +112,13 @@ class DiscordBridge(discord.Client):
                         TELEGRAM_CHAT_ID,
                         image_url=image_url,
                         message_thread_id=TELEGRAM_TOPIC_ID,
-                        caption=f"🔗 From: {image_url}"
+                        caption=f"🔗 From: {urlparse(url).netloc}"
                     )
+                    
+                    # Manually trigger test results extraction for test results channel
+                    if TELEGRAM_TOPIC_ID == '48':
+                        from src.helpers_test_results import extract_test_results_from_image
+                        extract_test_results_from_image(image_url, TELEGRAM_CHAT_ID, TELEGRAM_TOPIC_ID)
                     break  # Only send first image found
                     
             except Exception as e:
