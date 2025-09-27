@@ -20,6 +20,23 @@ class DiscordBridge(discord.Client):
     async def on_ready(self):
         logging.info(f'Discord bridge logged in as {self.user}')
         
+        # Check permissions on startup
+        channel = self.get_channel(DISCORD_CHANNEL_ID)
+        if channel:
+            permissions = channel.permissions_for(channel.guild.me)
+            missing_perms = []
+            if not permissions.send_messages:
+                missing_perms.append('Send Messages')
+            if not permissions.attach_files:
+                missing_perms.append('Attach Files')
+            if not permissions.read_message_history:
+                missing_perms.append('Read Message History')
+                
+            if missing_perms:
+                logging.warning(f"Discord bot missing permissions: {', '.join(missing_perms)}")
+            else:
+                logging.info("Discord bot has all required permissions")
+        
     async def on_message(self, message):
         if message.author.bot:
             return
@@ -60,8 +77,8 @@ class DiscordBridge(discord.Client):
                         from src.helpers_test_results import extract_test_results_from_image
                         extract_test_results_from_image(attachment.url, TELEGRAM_CHAT_ID, TELEGRAM_TOPIC_ID)
             
-            # Extract and send images from links if no attachments
-            if not message.attachments and has_content:
+            # Extract and send images from links (always run for messages with links)
+            if has_content:
                 await self.extract_and_send_link_images(message.content)
                     
             logging.info(f"Bridged Discord→Telegram: {message.author.display_name}")
@@ -133,12 +150,21 @@ class DiscordBridge(discord.Client):
                 logging.error("Discord channel not found")
                 return
                 
+            # Check bot permissions
+            permissions = channel.permissions_for(channel.guild.me)
+            if not permissions.send_messages:
+                logging.error("Bot lacks Send Messages permission in Discord channel")
+                return
+            if not permissions.attach_files:
+                logging.error("Bot lacks Attach Files permission in Discord channel")
+                return
+                
             # Download file
             response = requests.get(file_url)
             response.raise_for_status()
             
             # Create message content
-            content = f"📱 **STG Telegram Bridge**\n👤 **{username}**"
+            content = f"🔗 **STG Telegram Bridge**\n👤 **{username}**"
             if caption:
                 content += f"\n\n{caption}"
                 
@@ -148,6 +174,8 @@ class DiscordBridge(discord.Client):
             
             logging.info(f"Bridged Telegram→Discord: {username}")
             
+        except discord.Forbidden as e:
+            logging.error(f"Discord permission error: {e}. Bot needs Send Messages and Attach Files permissions")
         except Exception as e:
             logging.error(f"Failed to send to Discord: {e}")
 
@@ -187,11 +215,13 @@ def start_discord_bridge():
 def send_telegram_file_to_discord(username, file_url, filename, caption=None):
     """Send file from Telegram to Discord"""
     global discord_client
-    if discord_client:
+    if discord_client and discord_client.is_ready():
         asyncio.run_coroutine_threadsafe(
             discord_client.send_to_discord(username, file_url, filename, caption),
             discord_client.loop
         )
+    else:
+        logging.error("Discord client not ready or not connected")
 
 def stop_discord_bridge():
     """Stop the Discord bridge"""
