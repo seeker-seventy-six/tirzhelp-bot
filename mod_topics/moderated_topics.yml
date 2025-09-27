@@ -98,6 +98,7 @@ Banned_Topics:
     substances:
       - ['hGH', 'human growth hormone', 'somatropin', 'somatrem', 'gh']
       - ['Genotropin', 'Norditropin', 'Humatrope', 'Saizen', 'Omnitrope', 'Zomacton', 'Nutropin', 'Serostim']
+      - ['EPO', 'erythropoietin', 'Epogen', 'Procrit', 'Aranesp']
 
 
 Auto_Poof_Topics:
