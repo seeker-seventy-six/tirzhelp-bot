@@ -107,7 +107,7 @@ class DiscordBridge(discord.Client):
                         TELEGRAM_CHAT_ID,
                         image_url=image_url,
                         message_thread_id=TELEGRAM_TOPIC_ID,
-                        caption=f"🔗 From: {urlparse(url).netloc}"
+                        caption=f"🔗 From: {image_url}"
                     )
                     break  # Only send first image found
                     
