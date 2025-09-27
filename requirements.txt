@@ -13,3 +13,4 @@ PyYAML
 pdf2image
 telebot
 telethon
+discord.py

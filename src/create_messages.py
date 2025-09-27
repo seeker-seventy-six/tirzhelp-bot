@@ -33,8 +33,9 @@ def newbie_announcement():
         "Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor spreadsheet or vendor's community.",
         "Check your reconstituted peptide's pH level before injecting! 🧪📈 GLP-1s should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find pH strips on Amazon.",
         "Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
-        "We don't actively recommend single vial vendors in this community because they cannot be tested and therefore lack the same level of accountability for quality control as kits. If you choose to use a single vial vendor, please do so at your own risk and thoroughly research.",
-        "Vendor COAs are 🧻 - they can be biased due to cherry-picking. Use them only to verify what the vendor *claims* to be selling. To mitigate risk, third-party (3P) test your actual order!"
+        "We don't recommend single vial vendors in this community because they cannot be tested and therefore lack the same level of accountability for quality control as kits. If you choose to use a single vial vendor, please do so at your own risk and thoroughly research.",
+        "Vendor COAs are 🧻 - they can be biased due to cherry-picking. Use them only to verify what the vendor *claims* to be selling. To mitigate risk, third-party (3P) test your actual order!",
+        "We don't recommend individual-ran group buys for first-time buyers because of the increased risk of scams and typically a lack of leverage to make buyers whole in the event of an issue. If you choose to go the group buy route, please do so at your own risk and thoroughly research."
     ])
     message = (
         "🚨 New here? Start here! 🚨\n\n"
