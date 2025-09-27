@@ -13,7 +13,8 @@ import logging
 
 sys.path.append('./src')
 from src import create_messages as msgs
-from src import helpers_telegram 
+from src import helpers_telegram
+from src import helpers_discord 
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -193,6 +194,7 @@ def create_globals():
 # start_ai_roleplay_thread()
 initialize_announcement_thread()
 create_globals()
+helpers_discord.start_discord_bridge()
 ### NON WEBHOOK END ###
 
 
@@ -319,16 +321,47 @@ def webhook():
                         helpers_telegram.send_message(chat_id, message, message_thread_id, reply_to_message_id=message_id)
                         return jsonify({"ok": True}), 200
 
-            ### AUTO EXTRACT TEST RESULTS ###
-            # Respond to uploaded documents in Test Results channel
+
+            ### WHEN DOC OR PHOTO POSTED IN TEST RESULTS CHANNEL 
             if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
+                # AUTO EXTRACT TEST RESULTS
                 try:
                     test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
                     helpers_telegram.send_message(chat_id, test_results_summary, message_thread_id)
-                    return jsonify({"ok": True}), 200
                 except:
                     helpers_telegram.send_message(chat_id, "🚫 Unsupported file format received. Please check your file is a .pdf, .png, or .jpeg and retry.", message_thread_id)
-                    return jsonify({"ok": True}), 200
+                
+                # DISCORD BRIDGE - TELEGRAM TO DISCORD
+                if str(chat_id) == TIRZHELP_SUPERGROUP_ID:
+                    try:
+                        file_id = None
+                        filename = None
+                        
+                        if "photo" in message:
+                            file_id = message["photo"][-1]["file_id"]
+                            filename = "image.jpg"
+                        elif "document" in message:
+                            file_id = message["document"]["file_id"]
+                            filename = message["document"].get("file_name", "document")
+                        
+                        if file_id:
+                            file_response = requests.get(f"{TELEGRAM_API_URL}/getFile?file_id={file_id}")
+                            file_data = file_response.json()
+                            
+                            if file_data.get("ok"):
+                                file_path = file_data["result"]["file_path"]
+                                file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+                                
+                                display_name = username or user_firstname or "Anonymous"
+                                caption = text if text else None
+                                
+                                helpers_discord.send_telegram_file_to_discord(display_name, file_url, filename, caption)
+                                logging.info(f"Bridged Telegram→Discord: {display_name} ({filename})")
+                                
+                    except Exception as e:
+                        logging.error(f"Failed to bridge Telegram file to Discord: {e}")
+                
+                return jsonify({"ok": True}), 200
 
             ### AUTO POOF LINKED COMMUNITIES ###
             # Flag t.me/ links in group test channel
