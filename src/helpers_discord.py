@@ -4,6 +4,8 @@ import logging
 import os
 import requests
 from io import BytesIO
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
 from src import helpers_telegram
 
 # Bridge IDs
@@ -43,6 +45,7 @@ class DiscordBridge(discord.Client):
                 message_thread_id=TELEGRAM_TOPIC_ID
             )
             
+            # Send attachments
             for attachment in message.attachments:
                 if attachment.content_type and attachment.content_type.startswith('image/'):
                     helpers_telegram.send_image(
@@ -51,11 +54,66 @@ class DiscordBridge(discord.Client):
                         message_thread_id=TELEGRAM_TOPIC_ID,
                         caption=f"📎 {attachment.filename}"
                     )
+            
+            # Extract and send images from links if no attachments
+            if not message.attachments and has_content:
+                await self.extract_and_send_link_images(message.content)
                     
             logging.info(f"Bridged Discord→Telegram: {message.author.display_name}")
             
         except Exception as e:
             logging.error(f"Failed to bridge Discord message: {e}")
+            
+    async def extract_and_send_link_images(self, content):
+        """Extract images from webpage links and send to Telegram"""
+        import re
+        
+        # Find URLs in content
+        urls = re.findall(r'https?://[^\s]+', content)
+        
+        for url in urls:
+            try:
+                response = requests.get(url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
+                response.raise_for_status()
+                
+                soup = BeautifulSoup(response.content, 'html.parser')
+                
+                # Look for images with priority order
+                image_url = None
+                
+                # 1. Try report-specific images first
+                report_img = soup.find('img', class_='report-img') or soup.find('img', alt=lambda x: x and 'test report' in x.lower())
+                if report_img and report_img.get('src'):
+                    image_url = report_img['src']
+                
+                # 2. Try Open Graph image
+                if not image_url:
+                    og_image = soup.find('meta', property='og:image')
+                    if og_image and og_image.get('content'):
+                        image_url = og_image['content']
+                
+                # 3. Try first img tag
+                if not image_url:
+                    img_tag = soup.find('img')
+                    if img_tag and img_tag.get('src'):
+                        image_url = img_tag['src']
+                
+                # Make URL absolute
+                if image_url:
+                    image_url = urljoin(url, image_url)
+                    
+                    # Send image to Telegram
+                    helpers_telegram.send_image(
+                        TELEGRAM_CHAT_ID,
+                        image_url=image_url,
+                        message_thread_id=TELEGRAM_TOPIC_ID,
+                        caption=f"🔗 From: {urlparse(url).netloc}"
+                    )
+                    break  # Only send first image found
+                    
+            except Exception as e:
+                logging.error(f"Failed to extract image from {url}: {e}")
+                continue
             
     async def send_to_discord(self, username, file_url, filename, caption=None):
         """Send file from Telegram to Discord"""
