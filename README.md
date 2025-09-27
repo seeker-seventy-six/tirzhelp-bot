@@ -12,6 +12,7 @@ Once the bot is deployed to Heroku and added as a member to a Telegram supergrou
 - **Banned Topic Filtering**: Filters messages for banned topics and alerts the user if a topic is found. It can also auto-delete messages for certain terms organized by yaml files.
 - **Automated Messages**: Can automatically respond to certain terms or regex patterns with predefined messages for certain terms organized by yaml files.
 - **Test Results Extraction**: Extract any document (pdf) or image uploaded to Test Results channel and upload the extracted data to a Google Spreadsheet automatically.
+- **Discord Bridge**: Automatically bridges posts with links and images from a specific Discord channel to a Telegram topic.
 
 ## Environment Setup
 
@@ -23,6 +24,7 @@ WEBHOOK_URL=https://your-heroku-app-url/webhook
 ENVIRONMENT=[PROD or DEV]
 OPENAI_TOKEN=your-openai-token
 GOOGLE_SERVICE_ACCOUNT_FILE=your-google-developer-app-token
+DISCORD_BOT_TOKEN=your-discord-bot-token
 ```
 
 ## Deployment
