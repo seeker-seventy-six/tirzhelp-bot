@@ -201,7 +201,7 @@ def summarize_test_results(update, BOT_TOKEN):
             grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
             logging.info(f"Grouped stats: {grouped_stats}")
             # Initialize the message text
-            message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 3 months:</b>\n\n"
+            message_text = f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()} Analysis for the last 6 months:</b>\n\n"
 
             # Iterate through each group and append stats to the message
             for expected_mass, stats in grouped_stats.items():
@@ -222,9 +222,9 @@ def summarize_test_results(update, BOT_TOKEN):
                     f"   • Avg Tested Mass: {stats['average_mass']:.2f} mg\n"
                     f"   • Avg Tested Purity: {stats['average_purity']:.2f}%\n"
                     f"   • # Vials Tested: {stats['test_count']}\n"
-                    f"   • Typical Deviation Tested Mass (Std Dev): ±{stats['std_mass']:.1f} mg\n"
-                    f"   {icon_status_mass} <b>±{stats['mass_diff_percent']:.1f}% : % Std Dev of Potency</b>\n"
-                    f"   {icon_status_purity} <b>±{stats['std_purity']:.1f}% : % Std Dev of Purity</b>\n\n"
+                    f"   • Mass Variation between Vials (Std Dev): ±{stats['std_mass']:.1f} mg\n"
+                    f"   {icon_status_mass} <b>±{stats['mass_diff_percent']:.1f}% Mass Variation from Expected Mass</b>\n"
+                    f"   {icon_status_purity} <b>±{stats['std_purity']:.1f}% Purity Variation</b>\n\n"
                 )
 
             # Clean up

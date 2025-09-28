@@ -81,10 +81,10 @@ def calculate_statistics(vendor_name, peptide):
     df['Mass mg'] = pd.to_numeric(df['Mass mg'], errors='coerce')
     df['Purity %'] = pd.to_numeric(df['Purity %'], errors='coerce')
 
-    # Filter for the Vendor in last 3 months
-    three_months_ago = datetime.now() - pd.DateOffset(months=3)
+    # Filter for the Vendor in last 6 months
+    six_months_ago = datetime.now() - pd.DateOffset(months=6)
     recent_data = df[
-        (df['Test Date'] >= three_months_ago) &
+        (df['Test Date'] >= six_months_ago) &
         (df['Vendor'].str.lower() == vendor_name.lower()) &
         (df['Peptide'].str.lower()== peptide.lower())
     ]
@@ -94,11 +94,14 @@ def calculate_statistics(vendor_name, peptide):
 
     group_stats = {}
     for group, data in grouped_data:        
-        # Calculate percentage differences
-        mass_diff_percent = (data['Mass mg'].std() / group) * 100
+        # Calculate RMSE as percentage of test mass difference from expected mass
+        test_count = data['Vendor'].count()
+        sum_squared_errors = ((data['Mass mg'] - group) ** 2).sum()
+        rmse = (sum_squared_errors / test_count) ** 0.5
+        mass_diff_percent = (rmse / group) * 100
 
         group_stats[group] = {
-            "test_count": data['Vendor'].count(),
+            "test_count": test_count,
             "average_mass": data['Mass mg'].mean(),
             "average_purity": data['Purity %'].mean(),
             "std_mass": data['Mass mg'].std(),
