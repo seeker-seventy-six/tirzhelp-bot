@@ -21,10 +21,12 @@ def welcome_newbie(new_user):
     guides = "<a href='https://t.me/c/2410577414/3/51643'>📚 Rules & Guides Channel</a>"
     mention = f"<a href='tg://user?id={new_user['id']}'>@{new_user.get('username', new_user['first_name'])}</a> " if new_user!='' else new_user
     welcome_message = (
-        f"{mention} Welcome to the Telegram community for Stairway to Gray! 🎉 \n\nYou've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more ✨🐰\n\n"
+        f"{mention} Welcome to the Telegram community for Stairway to Gray! ✨🐰\n\n"
         f"Before jumping in, we've gathered answers to the most common newbie questions in our <b>Gray 101</b> guide and <b>Rules & Guides channel</b> linked below:\n\n{wiki}\n{guides}\n\n"
         f"Once you've read thru these guides, feel free to post follow-up questions in the <i>Newbies</i> channel and further explore the <i>Rules & Guides</i> channel. We're here to help and happy to have you join us! 😊"
     )
+
+    # Removed text from welcome bot: 🎉 \n\nYou've found your way to the end of the rabbit hole where you can ask all your questions about the gray peptide community, vendor sources, and more 
     return welcome_message
 
 
