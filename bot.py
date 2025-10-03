@@ -308,7 +308,7 @@ def webhook():
                 for tuple_topic in banned_topics:
                     for word in tuple_topic:
                         pattern = r'\b' + re.escape(word.lower()) + r'\b'
-                        if re.search(pattern, text.lower()) and username not in MOD_ACCOUNTS:
+                        if re.search(pattern, text.lower()):
                             banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
                             return jsonify({"ok": True}), 200
