@@ -251,7 +251,7 @@ def extract_data_with_openai(file_path, text):
         "Amo": ["Amolist", "Amopure", "Amopeptide", "Bff", "Bfflist"],
         "ASC": ["Angel Shanghai Chemical"],
         "Bio": ["Biostratigx"],
-        "BDB": ["Baohua Dongnuo Biotechnology", "Baohua Dongnuo"],
+        "BDB": ["Baohua Dongnuo Biotechnology", "Baohua Dongnuo", "BHD"],
         "CDS": ["Changan District Sheng", "Jenny He", "Sheng Peptides"],
         "FSD": ["Shanghai Fushida Chemical", "DYL"],
         "GB": ["Guangebio"],
