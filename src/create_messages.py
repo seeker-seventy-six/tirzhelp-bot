@@ -123,7 +123,7 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
     elif 'BAM15' in banned_topic:
         topic_msg = "\nThis is a dangerous mitochondrial decoupler."
     
-    message = f"""{mention}{header_msg}\n\nauto-moderated term: {banned_topic}\n{topic_msg}""".strip()
+    message = f"""{mention}{header_msg}\n\n{topic_msg}""".strip()
     return message
 
 def dont_link(user_id, user_name):
