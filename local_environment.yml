@@ -22,3 +22,4 @@ dependencies:
     - telebot
     - telethon
     - discord.py
+    - beautifulsoup4
