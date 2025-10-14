@@ -85,13 +85,17 @@ Banned_Topics:
       - ['Vyvanse', 'Lisdexamfetamine']
   DEA_Scheduled_Substance_3:
     message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing your peptides for controlled substance contaminates. 🚫"
+    patterns:
+      - "(?i)\\btren(?:\\s*[-/]?\\s*(?:a|ace|acetate|e|enan(?:thate)?|hex|hexahydrobenzyl(?:carbonate)?))\\b"
+      - "(?i)\\btest(?:\\s*[-/]?\\s*(?:e|c|p|prop|cyp|enan(?:thate)?|undec(?:anoate)?|susp(?:ension)?))\\b"
+
     substances:
       - ['Steroids', 'Anabolic steroids', 'Methandrostenolone', 'Dianabol', 'Metabolina', 'Nerobol', 'Perbolin', 'Oils', 'AAS']
+      - ['Tren', 'Trenbolone', 'Parabolan', 'Masteron', 'Deca', 'Nandrolone', 'Primobolan', 'Anavar', 'Oxandrolone', 'Winstrol', 'Stanozolol', 'Dbol', 'Tbol', 'Halotestin', 'Proviron']
       - ['Buprenorphine', 'Buprenex', 'Temgesic', 'Subutex', 'Suboxone']
       - ['Ketamine', 'Ketaset', 'Ketalar', 'Special K']
       - ['Testosterone', 'Androgel', 'Testim', 'Androderm', 'Testoderm', 'TRT']
       - ['Anabolex', 'Andractim', 'Pesomax', 'Stanolone']
-      - ['Carfentanil', 'Wildnil']
       - ['Tributane', 'Embutramide']
   FDCA_Substance:
     message: "🚫 Reminder: Discussion of substances that fall under Under U.S. law (FDCA, 21 U.S.C. §333(e)) is not allowed. Our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about these substances be taken elsewhere. 🚫"
