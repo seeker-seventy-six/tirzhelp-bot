@@ -312,6 +312,17 @@ def webhook():
                             banned_topic_message = msgs.banned_topic(tuple_topic, banned_message)
                             helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
                             return jsonify({"ok": True}), 200
+                        
+                ### REGEX PATTERNS PER BANNED TOPIC ###  
+                banned_patterns = data.get('patterns', [])
+                for rx in banned_patterns:
+                    try:
+                        if re.search(rx, text, flags=re.IGNORECASE | re.DOTALL):
+                            banned_topic_message = msgs.banned_topic("Pattern match", banned_message)
+                            helpers_telegram.send_message(chat_id, banned_topic_message, message_thread_id, reply_to_message_id=message_id)
+                            return jsonify({"ok": True}), 200
+                    except re.error as e:
+                        logging.error(f"Invalid regex in banned pattern '{rx}': {e}")
 
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
             if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL] and username not in MOD_ACCOUNTS:
