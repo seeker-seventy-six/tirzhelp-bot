@@ -68,6 +68,11 @@ Banned_Topics:
       - ['GHB', 'gamma hydroxybutyrate', 'sodium oxybate']
   DEA_Scheduled_Substance_2:
     message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing your peptides for controlled substance contaminates. 🚫"
+    patterns:
+      # "addy"/"addies" only when clearly drug/sourcing context is nearby
+      - "(?i)\\baddy(?:['’]?s|ies)?\\b.{0,24}\\b(?:\\d{1,3}\\s*mg|xr|ir|er|pill|pills|tabs?|caps?|rx|script|prescription|dose|dosing|generic|brand|amphetamine|adderall|dexedrine|methylphenidate|ritalin|vyvanse|lisdexamfetamine|vendor|source|buy|sell|find|plug|order|ship|mail|reship)\\b"
+      # common misspellings/evasions
+      - "(?i)\\badd+e?r+a+l+l*\\b"   # adderal, aderal, adderalll, etc.
     substances:
       - ['Carfentanil', 'Wildnil']
       - ['Cocaine', 'Methyl benzoylecgonine', 'Crack cocaine']
