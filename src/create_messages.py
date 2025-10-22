@@ -208,7 +208,7 @@ def summarize_test_results(update, BOT_TOKEN):
             # Iterate through each group and append stats to the message
             for expected_mass, stats in grouped_stats.items():
                 icon_status_mass = (
-                    "🟢" if stats['mass_diff_percent'] <= 10 else # more stringent USP standard
+                    "🟢" if stats['mass_diff_percent'] <= 10 else # vendor standard if it exists
                     "🟡" if stats['mass_diff_percent'] <= 15 else # USP <905> & USP <797>
                     "🔴" if stats['mass_diff_percent'] > 15 else
                     "⚪"
@@ -239,8 +239,8 @@ def summarize_test_results(update, BOT_TOKEN):
                 f"📊 <b>{sample.vendor.upper()} {sample.peptide.upper()}</b>\n\n"
                 f"🔹 <b>Endotoxin Level:</b> {sample.endotoxin}\n\n"
                 f"<i>Note:</i> Endotoxin is measured in EU (Endotoxin Units). For tirzepatide, <b>&lt;10 EU/mg</b> is the recommended threshold from FDA-registered API standards.\n"
-                f"• Janoshik reports EU per vial → divide by Y mg to get EU/mg\n"
-                f"• TrustPointe reports EU/mL → divide by (Y mg ÷ 2mL) to get EU/mg\n"
+                f"• Janoshik reports EU per vial → divide by Vial mg to get EU/mg\n"
+                f"• TrustPointe reports EU/mL → divide by (Vial mg ÷ 2mL) to get EU/mg\n"
                 f"<a href='https://www.stairwaytogray.com/posts/testing/testing-101/#endotoxin'>More details in the Testing 101 Guide 🔬</a>\n\n"
             )
             os.remove(local_path)
@@ -257,7 +257,7 @@ def summarize_test_results(update, BOT_TOKEN):
             return message_text + raw_data_url
     
     else:
-        return "😳🚧 Oops! We cannot parse this test result. This test type may not be supported yet, but we're working on supporting more test types soon!"
+        return "😳🚧 Oops! We cannot parse this test result. This test type may not be supported yet or we ran into an error."
 
 
 def unsupported():
