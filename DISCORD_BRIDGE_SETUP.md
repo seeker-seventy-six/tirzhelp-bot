@@ -5,8 +5,8 @@ This feature provides **bidirectional bridging** between Discord and Telegram:
 - **Discord → Telegram**: Links and images from Discord channel to Telegram topic
 - **Telegram → Discord**: Images from Telegram topic to Discord channel
 
-**Discord Channel**: https://discord.com/channels/1351746139325595748/1367945937774706799
-**Telegram Topic**: https://web.telegram.org/a/#-1002410577414_48
+**Discord Channel**: #public-test-results-no-discussion 
+**Telegram Topic**: Test Results 3P ONLY - No Discussion
 
 ## Setup Instructions
 
@@ -20,9 +20,9 @@ This feature provides **bidirectional bridging** between Discord and Telegram:
 ### 2. Add Bot to Discord Server
 1. Go to "OAuth2" > "URL Generator"
 2. Select scopes: `bot`
-3. Select bot permissions: `Read Messages`, `Read Message History`, `Send Messages`, `Attach Files`
+3. Select bot permissions: ``View Channels`, `Read Messages`, `Read Message History`, `Send Messages`, `Attach Files`
 4. Copy the generated invite URL
-5. Open the URL in your browser and select the Discord server that contains channel ID `1367945937774706799`
+5. Open the URL in your browser and select the Discord server to add the bot to
 6. Click "Authorize" to add the bot to that server
 
 ### 3. Environment Variables
