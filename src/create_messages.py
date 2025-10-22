@@ -140,11 +140,11 @@ def dont_link_group_test(user_id, user_name):
     message = (
     f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 Ope! "
     "STG has moved group testing support to the new testing server STGTS on Discord. You can find that linked below, along with mods and group support to help you in your testing journey!\n\n"
-    "https://discord.gg/7m2XhYu4ug \n\n"
+    "https://discord.gg/GHqzcqUyFS \n\n"
     "While the most important thing is that members test what they buy for safety, please be aware that TG private chat testing groups will no longer have mod support if something goes wrong. "
     "Please join TG organized groups at your own risk. 🙏\n\n"
-    "To post your group test here, either copy the discord # looking-for-group-test THREAD link <a href='https://discord.com/channels/1351746139325595748/1359204768983289856/1361058059895570503'>(learn how here)</a>"
-    ", or post the discord channel name of your OPEN group test so folks can join from the <a href='https://discord.com/channels/1351746139325595748/1352074864906735687'>#start-join-leave-test-groups</a> channel"
+    "To post your group test here, either copy the discord # looking-for-group-test THREAD LINK"
+    ", or post the discord CHANNEL NAME of your OPEN group test so folks can join from the <a href='https://discord.com/channels/1402816972047122512/1428846550112665731'>#start-join-leave-test-groups</a> channel"
     )
     return message
 
