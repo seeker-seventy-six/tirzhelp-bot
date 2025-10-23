@@ -214,9 +214,9 @@ def summarize_test_results(update, BOT_TOKEN):
                     "⚪"
                 )
                 icon_status_purity = (
-                    "🟢" if stats['std_purity'] <= 2 else # from API tirz COA for FDA registered manufacturer 
-                    "🟡" if stats['std_purity'] <= 4 else # arbitrary doubled
-                    "🔴" if stats['std_purity'] > 4 else 
+                    "🟢" if stats['purity_diff_percent'] <= 2 else # from API tirz COA for FDA registered manufacturer 
+                    "🟡" if stats['purity_diff_percent'] <= 4 else # arbitrary doubled
+                    "🔴" if stats['purity_diff_percent'] > 4 else 
                     "⚪"
                 )
                 message_text += (
@@ -226,7 +226,7 @@ def summarize_test_results(update, BOT_TOKEN):
                     f"   • # Vials Tested: {stats['test_count']}\n"
                     f"   • Mass Variation between Vials (Std Dev): ±{stats['std_mass']:.1f} mg\n"
                     f"   {icon_status_mass} <b>±{stats['mass_diff_percent']:.1f}% Mass Variation from Expected Mass</b>\n"
-                    f"   {icon_status_purity} <b>±{stats['std_purity']:.1f}% Purity Variation</b>\n\n"
+                    f"   {icon_status_purity} <b>±{stats['purity_diff_percent']:.1f}% Purity Variation from 100%</b>\n\n"
                 )
 
             # Clean up
