@@ -105,7 +105,7 @@ def calculate_statistics(vendor_name, peptide):
             "average_mass": data['Mass mg'].mean(),
             "average_purity": data['Purity %'].mean(),
             "std_mass": data['Mass mg'].std(),
-            "std_purity": data['Purity %'].std(),
+            "purity_diff_percent": 100 - data['Purity %'].mean(),
             "mass_diff_percent": mass_diff_percent
         }
 
