@@ -226,7 +226,7 @@ def summarize_test_results(update, BOT_TOKEN):
                     f"   • # Vials Tested: {stats['test_count']}\n"
                     f"   • Mass Variation between Vials (Std Dev): ±{stats['std_mass']:.1f} mg\n"
                     f"   {icon_status_mass} <b>±{stats['mass_diff_percent']:.1f}% Mass Variation from Expected Mass</b>\n"
-                    f"   {icon_status_purity} <b>±{stats['purity_diff_percent']:.1f}% Purity Variation from 100%</b>\n\n"
+                    f"   {icon_status_purity} <b>{stats['purity_diff_percent']:.1f}% Purity Variation from 100%</b>\n\n"
                 )
 
             # Clean up
