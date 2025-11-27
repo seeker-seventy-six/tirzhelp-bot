@@ -41,7 +41,7 @@ Newbies_Auto_Reply:
 
 Banned_Topics:
   Unsafe_Banned_Substance:
-    message: "⚠️ Safety Warning ⚠️ The following topic is not allowed for sourcing discussion for newcomer safety. In order to maintain a research peptide focused community, we kindly ask that all conversations about this substance be taken elsewhere:"
+    message: "⚠️ Safety Warning ⚠️ The following topic is not allowed for sourcing discussion for newcomer safety. In order to maintain a research peptide focused community, we kindly ask that all conversations about this substance be taken elsewhere."
     substances:
       - ['DNP', 'Dinitrophenol']
       - ['BAM15', 'BAM-15']
