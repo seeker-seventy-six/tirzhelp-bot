@@ -124,8 +124,7 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
     elif 'BAM15' in banned_topic:
         topic_msg = "\nThis is a dangerous mitochondrial decoupler."
     elif 'SLU' in banned_topic:
-        topic_msg = "\nSLU-pp is hydrophobic and must be dissolved in chemicals not safe for injection. \n\nFor oral use, early member tests suggest that SLU-PP does not survive stomach acid and may break down."
-    "into unsafe byproducts — including hydrazine-like fragments — that should not be ingested by humans."
+        topic_msg = "\nSLU-PP is hydrophobic and must be dissolved in chemicals not safe for injection. \n\nFor oral use, early member tests suggest that SLU-PP does not survive stomach acid and may break down into unsafe byproducts, including hydrazine-like fragments, which should not be ingested by humans."
     
     message = f"""{mention}{header_msg}\n\n{topic_msg}""".strip()
     return message
