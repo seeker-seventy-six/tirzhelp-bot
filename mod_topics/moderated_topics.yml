@@ -46,7 +46,8 @@ Banned_Topics:
       - ['DNP', 'Dinitrophenol']
       - ['BAM15', 'BAM-15']
       - ['Botox', 'Botulinum']
-      - ['PBS', 'DMSO']
+      - ['PBS']
+      - ['DMSO']
       - ['Dermorphine', 'Dermorphin' ]
       - ['SLU', 'slupp', 'slu-pp']
   DEA_Scheduled_Substance_1:
