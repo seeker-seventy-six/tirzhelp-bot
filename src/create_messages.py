@@ -125,8 +125,14 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
         topic_msg = "\nThis is a dangerous mitochondrial decoupler."
     elif 'SLU' in banned_topic:
         topic_msg = "\nSLU-PP is hydrophobic and must be dissolved in chemicals not safe for injection. \n\nFor oral use, early member tests suggest that SLU-PP does not survive stomach acid and may break down into unsafe byproducts, including hydrazine-like fragments, which should not be ingested by humans."
-    
+    elif 'PBS' in banned_topic:
+        topic_msg = "\nPBS is a lab reagent, not a pharmaceutical product, and is not intended for injection in humans."
+    elif 'DMSO' in banned_topic:
+        topic_msg = "\nDMSO is an aggressive solvent used in labs and industry. It readily carries dissolved contaminants into tissues and the bloodstream. It is not made to pharmaceutical standards and is not safe or intended for human injection."
+    elif 'Dermorphin' in banned_topic:
+        topic_msg = "\nDermorphin is an extremely potent experimental peptide that has never been approved for human use. \n\nIt carries a high risk for both dependence and life-threatening overdose, even at very small amounts"
     message = f"""{mention}{header_msg}\n\n{topic_msg}""".strip()
+
     return message
 
 def dont_link(user_id, user_name):
