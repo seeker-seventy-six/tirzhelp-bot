@@ -49,7 +49,11 @@ Banned_Topics:
       - ['PBS']
       - ['DMSO']
       - ['Dermorphine', 'Dermorphin' ]
-      - ['SLU', 'slupp', 'slu-pp']
+      - ['SLU']   # keep a simple marker so tuple-based match still works
+    patterns:
+      # Match slu / slup / slupp / slu-pp / slu-pp-332 / slupp332 / slu322, etc.
+      - "(?i)\\bslup*[- ]?(?:pp)?[- ]?(?:3(?:32|22))?\\b"
+      
   DEA_Scheduled_Substance_1:
     message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing your peptides for controlled substance contaminates. 🚫"
     substances:
