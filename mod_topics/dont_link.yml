@@ -11,6 +11,8 @@ domain_urls:
   - "discord.gg"
   - "t.me/+"
   - "t.me/SNPcomm"
+  - "researchdosing.com"
+  - "certified-pep.com"
 ignore_urls:
   - "discord.gg/WszTsF5s" # STG Server 2.0
   - "discord.gg/VssDZhcZ" # STG Server 3.0
