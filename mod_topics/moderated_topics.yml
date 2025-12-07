@@ -17,15 +17,16 @@ Newbies_Auto_Reply:
   # VENDOR SPREADSHEET VS VENDOR PROMO CHANNEL    
   Vendor_List_FAQ:
     message: |
-      <b>📌 AAbout the Vendor Spreadsheet vs Promo Channel</b>
+      <b>📌 About the Vendor Spreadsheet vs Promo Channel</b>
 
       We get this question a lot, so here's a quick overview:
 
       • The <b>Vendor Promo & Prices</b> channel is the most up-to-date place for current reps, promos, and contact info.  
-      • The <b>Vendor Spreadsheet</b> is a supporting resource, but it isn't updated on a strict cadence and may lag behind the promo channel.  
-      • Being on (or off) the spreadsheet is <b>not</b> an endorsement, quality ranking, or guarantee — it's just a community-maintained reference.
+      • The <b>Vendor Spreadsheet</b> is a supporting resource, but it isn't upated often. It's main purpose is for historical notes on vendors.
+      • Promos in the <b>Vendor Promo & Prices</b> channel are forwarded by mods and not posted directly by vendors themselves. Vendors are not allowed to post.
+      • Being on (or off) the spreadsheet, or in the <b>Vendor Promo & Prices</b> channel is <b>not</b> an endorsement, quality ranking, or guarantee, it's just a minimally vetted reference.
 
-      If you don't see a vendor listed on the sheet, check the Vendor Promo & Prices channel and ask a mod or the community if you need context or experiences. 🙏
+      If you don't see a vendor listed on the sheet, check the <b>Vendor Promo & Prices</b> channel. 🙏
     patterns:
       # “I don’t see XYZ on the vendor list”
       - "(?i)\\bdon'?t see .*vendor (list|sheet|spreadsheet)\\b"
