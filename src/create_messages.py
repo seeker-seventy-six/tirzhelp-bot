@@ -126,8 +126,7 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
         topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
     elif 'BAM15' in bt_str:
         topic_msg = "\nThis is a dangerous mitochondrial decoupler."
-    elif (
-        'SLU' in bt_str:
+    elif 'SLU' in bt_str:
         topic_msg = "\nSLU-PP is hydrophobic and must be dissolved in chemicals not safe for injection. \n\nFor oral use, early member tests suggest that SLU-PP does not survive stomach acid and may break down into unsafe byproducts, including hydrazine-like fragments, which should not be ingested by humans."
     elif 'PBS' in bt_str:
         topic_msg = "\nPBS is a lab reagent, not a pharmaceutical product, and is not intended for injection in humans."
