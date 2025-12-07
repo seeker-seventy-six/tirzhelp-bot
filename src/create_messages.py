@@ -116,28 +116,24 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
         mention = f"<a href='tg://user?id={user['id']}'>@{user.get('username', user['first_name'])}</a> "
     else:
         mention = ""
-    
-    # Normalize to string for tuples/lists
-    bt_str = str(banned_topic)
 
-    if 'DNP' in bt_str:
+    if 'DNP' in banned_topic:
         topic_msg = "\nThis is a highly dangerous mitochondrial decoupler.\nhttps://pharmaceutical-journal.com/article/feature/dnp-the-dangerous-diet-pill-pharmacists-should-know-about"
-    elif 'Botox' in bt_str:
+    elif 'Botox' in banned_topic:
         topic_msg = "\nCurrently, there are no known labs in the community who can test Botox to verify the potency of active ingredient. Given that a 100-unit vial of Botox contains only 5-20 nanograms of the active toxin, even slight errors in dosage can significantly increase the risk of lethal toxicity. For safety reasons, we strongly advise against DIY Botox, especially when sourced from unregulated, untested vendors.\n<a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC2856357/'>source</a>"
-    elif 'BAM15' in bt_str:
+    elif 'BAM15' in banned_topic:
         topic_msg = "\nThis is a dangerous mitochondrial decoupler."
-    elif 'SLU' in bt_str:
+    elif (
+        'SLU' in str(banned_topic).upper()
+        or banned_topic == "Pattern match"
+    ):
         topic_msg = "\nSLU-PP is hydrophobic and must be dissolved in chemicals not safe for injection. \n\nFor oral use, early member tests suggest that SLU-PP does not survive stomach acid and may break down into unsafe byproducts, including hydrazine-like fragments, which should not be ingested by humans."
-    elif 'PBS' in bt_str:
+    elif 'PBS' in banned_topic:
         topic_msg = "\nPBS is a lab reagent, not a pharmaceutical product, and is not intended for injection in humans."
-    elif 'DMSO' in bt_str:
+    elif 'DMSO' in banned_topic:
         topic_msg = "\nDMSO is an aggressive solvent used in labs and industry. It readily carries dissolved contaminants into tissues and the bloodstream. It is not made to pharmaceutical standards and is not safe or intended for human injection."
-    elif 'Dermorphin' in bt_str:
+    elif 'Dermorphin' in banned_topic:
         topic_msg = "\nDermorphin is an extremely potent experimental peptide that has never been approved for human use. \n\nIt carries a high risk for both dependence and life-threatening overdose, even at very small amounts"
-
-    # BOT EVASION WARNING
-    if banned_topic == "Pattern match":
-        topic_msg += "\n\n🤖 <i>Please don’t try to evade the bot… he feels sad when you do that.</i> 💔"
     message = f"""{mention}{header_msg}\n\n{topic_msg}""".strip()
 
     return message
