@@ -136,7 +136,7 @@ Banned_Topics:
       - ['Anabolex', 'Andractim', 'Pesomax', 'Stanolone']
       - ['Tributane', 'Embutramide']
   FDCA_Substance:
-    message: "🚫 Reminder: Discussion of substances that fall under Under U.S. law (FDCA, 21 U.S.C. §333(e)) is not allowed. Our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about these substances be taken elsewhere. 🚫"
+    message: "🚫 Reminder: Discussion of substances that fall under Under U.S. law (FDCA, 21 U.S.C. §333(e)) is not allowed. Our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about these substances be taken elsewhere. 🚫 \n\nAnd yes, we know it's a peptide and not on the DEA scheduled list. But you still can't talk about it here. 🚫"
     substances:
       - ['hGH', 'human growth hormone', 'somatropin', 'somatrem']
       - ['Genotropin', 'Norditropin', 'Humatrope', 'Saizen', 'Omnitrope', 'Zomacton', 'Nutropin', 'Serostim']
