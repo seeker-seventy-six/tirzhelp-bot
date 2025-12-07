@@ -141,6 +141,11 @@ Banned_Topics:
       - ['hGH', 'human growth hormone', 'somatropin', 'somatrem']
       - ['Genotropin', 'Norditropin', 'Humatrope', 'Saizen', 'Omnitrope', 'Zomacton', 'Nutropin', 'Serostim']
       - ['EPO', 'erythropoietin', 'Epogen', 'Procrit', 'Aranesp']
+    patterns:
+      # Evasion patterns for HGH (H…H, H H, H-H, H*H, H\H, H.G.H, H|H)
+      - "(?i)h[^a-zA-Z0-9]?g[^a-zA-Z0-9]?h"
+      - "(?i)h[^a-zA-Z0-9]{0,2}h"  # catches “H…H”
+      - "(?i)h\\W*g\\W*h"
 
 
 Auto_Poof_Topics:
