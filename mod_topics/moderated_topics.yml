@@ -14,6 +14,28 @@ Newbies_Auto_Reply:
       - "\\b[cC]rypto\\b"
       - "\\b[cC]ryptocurrency\\b"
       - "\\b[bB]itcoin\\b"
+  # VENDOR SPREADSHEET VS VENDOR PROMO CHANNEL    
+  Vendor_List_FAQ:
+    message: |
+      <b>📌 About the Vendor Spreadsheet vs Promo Channel</b>
+
+      We get this question a lot, so here's a quick overview:
+
+      • The <b>Vendor Promo & Prices</b> channel is the most up-to-date place for current reps, promos, and contact info.  
+      • The <b>Vendor Spreadsheet</b> is a supporting resource, but it isn't upated often. It's main purpose is for historical notes on vendors.
+      • Promos in the <b>Vendor Promo & Prices</b> channel are forwarded by mods and not posted directly by vendors themselves. Vendors are not allowed to post.
+      • Being on (or off) the spreadsheet, or in the <b>Vendor Promo & Prices</b> channel is <b>not</b> an endorsement, quality ranking, or guarantee, it's just a minimally vetted reference.
+
+      If you don't see a vendor listed on the sheet, check the <b>Vendor Promo & Prices</b> channel. 🙏
+    patterns:
+      # “I don’t see XYZ on the vendor list”
+      - "(?i)\\bdon'?t see .*vendor (list|sheet|spreadsheet)\\b"
+      - "(?i)\\bmissing (from|on) the vendor (list|sheet|spreadsheet)\\b"
+      # “not on the vendor list”
+      - "(?i)\\bnot (on|in) the vendor (list|sheet|spreadsheet)\\b"
+      # “are vendors on the sheet better than…”
+      - "(?i)\\b(spreadsheet|vendor (list|sheet))\\b.*\\b(better|safer|more legit|more reliable)\\b"
+      - "(?i)\\b(better|safer|more legit|more reliable)\\b.*\\b(spreadsheet|vendor (list|sheet))\\b"    
   ### AMO HAS STOPPED USING L FOR TIRZ AS OF NOVEMBER 2025 ###
   # Amo:
   #   message: |
@@ -49,7 +71,11 @@ Banned_Topics:
       - ['PBS']
       - ['DMSO']
       - ['Dermorphine', 'Dermorphin' ]
-      - ['SLU', 'slupp', 'slu-pp']
+      - ['SLU']   # keep a simple marker so tuple-based match still works
+    patterns:
+      # Match slu / slup / slupp / slu-pp / slu-pp-332 / slupp332 / slu322, etc.
+      - "(?i)\\bslup*[- ]?(?:pp)?[- ]?(?:3(?:32|22))?\\b"
+
   DEA_Scheduled_Substance_1:
     message: "🚨 Reminder: Discussion of Controlled Substances 🚨\n\nWe recognize that the DEA's classification of substances is often arbitrary and politically motivated. However, our community is primarily committed to fostering discussions focused solely on research peptides. 💡🔬\n\nIn order to maintain a focused community for newbies, we kindly ask that all conversations about scheduled substances be taken elsewhere unless this discussion is about testing your peptides for controlled substance contaminates. 🚫"
     substances:
