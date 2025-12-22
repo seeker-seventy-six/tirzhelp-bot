@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlparse
 from src import helpers_telegram
 
 # Bridge IDs
-DISCORD_CHANNEL_ID = 1428846536007094424
+DISCORD_CHANNEL_ID = 1439320635477065819
 TELEGRAM_CHAT_ID = '-1002410577414'
 TELEGRAM_TOPIC_ID = '48'
 
