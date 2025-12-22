@@ -342,7 +342,7 @@ def webhook():
                     logging.info("Test results extraction completed successfully")
                 except Exception as e:
                     logging.error(f"Test results extraction failed: {e}")
-                    helpers_telegram.send_message(chat_id, "🚫 Unsupported file format received or expected mass not included in test result. Please check your file is a .pdf, .png, or .jpeg, and ensure the expected mass is included somewhere in test result and retry.", message_thread_id)
+                    helpers_telegram.send_message(chat_id, "🚫 Test results extraction failed. Probably an unsupported file format received or expected mass not included in test result. Please check your file is a .pdf, .png, or .jpeg, and ensure the expected mass is included somewhere in test result and retry.", message_thread_id)
                 
                 # DISCORD BRIDGE - TELEGRAM TO DISCORD (skip for bot messages)
                 if str(chat_id) == TIRZHELP_SUPERGROUP_ID:
