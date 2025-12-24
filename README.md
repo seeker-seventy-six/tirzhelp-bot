@@ -3,7 +3,7 @@
 
 This is a Flask-based application that integrates with the Telegram Bot API. It allows you to interact with Telegram supergroups and handle commands from users. The bot is set up with a webhook to process incoming updates and respond accordingly.
 
-Once the bot is deployed to Heroku and added as a member to a Telegram supergroup or group chat, it can be used for the following features.
+Once the Telegram bot is deployed to Heroku and it's Telegram account added as a member to a Telegram supergroup or group chat with moderator permissions, it can be used for the following features.
 
 ## Features
 
@@ -14,9 +14,9 @@ Once the bot is deployed to Heroku and added as a member to a Telegram supergrou
 - **Test Results Extraction**: Extract any document (pdf) or image uploaded to Test Results channel and upload the extracted data to a Google Spreadsheet automatically.
 - **Discord Bridge**: Automatically bridges posts with links and images from a specific Discord channel to a Telegram topic.
 
-## Environment Setup
+## Local Environment Setup
 
-Before deploying, create a `.env-dev` and `.env-prod` file with the following environment variables for each bot environment. If developing on the existing bot, these can be found on the Heroku Dashboard > [Application Name] > Settings > Config Vars:
+For local development, create a `.env-dev` file with the following environment variables for each bot environment. If developing on the existing bot, these can be found on the Heroku Dashboard > [Application Name] > Settings > Config Vars or by reaching out to @seeker-seventy-six or @True_Case if you're a Collaborator:
 
 ```
 BOT_TOKEN=your-telegram-bot-token
@@ -27,15 +27,29 @@ GOOGLE_SERVICE_ACCOUNT_FILE=your-google-developer-app-token
 DISCORD_BOT_TOKEN=your-discord-bot-token
 ```
 
+Even without a local `.env-dev` file, you can also test changes in the Telegram dev environment by joining the Test Bot server before merging changes to the main prod environment. Ask @seeker-seventy-six for access.
+
+### Conda environment
+
+To develop locally, you'll need to install packages by:
+
+- install miniconda: https://www.anaconda.com/docs/getting-started/miniconda/install#quickstart-install-instructions
+- Run `conda env create -f local_environment.yml`
+
+
 ## Deployment
 *Only if setting up a new bot*
 
 The app is deployed on Heroku and uses the `deploy_bot.sh` script to deploy the application to different environments (dev and prod) based on the Git branch. 
 
-### Prerequisites
+*CI/CD*
 
-- **Heroku Account**: You need a Heroku account to deploy and manage the app.
-- **Telegram Bot API Token**: You need to generate a bot token from [BotFather](https://core.telegram.org/bots#botfather) on Telegram.
+Heroku is setup to automatically deploy the webapp when it detects changes to dev and main branches in github. Changes go live to each of these environments within a couple minutes once PRs are successfully merged.
+
+### Prerequisites if Hosting Your Own
+
+- **Heroku Account**: You need a host like a Heroku account to deploy and manage the app. This has already been setup if working as a Collaborator.
+- **Telegram Bot API Token**: You need to generate a bot token from [BotFather](https://core.telegram.org/bots#botfather) on Telegram. This has already been setup if working as a Collaborator.
 
 
 ### Deploying the App
