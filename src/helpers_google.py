@@ -19,6 +19,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # Load credentials
 GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
 
 # Parse the JSON string into a dictionary
 credentials_info = json.loads(GOOGLE_SERVICE_ACCOUNT_FILE)
@@ -28,7 +29,6 @@ credentials = Credentials.from_service_account_info(credentials_info, scopes=SCO
 service = build('sheets', 'v4', credentials=credentials)
 
 # Define your spreadsheet ID
-SPREADSHEET_ID = '1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'  # Found in the URL of your spreadsheet https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ
 RANGE_NAME = "raw_data!A:N"  # Adjust as per your sheet structure
 SPREADSHEET_COLS = ["Vendor", "Test Date", "Batch", "Expected Mass mg", "Mass mg", "Purity %", "TFA", "Endotoxin", "Test Lab", "File Name", "Lab URL", "Test Key", "Test Task"]
 
