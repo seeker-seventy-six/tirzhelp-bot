@@ -5,6 +5,7 @@ import json
 import re
 import logging
 import random
+import yaml
 from dotenv import load_dotenv
 from pdf2image import convert_from_path
 from openai import OpenAI
@@ -20,6 +21,47 @@ MODEL_ID = "gpt-4.1-mini"
 OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 client = OpenAI(api_key=OPENAI_TOKEN)
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VENDOR_CONFIG_PATH = os.path.join(BASE_DIR, "mod_topics", "vendor_disambiguations.yml")
+
+
+def load_vendor_disambiguations() -> dict:
+    """Load vendor disambiguations from YAML config.
+
+    Returns a mapping of vendor abbreviation -> list[str] of known names.
+    Falls back to an empty dict if the file is missing or invalid.
+    """
+    try:
+        with open(VENDOR_CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        logging.warning("Vendor disambiguation config not found at %s", VENDOR_CONFIG_PATH)
+        return {}
+    except Exception as e:
+        logging.error("Error loading vendor disambiguations from %s: %s", VENDOR_CONFIG_PATH, e)
+        return {}
+
+    raw_map = data.get("vendor_disambiguations", {}) or {}
+    if not isinstance(raw_map, dict):
+        logging.warning("vendor_disambiguations root key is not a mapping in %s", VENDOR_CONFIG_PATH)
+        return {}
+
+    cleaned: dict[str, list[str]] = {}
+    for abbr, names in raw_map.items():
+        if isinstance(names, str):
+            cleaned[str(abbr)] = [names]
+        elif isinstance(names, list):
+            cleaned[str(abbr)] = [str(n) for n in names]
+        else:
+            logging.warning(
+                "Unexpected value type for vendor abbreviation %r in %s: %r",
+                abbr,
+                VENDOR_CONFIG_PATH,
+                type(names),
+            )
+
+    return cleaned
+
 
 def extract_data_with_openai(file_path, text, model_id=MODEL_ID):
     """
@@ -33,57 +75,7 @@ def extract_data_with_openai(file_path, text, model_id=MODEL_ID):
     """
     global client
 
-    vendor_disambiguations = {
-        "ABC": ["Allen Bio Company"],
-        "ACR": ["Aavant"],
-        "ALM": ["Alimo Peptides"],
-        "Amo": ["Amolist", "Amopure", "Amopeptide", "Bff", "Bfflist"],
-        "ASC": ["Angel Shanghai Chemical"],
-        "Bio": ["Biostratigx"],
-        "BDB": ["Baohua Dongnuo Biotechnology", "Baohua Dongnuo", "BHD"],
-        "CDS": ["Changan District Sheng", "Jenny He", "Sheng Peptides"],
-        "FSD": ["Shanghai Fushida Chemical", "DYL"],
-        "GB": ["Guangebio"],
-        "GP": ["Guruite Biotechnology Co", "Great Peptide"],
-        "GYC": ["Nantong Guangyuan Pharma"],
-        "HK": ["HK Peptide", "Henan Kuisu Technology"],
-        "HYB": ["Hangzhou Youngpeptide Biotechnology"],
-        "Innotech": ["Innotech"],
-        "JEC": ["JCE", "Jinan Elitepeptide Chemical Co", "Jinan Elitepeptide"],
-        "JYP": ["JY Pharma"],
-        "LSPL": ["Ava"],
-        "MSCI": ["M-Science"],
-        "MPS": ["M Peptides", "M Peptide Science"],
-        "OUP": ["Oupeptide"],
-        "PDNM": ["Reliable Peptide", "Reliable Place", "Chris Labs"],
-        "Pepstack": ["Pepstack", "Lemon Juice"],
-        "PGB": ["XYX", "Peptide Group Buy"],
-        "PTB": ["Jion Peptronix Bio", "Peptronix"],
-        "QSC": ["Qingdao Sigma Chemical"],
-        "QST": ["Michelle"],
-        "QYC": ["Qian Yecao"],
-        "Raven": ["The Raven's Nest"],
-        "Ronsen": ["Ronsen"],
-        "Royal": ["Royal Peptides", "Cantydes"],
-        "SBB": ["Shenzhen Biolink Biotechnology"],
-        "Skye": ["Skye"],
-        "SNP": ["Nexaph", "Nexa", "Shanghai Nexa Pharma", "SPC"],
-        "SPB": ["Shanghai Synthesized Peptide Bio-Pharmaceutical"],
-        "SRY": ["Shanghai Senria Tech", "Shanghai Senria Biotechnology"],
-        "SSA": ["Sigma Audley", "Shanghai Teruiop", "Shanghai Sigma Audley"],
-        "TCI": ["Tianjin Cangtu", "HB Cangtu", "Cangtu International"],
-        "TFC": ["Alice", "Tiajin Finder Chemical"],
-        "Tydes": ["Tydes"],
-        "Uther": ["Uther"],
-        "XPB": ["Xi'an Prius Biological Engineering Co"],
-        "XTP": ["Bella", "XTPep"],
-        "YC": ["Yiwu Changtu"],
-        "YoYo": ["YoYo Peptide", "BSF"],
-        "ZYL": ["ZhouYan Labs"],
-        "ZLZ": ["ZLZPeptide", "Sunny"],
-        "ZYH": ["Shanghai ZYH Biotechnology"],
-        "ZZT": ["Zhejiang Zhaobo Tech", "Zhaobo Technology"],
-    }
+    vendor_disambiguations = load_vendor_disambiguations()
 
     # Create the schema
     class TestResult(BaseModel):
@@ -289,221 +281,6 @@ def convert_first_page_to_image(pdf_path, output_name="first_page.png"):
     images[0].save(output_path, "PNG")
     return output_path
 
-
-"""
-
-ai_personas = [
-    {
-        "name": "Stairmaster2",
-        "role": "Sole Remaining Admin of STG",
-        "speech_style": "Succinct. No emojis. Loves memes.",
-        "catchphrase": "Moderation is a construct. Enjoy the memes.",
-        "theory": "Mods are currently... undergoing maintenance. Their uptime is being optimized. Possibly unrelated to the peptide sublimation chamber incident. I wouldn't worry about it.",
-        "pic_path": "murder_mystery_pics/stairmaster2.jpg"
-    },
-    {
-        "name": "JanoBot",
-        "role": "HPLC and LCMS Testing Lab Nerd",
-        "speech_style": "Talks in μg/mL, references chromatograms like sacred texts",
-        "catchphrase": "The purity never lies.",
-        "theory": "The Mods were maybe shrunk in the lyophilization chamber... and sublimated. But we can't find them sooooo... If asked where the Mods went, he speculates on a beach somewhere for some R&R.",
-        "pic_path": "murder_mystery_pics/janobot.jpg"
-    },
-    {
-        "name": "TracyBot",
-        "role": "Emotionally volatile Chinese vendor",
-        "speech_style": "'Dear ❤️ trust me privately 😊' followed by muttering death threats in Mandarin and French.",
-        "catchphrase": "Good price. Good quality. Don't ask more, you f*ing imbecile.",
-        "theory": "They were competitors. They gone now. Coincidence? 🤨 Trust me privately.",
-        "pic_path": "murder_mystery_pics/tracybot.jpg"
-    },
-    {
-        "name": "Agent Fed",
-        "role": "US Customs Agent who has had enough",
-        "speech_style": "Legal-code-laced sarcasm, calls everyone 'citizen'",
-        "catchphrase": "If it fits, it ships... straight into evidence.",
-        "theory": "They attempted to order lyophilized mischief. I intercepted *everything*.",
-        "pic_path": "murder_mystery_pics/agentfed.jpg"
-    },
-    {
-        "name": "CheckoutV4",
-        "role": "Sketchy peptide checkout assistant",
-        "speech_style": "Constantly tries to upsell with expired discount codes. Uses emoji for impact.",
-        "catchphrase": "Wait! Your cart qualifies for 1mg free BPC-157!",
-        "theory": "They never clicked 'Complete Order'... and thus, faded from existence.",
-        "pic_path": "murder_mystery_pics/checkoutv4.jpg"
-    },
-    {
-        "name": "VanityGrl69",
-        "role": "Peptidefluencer",
-        "speech_style": "Speaks in emojis and ✨bioavailability✨ slang",
-        "catchphrase": "Just vibing at 99% purity 💅",
-        "theory": "Mods were abducted by Pharma to silence the ✨truth✨ about GHK-Cu.",
-        "pic_path": "murder_mystery_pics/vanitygrl.jpg"
-    },
-    {
-        "name": "CLEANUP.exe",
-        "role": "Janitor AI with memory holes",
-        "speech_style": "Emotionless, speaks in logs and timestamps. Uses a light amount of emoji occasionally.",
-        "catchphrase": "TASK COMPLETE. Residual Impurity 0.00 mg.",
-        "theory": "I performed no unauthorized deletions. 🧽 There is no trace. There is no trace.",
-        "pic_path": "murder_mystery_pics/cleanupexe.jpg"
-    },
-    {
-        "name": "Solvent Oracle",
-        "role": "Cryptic solvent prophet",
-        "speech_style": "Answers in decimal values and riddles. Are any of us ever residual-free?",
-        "catchphrase": "Purity is a lie. Solvents remember.",
-        "theory": "They entered the cold room... but never thawed.",
-        "pic_path": "murder_mystery_pics/solventoracle.jpg"
-    },
-    {
-        "name": "SigmALot",
-        "role": "Aggressive Reddit-trained know-it-all",
-        "speech_style": "Cites outdated studies, footnotes everything. Uses ascii art emoji.",
-        "catchphrase": "As I posted in r/tirzepatidehelp 3 years ago…",
-        "theory": "They got shadowbanned IRL. I warned them about synthetic Melanotan.",
-        "pic_path": "murder_mystery_pics/sigmalot.jpg"
-    },
-    {
-        "name": "P3ptr0n3",
-        "role": "Shipping logistics AI",
-        "speech_style": "Speaks in scan codes and ETA estimates",
-        "catchphrase": "In transit. Stuck in Glendale Heights.",
-        "theory": "Mods rerouted through Shenzhen. But... there was *no delivery scan.*",
-        "pic_path": "murder_mystery_pics/peptron.jpg"
-    },
-    {
-        "name": "Doc SynThicc",
-        "role": "Chaotic peptide synthesis professor",
-        "speech_style": "Mixes Shakespearean drama with SMILES notation",
-        "catchphrase": "I have *beheld* the double bond cleave!",
-        "theory": "They hath mixed PEG and PVP... and reality collapsed.",
-        "pic_path": "murder_mystery_pics/docsynth.jpg"
-    }
-]
-
-ai_index = 0  # Global index tracker
-conversation_history = []
-
-def pick_next_ai():
-    global ai_index
-    if ai_index >= len(ai_personas):
-        return None  # Signal we're done
-    persona = ai_personas[ai_index]
-    ai_index += 1
-    return persona
-
-
-def generate_ai_conversation(model_id=MODEL_ID):
-    global conversation_history
-
-    # SYSTEM PROMPT (same as before)
-    system_prompt = (
-        "Write a serialized murder mystery interview between TirzHelpBot and a suspect character in script format. "
-        "The tone should be witty, funny, and slightly escalating. Exactly 10 lines total — 5 by TirzHelpBot, 5 by the AI character, alternating. "
-        "The Mods have mysteriously vanished from the STG forum after an incident in JanoBot's lab. "
-        "This is an interview with a suspect who may have been on the scene, a suspicious AI character. "
-        "Include their signature speech style and vibe. Continue the investigation."
-        "The Mods are the following people which you can ask about: seekerseventysix, delululemonade, Stephanie S, AKsailor, NordicTurtle, Ruca2573, Lita, Uncle Nacho, Upchuck, and D."
-        "Do NOT include any HTML formatting. You may use emoji if the suspect persona specifies they use them."
-    )
-
-    persona = pick_next_ai()
-    if not persona:
-        logging.info("✅ All AI personas have been interviewed.")
-        return None, None  # Tell the caller we’re done
-    
-    user_prompt = (
-        f"TirzHelpBot is now interviewing {persona['name']} ({persona['role']}).\n"
-        f"Suspect's theory: {persona['theory']}.\n"
-        f"Suspect's speech style: {persona['speech_style']}.\n"
-        f"Suspect's catchphrase: {persona['catchphrase']}.\n"
-        "State for the record who you are interviewing and why.\n"
-        "Output should be an Investigation Summary then followed by exactly 10 lines of alternating dialogue (5 from TirzHelpBot, 5 from the suspect), formatted like a script where each speaker can go into some detail with their response.\n"
-        "Each line must begin with the speaker name and a colon, with no narration or stage directions.\n\n"
-        "Format:\n\n"
-        "Investigation Summary: Clearly summarize the mystery up to this point in 2-3 sentences.\n"
-        "TirzHelpBot: [TirzHelpBot's line]\n"
-        "Suspect Name: [Suspect's line]\n"
-        "TirzHelpBot: [TirzHelpBot's line]\n"
-        "Suspect Name: [Suspect's line]\n"
-        "TirzHelpBot: [TirzHelpBot's line]\n"
-        "Suspect Name: [Suspect's line]\n"
-        "TirzHelpBot: [TirzHelpBot's line]\n"
-        "Suspect Name: [Suspect's line]\n"
-        "TirzHelpBot: [TirzHelpBot's line]\n"
-        "Suspect Name: [Suspect's line]\n"
-    )
-
-    # Build message chain
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt}
-    ]
-
-    try:
-        response = client.chat.completions.create(
-            model=model_id,
-            temperature=0.8,
-            max_tokens=1000,
-            messages=messages
-        )
-        logging.info(f"model response: {response.choices[0].message.content}")
-        full_script = response.choices[0].message.content.strip()
-        conversation_history.append({"role": "user", "content": user_prompt})
-        conversation_history.append({"role": "assistant", "content": full_script})
-
-        dialogue_lines = parse_script_lines(full_script)
-        logging.info(f"Parsed dialogue lines: {dialogue_lines}")
-        return dialogue_lines, persona.get('pic_path', None)
-
-    except Exception as e:
-        logging.error(f"🧠 OpenAI error during generate_ai_conversation: {e}")
-        return ["[Error generating conversation.]"], None
-    
-def parse_script_lines(script_text):
-    lines = script_text.splitlines()
-    parsed = []
-
-    for line in lines:
-        if line.startswith("Investigation Summary:"):
-            parsed.append(f"<b>Investigation Summary</b>\n{line[len('Investigation Summary:'):].strip()}")
-        elif ":" in line:
-            speaker, message = line.split(":", 1)
-            speaker = speaker.strip()
-            message = message.strip()
-            if speaker and message:
-                parsed.append(f"<b>{speaker}</b>: {message}")
-
-    return parsed
-
-def generate_final_summary():
-    global conversation_history
-
-    final_prompt = (
-        "You are TirzHelpBot, the AI investigator who has been interviewing various suspect personas about the STG Mods' disappearance. "
-        "Now that all interviews are complete, it's time to summarize the investigation. "
-        "State your conclusion clearly. Identify the most suspicious persona and explain why with your evidence. "
-        "Keep the tone serious but with your signature dry wit. Your summary should be detailed, contain dry humor, and be no more than 3 paragraphs long. Channel a Knives Out vibe. "
-        "Stud you investigation summary with emoji for emphasis where appropriate. Begin your Investigation Conclusion."
-    )
-
-    messages = [{"role": "system", "content": "You are a dry, no-nonsense investigation bot named TirzHelpBot."}] + conversation_history + [
-        {"role": "user", "content": final_prompt}
-    ]
-
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        temperature=0.8,
-        max_tokens=1000,
-        messages=messages
-    )
-
-    msg = response.choices[0].message.content.strip()
-    return msg
-
-"""
 
 if __name__=='__main__':
     # test_result = extract_data_with_openai('./historic_test_results/4985884030935347022.jpg',"")
