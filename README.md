@@ -129,7 +129,7 @@ This will stream the logs, allowing you to monitor any issues or errors in real 
 
 ### **Common Errors**
 
-- **Missing Environment Variables**: Ensure your `.env-dev` and `.env-main` files contains the correct variables (`BOT_TOKEN`, `WEBHOOK_URL`, etc.). (NOTE: If developing on the existing bot, these can be found on the Heroku under Dashboard > [Application Name] > Settings > Config Vars)
+- **Missing Environment Variables**: Ensure your `.env-dev` file contains the correct variables (`BOT_TOKEN`, `WEBHOOK_URL`, etc.). (NOTE: If developing on the existing bot, these can be found on the Heroku under Dashboard > [Application Name] > Settings > Config Vars) or by contacting @seeker-seventy-six
 - **Webhook Issues**: If your webhook is not working, check if the URL is correctly set by inspecting the logs.
 
 ## Conclusion
