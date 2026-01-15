@@ -6,7 +6,7 @@ from typing import List, Union, Optional, AsyncIterator
 from dotenv import load_dotenv
 
 from telethon import TelegramClient
-from telethon.errors import FloodWaitError, UserAlreadyParticipantError, ServerError
+from telethon.errors import FloodWaitError, UserAlreadyParticipantError, ServerError, ChannelForumMissingError
 from telethon.tl.functions.messages import ForwardMessagesRequest, UpdatePinnedMessageRequest
 from telethon.tl.functions.channels import (
     CreateChannelRequest, 
@@ -53,9 +53,9 @@ NEW_GROUP_TITLE = "Stairway to Gray 🐦‍🔥🐦‍🔥"
 NEW_GROUP_DESCRIPTION = "We help people with tirzepatide in the peptide community\nhttps://www.stairwaytogray.com"
 
 USERS_TO_ADD = [
-    'tirzhelp_bot',
+    'stg_help_bot',
     'seekerseventysix',
-    'tirzepatidehelp',
+    'stg_stairmaster1',
     'delululemonade',
     'Steph_752501',
     'aksailor',
@@ -180,34 +180,46 @@ async def main():
     logging.info("Telegram session opened")
 
     # create new group (retry around CHAT_OCCUPY_LOC_FAILED)
+    logging.info("[STEP] Creating new group…")
     new_group = await create_group_with_retry(client)
     if not new_group:
         logging.error("Group creation failed; aborting")
         return
-    await safe(client, ToggleForumRequest(channel=new_group, enabled=True))
+    logging.info("[STEP] New group created as forum-enabled megagroup (via CreateChannelRequest).")
 
+    logging.info("[STEP] Renaming and locking General topic…")
     await rename_and_lock_general(client, new_group)
 
+    logging.info(f"[STEP] Fetching source supergroup {SOURCE_SUPERGROUP_ID}…")
     src_entity = await client.get_entity(SOURCE_SUPERGROUP_ID)
     src_peer   = InputPeerChannel(src_entity.id, src_entity.access_hash)
     dst_peer   = InputPeerChannel(new_group.id, new_group.access_hash)
+
+    logging.info("[STEP] Building source topic map…")
     src_topic_map = await build_topic_map(client, src_entity)
 
+    logging.info("[STEP] Setting logo on destination group…")
     await set_logo(client, "./stairway-to-gray-logo.png", dst_peer)
+
+    logging.info("[STEP] Adding admins to destination group…")
     await add_admins(client, dst_peer)
 
+    logging.info("[STEP] Creating destination topics and migrating messages…")
     # create + migrate topics
     for title, cfg in TOPIC_FORWARD_MAP.items():
+        logging.info(f"[TOPIC] Creating/migrating '{title}'…")
         dst_topic = await create_topic_and_pin_if_needed(client, new_group, title, cfg)
         if not dst_topic:
+            logging.warning(f"[TOPIC] Skipping '{title}' because destination topic was not created/found")
             continue
 
         src_topic_id = src_topic_map.get(title)
         if src_topic_id:
             await migrate_messages(client, src_peer, dst_peer, src_topic_id, dst_topic, cfg["messages"])
         else:
-            logging.info(f"[{title}] not found in source — created empty")
+            logging.info(f"[TOPIC] '{title}' not found in source — created empty")
 
+    logging.info("[STEP] Disconnecting client…")
     await client.disconnect()
     logging.info("✅ Done – new group ready")
 
@@ -215,7 +227,12 @@ async def main():
 async def create_group_with_retry(client, tries=5):
     for n in range(1, tries+1):
         try:
-            grp = await client(CreateChannelRequest(title=NEW_GROUP_TITLE, about=NEW_GROUP_DESCRIPTION, megagroup=True))
+            grp = await client(CreateChannelRequest(
+                title=NEW_GROUP_TITLE,
+                about=NEW_GROUP_DESCRIPTION,
+                megagroup=True,
+                forum=True,
+            ))
             logging.info(f"Created group '{NEW_GROUP_TITLE}' on attempt {n}")
             return grp.chats[0]
         except ServerError as e:
@@ -318,7 +335,11 @@ async def migrate_messages(client, src_peer, dst_peer, src_topic_id, dst_topic, 
             await asyncio.sleep(5.0)
 
 async def rename_and_lock_general(client, group):
-    res = await client(GetForumTopicsRequest(channel=group, offset_date=0, offset_id=0, offset_topic=0, limit=10))
+    try:
+        res = await client(GetForumTopicsRequest(channel=group, offset_date=0, offset_id=0, offset_topic=0, limit=10))
+    except ChannelForumMissingError:
+        logging.warning("[WARN] Channel does not have forum enabled; skipping rename_and_lock_general.")
+        return
     gen = next((t for t in res.topics if t.title == "General"), None)
     if gen:
         await safe(client, EditForumTopicRequest(channel=group, topic_id=gen.id, title="Welcome"))
