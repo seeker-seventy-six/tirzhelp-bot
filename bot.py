@@ -28,12 +28,11 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 # TELEGRAM IDS
-TIRZHELP_SUPERGROUP_ID = '-1003614588158'
-TIRZHELP_TEST_RESULTS_CHANNEL = '29'
-TIRZHELP_GROUP_TEST_CHANNEL = '33'
-TIRZHELP_NEWBIE_CHANNEL = '21'
-TIRZHELP_GENERAL_CHANNEL = '13'
-TIRZHELP_CLOSED_CHANNLES = ['27','30','2','873']
+TIRZHELP_SUPERGROUP_ID = '-1003587078798'
+TIRZHELP_TEST_RESULTS_CHANNEL = '33'
+TIRZHELP_GROUP_TEST_CHANNEL = '35'
+TIRZHELP_NEWBIE_CHANNEL = '27'
+TIRZHELP_GENERAL_CHANNEL = '379'
 TIRZHELP_IGNORE_AUTOMOD_CHANNELS = [TIRZHELP_GROUP_TEST_CHANNEL,TIRZHELP_TEST_RESULTS_CHANNEL]
 
 TEST_SUPERGROUP_ID = '-1002334662710'
@@ -43,12 +42,12 @@ TEST_NEWBIE_CHANNEL = '681'
 TEST_IGNORE_AUTOMOD_CHANNELS = [TEST_GROUP_TEST_CHANNEL,TEST_TEST_RESULTS_CHANNEL]
 
 MOD_ACCOUNTS = [
-    'stg_help_bot',
+    'Stair_bot',
     'seekerseventysix',
     'tirzepatidehelp',
     'delululemonade',
     'Steph_752501',
-    'aksailor',
+    'sailor21yo',
     'NordicTurtle',
     'Ruca2573',
     'Litajj',
@@ -56,54 +55,10 @@ MOD_ACCOUNTS = [
     'ruttheimer',
     'QuestyQuestyQuesty',
     'justaturkey',
+    'true_case',
 ]
 
 app = Flask(__name__)
-
-### NON WEBHOOK ###
-
-# def run_ai_conversation_loop():
-#     logging.info("🔁 Starting AI murder mystery roleplay thread...")
-
-#     while True:
-#         try:
-#             logging.info("🎭 Starting new AI exchange round...")
-#             # Generate one message (conversation history is tracked internally)
-#             exchange, pic_path = generate_ai_conversation()
-
-#             if exchange is None:
-#                 logging.info("🔚 All interviews complete. Ending loop.")
-#                 break  # Exit cleanly when all personas are done
-
-#             if ENVIRONMENT == 'PROD':
-#                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
-#                 for msg in exchange:
-#                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
-#                     time.sleep(10)
-#             else:
-#                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
-#                 for msg in exchange:
-#                     helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
-#                     time.sleep(10)
-#             # Wait 30 mins
-#             time.sleep(1800)
-
-#         except Exception as e:
-#             logging.error(f"💥 AI roleplay thread error: {e}")
-
-#     # After the loop exits
-#     summary = generate_final_summary()
-#     if ENVIRONMENT == 'PROD':
-#         helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', TIRZHELP_GENERAL_CHANNEL)
-#         helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
-#     else:
-#         helpers_telegram.send_image(TEST_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg')
-#         helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
-        
-# def start_ai_roleplay_thread():
-#     logging.info("Starting murder mystery roleplay...")
-#     thread = threading.Thread(target=run_ai_conversation_loop, daemon=True)
-#     thread.start()
     
 
 def start_periodic_announcement(frequency_minutes=180):
@@ -430,6 +385,50 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
         except:
             return helpers_telegram.send_message(chat_id, msgs.unsupported())
 
+### NON WEBHOOK ###
+
+# def run_ai_conversation_loop():
+#     logging.info("🔁 Starting AI murder mystery roleplay thread...")
+
+#     while True:
+#         try:
+#             logging.info("🎭 Starting new AI exchange round...")
+#             # Generate one message (conversation history is tracked internally)
+#             exchange, pic_path = generate_ai_conversation()
+
+#             if exchange is None:
+#                 logging.info("🔚 All interviews complete. Ending loop.")
+#                 break  # Exit cleanly when all personas are done
+
+#             if ENVIRONMENT == 'PROD':
+#                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
+#                 for msg in exchange:
+#                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
+#                     time.sleep(10)
+#             else:
+#                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
+#                 for msg in exchange:
+#                     helpers_telegram.send_message(TEST_SUPERGROUP_ID, msg)
+#                     time.sleep(10)
+#             # Wait 30 mins
+#             time.sleep(1800)
+
+#         except Exception as e:
+#             logging.error(f"💥 AI roleplay thread error: {e}")
+
+#     # After the loop exits
+#     summary = generate_final_summary()
+#     if ENVIRONMENT == 'PROD':
+#         helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', TIRZHELP_GENERAL_CHANNEL)
+#         helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
+#     else:
+#         helpers_telegram.send_image(TEST_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg')
+#         helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
+        
+# def start_ai_roleplay_thread():
+#     logging.info("Starting murder mystery roleplay...")
+#     thread = threading.Thread(target=run_ai_conversation_loop, daemon=True)
+#     thread.start()
 
 if __name__ == "__main__":
     import argparse
