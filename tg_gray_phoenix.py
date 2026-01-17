@@ -53,7 +53,7 @@ NEW_GROUP_TITLE = "Stairway to Gray 🐦‍🔥🐦‍🔥"
 NEW_GROUP_DESCRIPTION = "We help people with tirzepatide in the peptide community\nhttps://www.stairwaytogray.com"
 
 USERS_TO_ADD = [
-    # 'new_bot',
+    'Stair_bot',
     'seekerseventysix',
     'stairmasker1',
     'delululemonade',
