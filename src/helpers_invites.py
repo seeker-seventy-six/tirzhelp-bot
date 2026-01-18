@@ -3,15 +3,21 @@ import logging
 import os
 import threading
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import Iterable, List, Optional, Union
+
 
 import requests
 from dotenv import load_dotenv
 
 
 INVITE_MARKER = "[tg-invite-rotation]"
-INVITE_COUNT = 1
+## (INVITE_COUNT x INVITE_MEMBER_LIMIT) should stay under about 3000 per 24 hours to avoid triggering nuke
+INVITE_COUNT = 2
+INVITE_MEMBER_LIMIT = 1000
 DISCORD_API_BASE = "https://discord.com/api/v10"
+
 
 _TELEGRAM_API_BASE: Optional[str] = None
 _INVITE_CHAT_ID: Optional[str] = None
@@ -49,7 +55,7 @@ def _ensure_telegram_config():
     _INVITE_CHAT_ID = str(supergroup_id)
 
 
-def create_invite_links(expire_seconds: int, count: int = 1) -> List[dict]:
+def create_invite_links(expire_seconds: int, count: int = 1, members_per_link: int = 1000) -> List[dict]:
     """Create Telegram invite links for the configured chat.
 
     Parameters
@@ -70,8 +76,9 @@ def create_invite_links(expire_seconds: int, count: int = 1) -> List[dict]:
             "chat_id": _INVITE_CHAT_ID,
             "expire_date": int(time.time()) + expire_seconds,
             "creates_join_request": False,
-            "member_limit": 2000,
+            "member_limit": members_per_link,
         }
+
 
         try:
             response = requests.post(
@@ -166,12 +173,15 @@ def _delete_previous_invite_messages(channel_id: str, marker: str):
 
 
 def format_invite_message(invite_links: List[dict], marker: str) -> str:
+    est_timestamp = int(datetime.now().astimezone(ZoneInfo("America/New_York")).timestamp())
+
     lines = [
         marker,
-        "📨 **Current Telegram Invite Links**",
-        f"Last updated: <t:{int(time.time())}:F>",
+        "\n📨 **Current STG Telegram Invite Links**",
+        f"Last updated: <t:{est_timestamp}:F>",
         "",
     ]
+
 
     if not invite_links:
         lines.append("No invites available right now. Please check back soon.")
@@ -182,7 +192,8 @@ def format_invite_message(invite_links: List[dict], marker: str) -> str:
             display_name = f" ({name})" if name else ""
             lines.append(f"{idx}. {url}{display_name}")
 
-    lines.append("\nThese links rotate automatically to keep the TG entrance secure.")
+    lines.append("\nThese links rotate automatically each day to keep the TG entrance secure and to mitigate nuke risk.")
+    lines.append("If the links are currently not working, check back tomorrow!\n\n")
     return "\n".join(lines)
 
 
@@ -232,7 +243,12 @@ def _rotation_loop(
                 invite_count,
                 expire_days,
             )
-            new_links = create_invite_links(expire_seconds=expire_seconds, count=invite_count)
+            new_links = create_invite_links(
+                expire_seconds=expire_seconds,
+                count=invite_count,
+                members_per_link=INVITE_MEMBER_LIMIT,
+            )
+
 
             if new_links:
                 post_invites_to_discord_root(new_links, marker)
