@@ -239,7 +239,7 @@ def webhook():
         ### EXTRACT TG UPDATE IDs ###
         message = update.get('message', {})
         chat_id = message.get('chat', {}).get('id', None)
-        message_thread_id = message.get("message_thread_id", 1)
+        message_thread_id = message.get("message_thread_id")
         message_id = message.get("message_id", None)
         user_id = message.get('from', {}).get('id', None)
         user_firstname = message.get('from', {}).get('first_name', None)
