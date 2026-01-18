@@ -35,7 +35,7 @@ DISCORD_STGTS_CHANNEL_ID='discord-channel-id-for-stgts-bridge'
 DISCORD_ROOT_CHANNEL_ID='discord-channel-id-for-invite-posts'
 ```
 
-> If `INVITE_TARGET_CHAT_ID` is omitted, the bot defaults to the `SUPERGROUP_ID` defined in `TELEGRAM_CONFIG`.
+> The bot defaults to the `SUPERGROUP_ID` defined in `TELEGRAM_CONFIG`.
 
 ### 4. Deploy
 The bridge will automatically start when the bot is deployed and will:
