@@ -21,7 +21,7 @@ from src import helpers_discord
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
-ENV_FILE = ".env-main"
+ENV_FILE = ".env-dev"
 if os.path.exists(ENV_FILE):
     logging.info(f"Loading environment variables from {ENV_FILE}")
     load_dotenv(ENV_FILE, override=True)
