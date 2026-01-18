@@ -12,7 +12,7 @@ Once the Telegram bot is deployed to Heroku and it's Telegram account added as a
 - **Banned Topic Filtering**: Filters messages for banned topics and alerts the user if a topic is found. It can also auto-delete messages for certain terms organized by yaml files.
 - **Automated Messages**: Can automatically respond to certain terms or regex patterns with predefined messages for certain terms organized by yaml files.
 - **Test Results Extraction**: Extract any document (pdf) or image uploaded to Test Results channel and upload the extracted data to a Google Spreadsheet automatically.
-- **Discord Bridge**: Automatically bridges posts with links and images from a specific Discord channel to a Telegram topic.
+- **Discord Bridge & Invite Rotation**: Bridges links/images between Discord and Telegram, and keeps a dedicated Discord root channel stocked with fresh Telegram invite links.
 
 ## Local Environment Setup
 
@@ -25,6 +25,7 @@ ENVIRONMENT=[PROD or DEV]
 OPENAI_TOKEN=your-openai-token
 GOOGLE_SERVICE_ACCOUNT_FILE=your-google-developer-app-token
 DISCORD_BOT_TOKEN=your-discord-bot-token
+DISCORD_STGTS_CHANNEL_ID=discord-channel-id-for-stgts-bridge
 ```
 
 Even without a local `.env-dev` file, you can also test changes in the Telegram dev environment by joining the Test Bot server before merging changes to the main prod environment. Ask @seeker-seventy-six for access.

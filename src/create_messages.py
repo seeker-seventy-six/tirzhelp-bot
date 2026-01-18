@@ -1,3 +1,4 @@
+import bot
 import os
 import sys
 from uuid import uuid4
@@ -14,11 +15,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 def welcome_newbie(new_user):
-    """
-    Formats a welcome message for newbies.
-    """
+    """Formats a welcome message for newbies."""
     wiki = "<a href='https://www.stairwaytogray.com/'>📖 Community Intro</a>"
-    guides = "<a href='https://t.me/c/2410577414/3/51643'>📚 Rules & Guides Channel</a>"
+    guides = f"<a href='{bot.RULES_GUIDE_POST}'>📚 Rules & Guides Channel</a>"
     mention = f"<a href='tg://user?id={new_user['id']}'>@{new_user.get('username', new_user['first_name'])}</a> " if new_user!='' else new_user
     welcome_message = (
         f"{mention} Welcome to the Telegram community for Stairway to Gray! ✨🐰\n\n"
@@ -32,9 +31,9 @@ def welcome_newbie(new_user):
 
 def newbie_announcement():
     safety_tip = np.random.choice([
-        "Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor spreadsheet or vendor's community.",
+        "Never trust unsolicited DMs — scammers often impersonate vendor reps. Always verify rep contacts through the vendor promo channel or vendor's community. Reputable vendors will never reach out unsolicted with a price list; Unsolicited DMs are almost always scammers. 📵",
         "Check your reconstituted peptide's pH level before injecting! 🧪📈 GLP-1s should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find pH strips on Amazon.",
-        "Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
+        f"Check out the aggregated stats we have on <a href='{bot.TEST_RESULTS_SPREADSHEET}/#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
         "We don't recommend single vial vendors in this community because they cannot be tested and therefore lack the same level of accountability for quality control as kits. If you choose to use a single vial vendor, please do so at your own risk and thoroughly research.",
         "Vendor COAs are 🧻 - they can be biased due to cherry-picking. Use them only to verify what the vendor *claims* to be selling. To mitigate risk, third-party (3P) test your actual order!",
         "We don't recommend individual-ran group buys for first-time buyers because of the increased risk of scams and typically a lack of leverage to make buyers whole in the event of an issue. If you choose to go the group buy route, please do so at your own risk and thoroughly research."
@@ -42,7 +41,7 @@ def newbie_announcement():
     message = (
         "🚨 New here? Start here! 🚨\n\n"
         "Curious about research market GLP-1s but not sure where to begin? We've got you covered 🙌\n\n"
-        "1) Start with the Rules & Guides channel:\n<a href='https://t.me/c/2410577414/3/51643'>Rules & Guides 📚</a>\n\n"
+        f"1) Start with the Rules & Guides channel:\n<a href='{bot.RULES_GUIDE_POST}'>Rules & Guides 📚</a>\n\n"
         "2) Read our intro guide:\n<a href='https://www.stairwaytogray.com/posts/tirzepatide-101/'>Gray 101 🌐</a>\n\n"
         "<b>Who are we?</b> We're a community focused on making the unregulated research market safer to navigate and provide community support and connection. 🧪🫂💬\n\n"
         f"⚠️ <b>Safety Tip:</b> {safety_tip}"
@@ -98,17 +97,6 @@ def lastcall(update, BOT_TOKEN):
 
     return lastcall_message
 
-def safety():
-    """
-    Returns a Telegram message about harm reduction with a link to a section in a Google Doc.
-    """
-    links = [ 
-        f"Check out the aggregated stats we have on <a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ/edit?gid=1418853124#gid=1418853124'>Tirzepatide by Vendor</a> 📊",
-        f"Check out the history and future <a href='https://www.nature.com/articles/s41392-022-00904-4'>applications of peptides</a> 📝",
-        "Always check your reconstituted peptide's pH level before injecting! 🧪📈 Tirzepatide should fall in the 6-9 pH range. (For subQ injections, 4-9 pH is generally considered 'safe' for injection comfort.) Find any pH 0-14 strips on Amazon.",
-    ]
-    message = f"Did someone say Safety? 👀\n\nIf you haven't already seen this one...\n\n{np.random.choice(links)}"
-    return message
 
 def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
     # Optional @ mention
@@ -141,10 +129,10 @@ def banned_topic(banned_topic, header_msg, topic_msg="", user=None):
 def dont_link(user_id, user_name):
     message = (
         f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 "
-        "We're auto-poofing this direct link as most communities have requested invites be shared only through approved links or not to be directly linked.\n\n"
+        "We're auto-poofing this direct link as many communities have requested invites be shared only through approved links or not to be directly linked.\n\n"
         "If this was an order form, we also auto-poof these for newbie safety. Newbies should ask around here for experiences with the vendor.\n\n"
-        "Please DM these kinds of links instead, but be vigilant as a newbie receiving DMs.\n\n"
-        "You can check the <a href='https://docs.google.com/document/d/1CvAu42nH0i-VFPN9cLInSkjj7D8F0SBq7FIyqDjhF7M/edit?tab=t.lgryvp324lcd'>Printable Guides: External Resources</a> for the latest approved community invite method if they've provided one, the <a href='https://t.me/c/2410577414/37/389306'>Supply Vendors Spreasheet</a>, or the <a href='https://t.me/c/2410577414/3/51651'>Vendor Spreadhseet</a>. Thank you! 🙏"
+        "Please DM these kinds of links instead, but be vigilant as a newbie receiving DMs. Reputable vendors will never reach out to you directly; unsolicited DMs are typically scammers!\n\n"
+        "You can check the <i>Printable Guides: External Resources</i> under <i>Rules & Guides</i> channel for the latest approved community invite method if they've provided one, or the <i>Vendor Promo</i> channel for the latest vendor contact info. Thank you! 🙏"
     )
     return message
 
@@ -152,11 +140,11 @@ def dont_link_group_test(user_id, user_name):
     message = (
     f"<a href='tg://user?id={user_id}'>@{user_name}</a> 💨🚫 Ope! "
     "STG has moved group testing support to the new testing server STGTS on Discord. You can find that linked below, along with mods and group support to help you in your testing journey!\n\n"
-    "https://discord.gg/GHqzcqUyFS \n\n"
+    f"{bot.DISCORD_STGTS} \n\n"
     "While the most important thing is that members test what they buy for safety, please be aware that TG private chat testing groups will no longer have mod support if something goes wrong. "
-    "Please join TG organized groups at your own risk. 🙏\n\n"
-    "To post your group test here, either copy the discord # looking-for-group-test THREAD LINK"
-    ", or post the discord CHANNEL NAME of your OPEN group test so folks can join from the <a href='https://discord.com/channels/1402816972047122512/1428846550112665731'>#start-join-leave-test-groups</a> channel"
+    "Please join private TG organized groups at your own risk. 🙏\n\n"
+    "To post your group test here, either copy the discord #looking-for-group-test THREAD LINK"
+    ", or post the discord CHANNEL NAME of your OPEN group test so folks can join from the #start-join-leave-test-groups channel"
     )
     return message
 
@@ -210,7 +198,7 @@ def summarize_test_results(update, BOT_TOKEN):
             )
             helpers_google.append_to_sheet(data_row)
 
-        raw_data_url =  "<a href='https://docs.google.com/spreadsheets/d/1IbMh3BNqkQP-0ZyI51Dyz8K-msSHRiY_kT0Ue-Uv8qQ'>🌐 You can find the raw data here</a>"
+        raw_data_url =  f"<a href={bot.TEST_RESULTS_SPREADSHEET}>🌐 You can find the raw data here</a>"
         if sample.mass_mg:
             grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
             logging.info(f"Grouped stats: {grouped_stats}")

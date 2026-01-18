@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def is_user_in_supergroup(user_id):
     url = f"{bot.TELEGRAM_API_URL}/getChatMember"
     params = {
-        'chat_id': bot.TIRZHELP_SUPERGROUP_ID,
+        'chat_id': bot.SUPERGROUP_ID,
         'user_id': user_id
     }
     response = requests.get(url, params=params)
@@ -54,6 +54,17 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
             if "Bad Request: message to be replied not found" in response.text:
                 logging.warning("Reply message not found. Skipping sending message.")
                 return  # Exit the function without sending
+
+            # Handle missing topic/thread: retry without message_thread_id
+            if (
+                "Bad Request: message thread not found" in response.text
+                and payload.get("message_thread_id") is not None
+            ):
+                logging.warning("Message thread not found. Retrying without message_thread_id.")
+                payload.pop('message_thread_id', None)
+                response = requests.post(url, json=payload)
+                response.raise_for_status()
+                return response.json()
 
             response.raise_for_status()  # Raise for other non-2xx errors
 
