@@ -1,12 +1,14 @@
-# Discord-to-Telegram Bridge Setup
+# Discord-to-Telegram Bridge & Invite Rotation Setup
 
 ## Overview
-This feature provides **bidirectional bridging** between Discord and Telegram:
-- **Discord → Telegram**: Links and images from Discord channel to Telegram topic
-- **Telegram → Discord**: Images from Telegram topic to Discord channel
+This feature provides **bidirectional bridging** between Discord and Telegram, plus automated Telegram invite rotation:
+- **Discord → Telegram**: Links and images from the DISCORD_STGTS channel to a Telegram topic.
+- **Telegram → Discord**: Images from that Telegram topic back to DISCORD_STGTS.
+- **Telegram Invite Rotation → DISCORD_ROOT**: Periodically generates a batch of fresh Telegram invite links, revokes the old batch (configurable), and replaces the invite message inside the DISCORD_ROOT channel so members always see the latest links.
 
-**Discord Channel**: #public-test-results-no-discussion 
-**Telegram Topic**: Test Results 3P ONLY - No Discussion
+**Discord STGTS Channel**: #public-test-results-no-discussion  
+**Telegram Topic**: Test Results 3P ONLY - No Discussion  
+**Discord Root Channel**: Configurable via `DISCORD_ROOT_CHANNEL_ID`
 
 ## Setup Instructions
 
@@ -29,7 +31,16 @@ This feature provides **bidirectional bridging** between Discord and Telegram:
 Add to both `.env-dev` and `.env-main`:
 ```
 DISCORD_BOT_TOKEN='your-actual-discord-bot-token'
+DISCORD_STGTS_CHANNEL_ID='discord-channel-id-for-stgts-bridge'
+DISCORD_ROOT_CHANNEL_ID='discord-channel-id-for-invite-posts'
+INVITE_TARGET_CHAT_ID='optional-telegram-chat-id-if-not-supergroup'
+INVITE_ROTATION_INTERVAL_HOURS=24
+INVITE_ROTATION_BATCH_SIZE=5
+INVITE_ROTATION_EXPIRE_DAYS=7
+INVITE_ROTATION_REVOKE_PREVIOUS='true'
 ```
+
+> If `INVITE_TARGET_CHAT_ID` is omitted, the bot defaults to the `SUPERGROUP_ID` defined in `TELEGRAM_CONFIG`.
 
 ### 4. Deploy
 The bridge will automatically start when the bot is deployed and will:
@@ -41,6 +52,7 @@ The bridge will automatically start when the bot is deployed and will:
 - ✅ **Discord → Telegram**: Bridges messages with links (http/www)
 - ✅ **Discord → Telegram**: Bridges image attachments
 - ✅ **Telegram → Discord**: Bridges image posts
+- ✅ **Telegram Invite Rotation → Discord Root**: Automatically creates fresh Telegram invites, revokes the old batch (configurable), and keeps the DISCORD_ROOT channel updated with a single up-to-date message
 - ✅ Preserves usernames from both platforms
 - ✅ Formats messages appropriately for each platform
 - ✅ Runs in background thread
