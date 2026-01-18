@@ -55,6 +55,17 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
                 logging.warning("Reply message not found. Skipping sending message.")
                 return  # Exit the function without sending
 
+            # Handle missing topic/thread: retry without message_thread_id
+            if (
+                "Bad Request: message thread not found" in response.text
+                and payload.get("message_thread_id") is not None
+            ):
+                logging.warning("Message thread not found. Retrying without message_thread_id.")
+                payload.pop('message_thread_id', None)
+                response = requests.post(url, json=payload)
+                response.raise_for_status()
+                return response.json()
+
             response.raise_for_status()  # Raise for other non-2xx errors
 
         return response.json()
