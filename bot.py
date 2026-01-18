@@ -16,6 +16,7 @@ sys.path.append('./src')
 from src import create_messages as msgs
 from src import helpers_telegram
 from src import helpers_discord 
+from src import helpers_invites
 
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -158,6 +159,7 @@ def create_globals():
 initialize_announcement_thread()
 create_globals()
 helpers_discord.start_discord_bridge()
+helpers_invites.start_invite_rotation_thread()
 ### NON WEBHOOK END ###
 
 
