@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def is_user_in_supergroup(user_id):
     url = f"{bot.TELEGRAM_API_URL}/getChatMember"
     params = {
-        'chat_id': bot.TIRZHELP_SUPERGROUP_ID,
+        'chat_id': bot.SUPERGROUP_ID,
         'user_id': user_id
     }
     response = requests.get(url, params=params)
