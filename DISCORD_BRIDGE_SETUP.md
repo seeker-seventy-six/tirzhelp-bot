@@ -33,11 +33,6 @@ Add to both `.env-dev` and `.env-main`:
 DISCORD_BOT_TOKEN='your-actual-discord-bot-token'
 DISCORD_STGTS_CHANNEL_ID='discord-channel-id-for-stgts-bridge'
 DISCORD_ROOT_CHANNEL_ID='discord-channel-id-for-invite-posts'
-INVITE_TARGET_CHAT_ID='optional-telegram-chat-id-if-not-supergroup'
-INVITE_ROTATION_INTERVAL_HOURS=24
-INVITE_ROTATION_BATCH_SIZE=5
-INVITE_ROTATION_EXPIRE_DAYS=7
-INVITE_ROTATION_REVOKE_PREVIOUS='true'
 ```
 
 > If `INVITE_TARGET_CHAT_ID` is omitted, the bot defaults to the `SUPERGROUP_ID` defined in `TELEGRAM_CONFIG`.
