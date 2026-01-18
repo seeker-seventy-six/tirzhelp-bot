@@ -8,6 +8,7 @@ import unicodedata
 import os
 import sys
 import yaml
+import json
 from dotenv import load_dotenv
 import logging
 
@@ -20,46 +21,52 @@ from src import helpers_discord
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
 # Load environment variables
-load_dotenv()
+ENV_FILE = ".env-main"
+if os.path.exists(ENV_FILE):
+    logging.info(f"Loading environment variables from {ENV_FILE}")
+    load_dotenv(ENV_FILE, override=True)
+else:
+    logging.info("No local env file found; relying on OS / Heroku env vars.")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
+TELEGRAM_CONFIG_JSON = os.getenv("TELEGRAM_CONFIG")
+TEST_RESULTS_SPREADSHEET = os.getenv("TEST_RESULTS_SPREADSHEET")
+
+if not TELEGRAM_CONFIG_JSON:
+    raise RuntimeError("TELEGRAM_CONFIG env var is not set. Please set it to a JSON string with Telegram IDs and accounts.")
+try:
+    TELEGRAM_CONFIG = json.loads(TELEGRAM_CONFIG_JSON)
+except json.JSONDecodeError as exc:
+    raise RuntimeError(f"Invalid TELEGRAM_CONFIG JSON: {exc}") from exc
+
+
+def _require_value(key: str):
+    if key not in TELEGRAM_CONFIG:
+        raise RuntimeError(f"Missing '{key}' in TELEGRAM_CONFIG")
+    return TELEGRAM_CONFIG[key]
+
+
+def _require_list(key: str):
+    value = _require_value(key)
+    if not isinstance(value, list):
+        raise RuntimeError(f"'{key}' must be a list in TELEGRAM_CONFIG")
+    return value
+
+
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-# TELEGRAM IDS
-TIRZHELP_SUPERGROUP_ID = '-1003587078798'
-TIRZHELP_TEST_RESULTS_CHANNEL = '33'
-TIRZHELP_GROUP_TEST_CHANNEL = '35'
-TIRZHELP_NEWBIE_CHANNEL = '27'
-TIRZHELP_GENERAL_CHANNEL = '379'
-TIRZHELP_IGNORE_AUTOMOD_CHANNELS = [TIRZHELP_GROUP_TEST_CHANNEL,TIRZHELP_TEST_RESULTS_CHANNEL]
-
-TEST_SUPERGROUP_ID = '-1002334662710'
-TEST_TEST_RESULTS_CHANNEL = '367'
-TEST_GROUP_TEST_CHANNEL = '1240'
-TEST_NEWBIE_CHANNEL = '681'
-TEST_IGNORE_AUTOMOD_CHANNELS = [TEST_GROUP_TEST_CHANNEL,TEST_TEST_RESULTS_CHANNEL]
-
-MOD_ACCOUNTS = [
-    'Stair_bot',
-    'seekerseventysix',
-    'tirzepatidehelp',
-    'delululemonade',
-    'Steph_752501',
-    'sailor21yo',
-    'NordicTurtle',
-    'Ruca2573',
-    'Litajj',
-    'UncleNacho',
-    'ruttheimer',
-    'QuestyQuestyQuesty',
-    'justaturkey',
-    'true_case',
-]
+SUPERGROUP_ID = str(_require_value("SUPERGROUP_ID"))
+TEST_RESULTS_CHANNEL = str(_require_value("TEST_RESULTS_CHANNEL"))
+GROUP_TEST_CHANNEL = str(_require_value("GROUP_TEST_CHANNEL"))
+NEWBIE_CHANNEL = str(_require_value("NEWBIE_CHANNEL"))
+GENERAL_CHANNEL = str(_require_value("GENERAL_CHANNEL"))
+IGNORE_AUTOMOD_CHANNELS = [str(channel) for channel in _require_list("IGNORE_AUTOMOD_CHANNELS")]
+MOD_ACCOUNTS = [str(account) for account in TELEGRAM_CONFIG.get("MOD_ACCOUNTS", [])]
+RULES_GUIDE_POST = str(_require_value("RULES_GUIDE_POST"))
 
 app = Flask(__name__)
-    
 
 def start_periodic_announcement(frequency_minutes=180):
     """
@@ -92,10 +99,11 @@ def start_periodic_announcement(frequency_minutes=180):
             if should_send:
                 message = msgs.newbie_announcement()
                 if ENVIRONMENT == 'PROD':
-                    helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, message, TIRZHELP_NEWBIE_CHANNEL)
+                    helpers_telegram.send_message(SUPERGROUP_ID, message, NEWBIE_CHANNEL)
                     logging.info("Made newbie announcement")
+                ## Kept turned off for dev to avoid sending messages all day in test bed 
                 # elif ENVIRONMENT == 'DEV':
-                #     helpers_telegram.send_message(TEST_SUPERGROUP_ID, message, TEST_NEWBIE_CHANNEL)
+                #     helpers_telegram.send_message(SUPERGROUP_ID, message, NEWBIE_CHANNEL)
                 #     logging.info("Made newbie announcement")
 
             # Sleep until the next frequency boundary (e.g. next multiple of N)
@@ -177,6 +185,7 @@ def set_webhook():
         "url": f"{WEBHOOK_URL}",
         "allowed_updates": ["message", "edited_message", "channel_post", "edited_channel_post", "inline_query", "callback_query", "chat_member", "my_chat_member"]
     }
+    print(url)
     response = requests.post(url, json=payload)
     return response.json()
 
@@ -185,7 +194,16 @@ def set_webhook():
 def delete_webhook():
     url = f"{TELEGRAM_API_URL}/deleteWebhook"
     payload = {"url": f"{WEBHOOK_URL}"}
+    print(url)
     response = requests.post(url, json=payload)
+    return response.json()
+
+# Check current webhook status
+@app.route('/checkwebhook', methods=['GET'])
+def check_webhook():
+    url = f"{TELEGRAM_API_URL}/getWebhookInfo"
+    print(url)
+    response = requests.get(url)
     return response.json()
 
 # Handle incoming updates
@@ -213,7 +231,7 @@ def webhook():
             logging.info(f"New member status: {new_status}, Old member status: {old_status}")
             # Check if the user has joined the group
             if new_status == "member" and old_status in ["left", "kicked"]:
-                if str(chat_id) in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
+                if str(chat_id) == SUPERGROUP_ID:
                     welcome_message = msgs.welcome_newbie(new_member)
                     helpers_telegram.send_message(chat_id, welcome_message)
                     return jsonify({"ok": True}), 200
@@ -235,7 +253,7 @@ def webhook():
             return jsonify({"ok": True}), 200
         
         ### Skip the rest of the Bot functions if update is not from the main moderation TG groups
-        if str(chat_id) not in [TIRZHELP_SUPERGROUP_ID, TEST_SUPERGROUP_ID]:
+        if str(chat_id) != SUPERGROUP_ID:
             return jsonify({"ok": True}), 200  # Exit after handling the command for non-target groups
         
         ### ALL OTHER MESSAGES ###
@@ -243,7 +261,7 @@ def webhook():
 
             ### AUTO POOF MESSAGES WITH SPECIFIC TERMS ###
             normalized_text = unicodedata.normalize("NFKC", text)
-            if str(message_thread_id) not in TIRZHELP_IGNORE_AUTOMOD_CHANNELS+TEST_IGNORE_AUTOMOD_CHANNELS and username not in MOD_ACCOUNTS: 
+            if str(message_thread_id) not in IGNORE_AUTOMOD_CHANNELS and username not in MOD_ACCOUNTS: 
                 for _, data in auto_poof_topics.items():
                     banned_message = data.get('message')
                     banned_patterns = data.get('patterns')
@@ -280,7 +298,7 @@ def webhook():
                         logging.error(f"Invalid regex in banned pattern '{rx}': {e}")
 
             ### CHECK FOR SPECIFIC QUESTIONS IN NEWBIES CHANNEL ###
-            if str(message_thread_id) in [TIRZHELP_NEWBIE_CHANNEL, TEST_NEWBIE_CHANNEL] and username not in MOD_ACCOUNTS:
+            if str(message_thread_id) == NEWBIE_CHANNEL and username not in MOD_ACCOUNTS:
                 for topic, data in newbies_mod_topics.items():
                     if any(re.search(pattern, text) for pattern in data["patterns"]):
                         message = data["message"]
@@ -289,7 +307,7 @@ def webhook():
 
 
             ### WHEN DOC OR PHOTO POSTED IN TEST RESULTS CHANNEL 
-            if ("document" in message or "photo" in message) and str(message_thread_id) in [TIRZHELP_TEST_RESULTS_CHANNEL, TEST_TEST_RESULTS_CHANNEL]:
+            if ("document" in message or "photo" in message) and str(message_thread_id) == TEST_RESULTS_CHANNEL:
                 # AUTO EXTRACT TEST RESULTS (always run)
                 try:
                     test_results_summary = msgs.summarize_test_results(update, BOT_TOKEN)
@@ -300,7 +318,7 @@ def webhook():
                     helpers_telegram.send_message(chat_id, "🚫 Test results extraction failed. Probably an unsupported file format received or expected mass not included in test result. Please check your file is a .pdf, .png, or .jpeg, and ensure the expected mass is included somewhere in test result and retry.", message_thread_id)
                 
                 # DISCORD BRIDGE - TELEGRAM TO DISCORD (skip for bot messages)
-                if str(chat_id) == TIRZHELP_SUPERGROUP_ID:
+                if str(chat_id) == SUPERGROUP_ID:
                     try:
                         file_id = None
                         filename = None
@@ -333,8 +351,7 @@ def webhook():
 
             ### AUTO POOF LINKED COMMUNITIES ###
             # Flag t.me/ links in group test channel
-            group_test_threads = [TIRZHELP_GROUP_TEST_CHANNEL, TEST_GROUP_TEST_CHANNEL]
-            if "t.me/" in text and str(message_thread_id) in group_test_threads and username not in MOD_ACCOUNTS: 
+            if "t.me/" in text and str(message_thread_id) == GROUP_TEST_CHANNEL and username not in MOD_ACCOUNTS: 
                 logging.info(f"Detected t.me/ link in group test thread")
                 reply_message = msgs.dont_link_group_test(user_id, user_firstname)
                 helpers_telegram.send_message(chat_id, reply_message, message_thread_id, reply_to_message_id=message_id)
@@ -372,10 +389,7 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
         ),
         "/lastcall": lambda: helpers_telegram.send_message(
             chat_id, msgs.lastcall(update, BOT_TOKEN), message_thread_id, reply_to_message_id
-        ),
-        "/safety": lambda: helpers_telegram.send_message(
-            chat_id, msgs.safety(), message_thread_id, reply_to_message_id
-        ),
+        )
     }
     if command in command_dispatcher:
         return command_dispatcher[command]()
@@ -401,9 +415,9 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
 #                 break  # Exit cleanly when all personas are done
 
 #             if ENVIRONMENT == 'PROD':
-#                 helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, pic_path, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
+#                 helpers_telegram.send_image(SUPERGROUP_ID, pic_path, message_thread_id=GENERAL_CHANNEL)
 #                 for msg in exchange:
-#                     helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, msg, message_thread_id=TIRZHELP_GENERAL_CHANNEL)
+#                     helpers_telegram.send_message(SUPERGROUP_ID, msg, message_thread_id=GENERAL_CHANNEL)
 #                     time.sleep(10)
 #             else:
 #                 helpers_telegram.send_image(TEST_SUPERGROUP_ID, pic_path)
@@ -419,8 +433,8 @@ def handle_command(command, chat_id, message_thread_id, reply_to_message_id, upd
 #     # After the loop exits
 #     summary = generate_final_summary()
 #     if ENVIRONMENT == 'PROD':
-#         helpers_telegram.send_image(TIRZHELP_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', TIRZHELP_GENERAL_CHANNEL)
-#         helpers_telegram.send_message(TIRZHELP_SUPERGROUP_ID, summary, TIRZHELP_GENERAL_CHANNEL)
+#         helpers_telegram.send_image(SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg', GENERAL_CHANNEL)
+#         helpers_telegram.send_message(SUPERGROUP_ID, summary, GENERAL_CHANNEL)
 #     else:
 #         helpers_telegram.send_image(TEST_SUPERGROUP_ID, 'murder_mystery_pics/tirzhelpbot.jpg')
 #         helpers_telegram.send_message(TEST_SUPERGROUP_ID, summary)
@@ -437,6 +451,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Manage Telegram bot webhooks.")
     parser.add_argument("--delete-webhook", action="store_true", help="Delete the current webhook.")
     parser.add_argument("--set-webhook", action="store_true", help="Set the webhook.")
+    parser.add_argument("--check-webhook", action="store_true", help="Check the webhook status.")
     
     args = parser.parse_args()
 
@@ -445,11 +460,13 @@ if __name__ == "__main__":
         delete_response = delete_webhook()
         logging.info(f"Delete Webhook Response: {delete_response}")
 
-    # Handle set-webhook
     elif args.set_webhook:
         set_response = set_webhook()
         logging.info(f"Set Webhook Response: {set_response}")
 
-    # If no arguments, start the Flask app
+    elif args.check_webhook:
+        check_response = check_webhook()
+        logging.info(f"Check Webhook Response: {check_response}")
+
     else:
         app.run(host="0.0.0.0", port=8443)

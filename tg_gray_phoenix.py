@@ -3,6 +3,7 @@ import sys
 import asyncio
 import logging
 from typing import List, Union, Optional, AsyncIterator
+import json
 from dotenv import load_dotenv
 
 from telethon import TelegramClient
@@ -35,38 +36,32 @@ from telethon.tl.types import (
   ones explicitly listed in `messages`
 """
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+
 # -------------------------------------------------------------------
 # 1) CONFIGURATION
 # -------------------------------------------------------------------
 
 # Load environment and configure logging
-load_dotenv('.env-dev')
+load_dotenv('.env-dev', override=True)
+
+TELEGRAM_CONFIG_JSON = os.getenv("TELEGRAM_CONFIG")
+if not TELEGRAM_CONFIG_JSON:
+    raise RuntimeError("TELEGRAM_CONFIG env var is not set. Please set it to a JSON string with Telegram IDs and accounts.")
+try:
+    TELEGRAM_CONFIG = json.loads(TELEGRAM_CONFIG_JSON)
+except json.JSONDecodeError as exc:
+    raise RuntimeError(f"Invalid TELEGRAM_CONFIG JSON: {exc}") from exc
+
 APP_ID = os.getenv("TELEGRAM_APP_ID")
 APP_HASH = os.getenv("TELEGRAM_APP_HASH")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER")
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+SOURCE_SUPERGROUP_ID = os.getenv("SOURCE_SUPERGROUP_ID")
+USERS_TO_ADD_AS_ADMINS = [str(account) for account in TELEGRAM_CONFIG.get("MOD_ACCOUNTS", [])]
 
 # Constants
-SOURCE_SUPERGROUP_ID = -1002334662710
 NEW_GROUP_TITLE = "Stairway to Gray 🐦‍🔥🐦‍🔥" 
-NEW_GROUP_DESCRIPTION = "We help people with tirzepatide in the peptide community\nhttps://www.stairwaytogray.com"
-
-USERS_TO_ADD = [
-    'Stair_bot',
-    'seekerseventysix',
-    'stairmasker1',
-    'delululemonade',
-    'Steph_752501',
-    'aksailor',
-    'NordicTurtle',
-    'Ruca2573',
-    'Litajj',
-    'UncleNacho',
-    'ruttheimer',
-    'QuestyQuestyQuesty',
-    'justaturkey',
-]
+NEW_GROUP_DESCRIPTION = "We help new people with GLP-1s in the gray peptide community\nhttps://www.stairwaytogray.com"
 
 PINNED_TOPIC_NAMES = [
     "Rules & Guides - READ THIS FIRST", 
@@ -350,7 +345,7 @@ async def set_logo(client, path, peer):
     await safe(client, EditPhotoRequest(channel=peer, photo=InputChatUploadedPhoto(photo)))
 
 async def add_admins(client, peer):
-    for user in USERS_TO_ADD:
+    for user in USERS_TO_ADD_AS_ADMINS:
         try:
             ent = await client.get_entity('@'+user)
             try:
