@@ -158,8 +158,8 @@ def create_globals():
 # start_ai_roleplay_thread()
 initialize_announcement_thread()
 create_globals()
-helpers_discord.start_discord_bridge()
-helpers_invites.start_invite_rotation_thread()
+# helpers_discord.start_discord_bridge()
+# helpers_invites.start_invite_rotation_thread()
 ### NON WEBHOOK END ###
 
 

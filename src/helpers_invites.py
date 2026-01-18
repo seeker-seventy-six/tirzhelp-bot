@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 
 INVITE_MARKER = "[tg-invite-rotation]"
+INVITE_COUNT = 1
 DISCORD_API_BASE = "https://discord.com/api/v10"
 
 _TELEGRAM_API_BASE: Optional[str] = None
@@ -209,12 +210,6 @@ def post_invites_to_discord_root(invite_links: List[dict], marker: str = INVITE_
         logging.error("Failed to post invite links to Discord: %s", exc)
 
 
-def _normalize_bool(value: str, default: bool) -> bool:
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
-
-
 def _rotation_loop(
     interval_hours: float,
     expire_days: int,
@@ -270,7 +265,7 @@ def start_invite_rotation_thread():
 
     revoke_previous = True
     marker = INVITE_MARKER
-    invite_count = 1
+    invite_count = INVITE_COUNT
 
     logging.info(
         "Starting invite rotation thread: every %sh, expire=%sd, revoke_previous=%s, invites=%d",
