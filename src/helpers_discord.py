@@ -2,16 +2,46 @@ import discord
 import asyncio
 import logging
 import os
+import json
 import requests
 from io import BytesIO
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
+from dotenv import load_dotenv
+
 from src import helpers_telegram
 
-# Bridge IDs
-DISCORD_CHANNEL_ID = 1439320635477065819
-TELEGRAM_CHAT_ID = '-1002410577414'
-TELEGRAM_TOPIC_ID = '48'
+
+# Load environment variables
+ENV_FILE = ".env-dev"
+if os.path.exists(ENV_FILE):
+    logging.info(f"Loading environment variables from {ENV_FILE}")
+    load_dotenv(ENV_FILE, override=True)
+else:
+    logging.info("No local env file found; relying on OS / Heroku env vars.")
+
+
+DISCORD_STGTS_CHANNEL_ID = os.getenv('DISCORD_STGTS_CHANNEL_ID')
+DISCORD_ROOT_CHANNEL_ID = os.getenv('DISCORD_ROOT_CHANNEL_ID')
+
+
+def _get_telegram_targets():
+    config_json = os.getenv('TELEGRAM_CONFIG')
+    if config_json:
+        try:
+            telegram_config = json.loads(config_json)
+            chat_id = str(telegram_config['SUPERGROUP_ID'])
+            topic_id = str(telegram_config['TEST_RESULTS_CHANNEL'])
+            return chat_id, topic_id
+        except (json.JSONDecodeError, KeyError) as exc:
+            logging.warning('Failed to parse TELEGRAM_CONFIG (%s);', exc)
+
+    raise RuntimeError(
+        "Unable to resolve Telegram bridge chat/topic. Ensure TELEGRAM_CONFIG is valid with SUPERGROUP_ID and TEST_RESULTS_CHANNEL set."
+    )
+
+
+TELEGRAM_CHAT_ID, TELEGRAM_TOPIC_ID = _get_telegram_targets()
 
 class DiscordBridge(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -21,7 +51,7 @@ class DiscordBridge(discord.Client):
         logging.info(f'Discord bridge logged in as {self.user}')
         
         # Check permissions on startup
-        channel = self.get_channel(DISCORD_CHANNEL_ID)
+        channel = self.get_channel(DISCORD_STGTS_CHANNEL_ID)
         if channel:
             permissions = channel.permissions_for(channel.guild.me)
             missing_perms = []
@@ -41,7 +71,7 @@ class DiscordBridge(discord.Client):
         if message.author.bot:
             return
             
-        if message.channel.id != DISCORD_CHANNEL_ID:
+        if message.channel.id != DISCORD_STGTS_CHANNEL_ID:
             return
             
         has_content = bool(message.content and ('http' in message.content or 'www.' in message.content))
@@ -145,7 +175,7 @@ class DiscordBridge(discord.Client):
     async def send_to_discord(self, username, file_url, filename, caption=None):
         """Send file from Telegram to Discord"""
         try:
-            channel = self.get_channel(DISCORD_CHANNEL_ID)
+            channel = self.get_channel(DISCORD_STGTS_CHANNEL_ID)
             if not channel:
                 logging.error("Discord channel not found")
                 return
