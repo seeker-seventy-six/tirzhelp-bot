@@ -249,7 +249,9 @@ def format_invite_message(invite_links: List[dict], marker: str) -> str:
     lines.append(
         "\nThese links rotate automatically each day to keep the TG entrance secure and to mitigate nuke risk."
     )
-    lines.append("If the links are currently not working, check back tomorrow!\n\n")
+    lines.append("If the links are currently not working, check back tomorrow!")
+    lines.append("\nONLY JOIN THE TG USING THE LINKS ABOVE TO ENSURE YOU'RE JOINING THE REAL GROUP - Never trust DMs from internet strangers. Scammers abound in the gray market. The Mods of STG will **NEVER** solicit sales from you.")
+    lines.append("\nIf you want to invite others, please direct them to join this server **via the Discord invite in the footer of the Stairway to Gray website.**")
     return "\n".join(lines)
 
 def post_invites_to_discord_root(invite_links: List[dict], marker: str = INVITE_MARKER):
