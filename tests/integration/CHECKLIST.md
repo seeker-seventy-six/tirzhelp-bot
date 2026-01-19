@@ -29,5 +29,5 @@ If the integration test fails with a 403/404 when reading or posting to Discord,
 Once these checks pass, rerun:
 
 ```bash
-PYTHONPATH=. pytest tests/integration/test_helpers_invites_integration.py::test_create_and_revoke_telegram_invite_and_update_discord -q
+PYTHONPATH=. pytest tests/integration/test_helpers_invites_integration.py::test_create_and_revoke_telegram_invite_and_update_discord --log-cli-level=INFO
 ```
