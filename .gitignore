@@ -8,3 +8,4 @@ __pycache__/
 historic_test_results/*
 my_session*
 session_name.session
+.invite_rotation_state.json
