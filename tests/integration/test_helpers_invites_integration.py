@@ -24,6 +24,7 @@ Use throwaway chats/channels, because these tests create/delete live data.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import time
 from pathlib import Path
@@ -34,6 +35,8 @@ from dotenv import load_dotenv
 
 import src.helpers_invites as invites
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
 # Load .env-dev (or default .env) so tests pick up local credentials automatically.
 _ENV_PATH = Path(__file__).resolve().parents[2] / ".env-dev"
 if _ENV_PATH.exists():
@@ -43,6 +46,7 @@ else:
 
 DISCORD_API_BASE = "https://discord.com/api/v10"
 INVITE_BATCH_SIZE = 2
+INVITE_STATE_TEST_PATH = Path(__file__).resolve().parent / ".invite_rotation_test_state.json"
 
 _TELEGRAM_API_BASE: str | None = None
 _INVITE_CHAT_ID: str | None = None
@@ -138,6 +142,47 @@ def _assert_invites_present(message: dict, invite_urls: list[str]):
         assert url in content, f"Marker message is missing invite URL: {url}"
 
 
+def _write_state_file(invite_urls: list[str]):
+    payload = {
+        "invite_links": invite_urls,
+        "updated_at": str(time.time()),
+    }
+    INVITE_STATE_TEST_PATH.write_text(json.dumps(payload))
+
+
+def _seed_previous_cycle(
+    discord_token: str,
+    discord_channel_id: str,
+    marker: str,
+    expire_seconds: int,
+) -> list[dict]:
+    """Create a previous batch of invites and post them to Discord without using rotate_invites_once."""
+
+    previous_invites = invites.create_invite_links(
+        expire_seconds=expire_seconds,
+        count=INVITE_BATCH_SIZE,
+        members_per_link=invites.INVITE_MEMBER_LIMIT,
+    )
+    assert previous_invites, "Failed to seed previous Telegram invites"
+
+    previous_urls = [link.get("invite_link") for link in previous_invites if link.get("invite_link")]
+    assert len(previous_urls) == len(previous_invites), "Seeded invite missing invite_link"
+
+    _write_state_file(previous_urls)
+
+    content = invites.format_invite_message(previous_invites, marker)
+    response = requests.post(
+        f"{DISCORD_API_BASE}/channels/{discord_channel_id}/messages",
+        headers=_discord_headers(discord_token),
+        json={"content": content},
+        timeout=15,
+    )
+    response.raise_for_status()
+    # give Discord a moment so the message is discoverable via the API before deletion
+    time.sleep(2)
+    return previous_invites
+
+
 def test_create_and_revoke_telegram_invite_and_update_discord():
     """Full integration flow for Telegram invite rotation helpers.
 
@@ -154,59 +199,43 @@ def test_create_and_revoke_telegram_invite_and_update_discord():
     discord_token, discord_channel_id = _load_discord_env()
 
     expire_seconds = 600  # 10 minutes for test purposes
+    expire_days = expire_seconds / (24 * 3600)
     marker = "[tg-integration-test]"
 
-    # --- Step 1: create Telegram invite links ---
-    invites_list = invites.create_invite_links(expire_seconds=expire_seconds, count=INVITE_BATCH_SIZE)
-    assert invites_list, "Expected helpers_invites.create_invite_links to return at least one invite"
-    invite_urls = [link.get("invite_link") for link in invites_list if link.get("invite_link")]
-    assert len(invite_urls) == len(invites_list), "invite_link missing from Telegram response"
+    if INVITE_STATE_TEST_PATH.exists():
+        INVITE_STATE_TEST_PATH.unlink()
 
-    # --- Step 2: post to Discord & verify the new marker message exists ---
-    invites.post_invites_to_discord_root(invites_list, marker=marker)
-    time.sleep(2)  # give Discord a moment
-
-    messages = _fetch_discord_messages(discord_token, discord_channel_id)
-    latest_message = _assert_single_marker_message(messages, marker)
-    _assert_invites_present(latest_message, invite_urls)
-    print("Posted Discord message", latest_message.get("id"), "with invites", invite_urls)
-
-    # --- Step 3: revoke the Telegram invite links ---
-    invites.revoke_invite_links(invites_list)
-    time.sleep(2)  # give Telegram a moment
-
-    # --- Step 4: create a second invite batch + post to Discord again ---
-    second_invite_list = invites.create_invite_links(expire_seconds=expire_seconds, count=INVITE_BATCH_SIZE)
-    assert second_invite_list, "Failed to create second Telegram invite batch"
-    second_invite_urls = [link.get("invite_link") for link in second_invite_list if link.get("invite_link")]
-    assert len(second_invite_urls) == len(second_invite_list), "Second invite batch missing invite_link"
-
-    invites.post_invites_to_discord_root(second_invite_list, marker=marker)
-    time.sleep(2)
-
-    messages_after = _fetch_discord_messages(discord_token, discord_channel_id)
-    final_message = _assert_single_marker_message(messages_after, marker)
-    _assert_invites_present(final_message, second_invite_urls)
-    print("After second post, only message", final_message.get("id"), "remains with invites", second_invite_urls)
-
-    # Cleanup: revoke second invite batch so the test leaves no valid links (optional but polite)
-    invites.revoke_invite_links(second_invite_list)
-    time.sleep(2)
-
-    # Verify Telegram cleanup (optional best-effort)
-    for url in second_invite_urls:
-        cleanup_check = requests.post(
-            f"{telegram_base}/revokeChatInviteLink",
-            json={"chat_id": invite_chat_id, "invite_link": url},
-            timeout=15,
-        )
-        cleanup_data = cleanup_check.json()
-        assert (
-            cleanup_check.status_code == 400
-            and cleanup_data.get("description", "").lower().startswith("bad request: invite link has already been revoked")
-        ) or cleanup_data.get("ok"), (
-            "Expected Telegram cleanup revoke to either succeed or report already revoked; "
-            f"response was {cleanup_data}"
+    try:
+        # Seed a previous cycle so rotate_invites_once has something to revoke
+        _seed_previous_cycle(
+            discord_token,
+            discord_channel_id,
+            marker,
+            expire_seconds,
         )
 
-    print("Integration test completed; all invite batches revoked and Discord state validated.")
+        invites_list = invites.rotate_invites_once(
+            expire_days=expire_days,
+            invite_count=INVITE_BATCH_SIZE,
+            members_per_link=invites.INVITE_MEMBER_LIMIT,
+            marker=marker,
+            revoke_previous=True,
+            post_to_discord=True,
+            state_path=INVITE_STATE_TEST_PATH,
+        )
+        assert invites_list, "Expected rotate_invites_once to return at least one invite"
+        invite_urls = [link.get("invite_link") for link in invites_list if link.get("invite_link")]
+        assert len(invite_urls) == len(invites_list), "invite_link missing from Telegram response"
+
+        time.sleep(2)  # give Discord a moment
+        messages = _fetch_discord_messages(discord_token, discord_channel_id)
+        latest_message = _assert_single_marker_message(messages, marker)
+        _assert_invites_present(latest_message, invite_urls)
+        print("Posted Discord message", latest_message.get("id"), "with invites", invite_urls)
+
+        print(
+            "Integration test completed; current invite batch remains active until next rotation run."
+        )
+    finally:
+        if INVITE_STATE_TEST_PATH.exists():
+            INVITE_STATE_TEST_PATH.unlink()
