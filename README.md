@@ -1,143 +1,239 @@
 # 🤖 TirzHelpBot
-*A Telegram Bot API Heroku App for Stairway to Gray (aka r/TirzepatideHelp)*
+*Telegram + Discord automation for the Stairway to Gray community*
 
-This is a Flask-based application that integrates with the Telegram Bot API. It allows you to interact with Telegram supergroups and handle commands from users. The bot is set up with a webhook to process incoming updates and respond accordingly.
+TirzHelpBot is a Flask-based worker that:
 
-Once the Telegram bot is deployed to Heroku and it's Telegram account added as a member to a Telegram supergroup or group chat with moderator permissions, it can be used for the following features.
+- Automates moderation and helper flows inside Telegram supergroups
+- Bridges test results between Discord and Telegram (bi-directional)
+- Keeps a Discord root channel stocked with fresh Telegram invite links
+- Extracts lab/test results and syncs them to Google Sheets
 
-## Features
+This README doubles as the onboarding guide **and** the day-to-day runbook so anyone on the mod team can spin up, deploy, or troubleshoot the bot.
 
-- **Webhook Handling**: Listens to incoming updates and processes commands like `/newbie`, `/lastcall`, and `/safety`.
-- **Automatic Welcome**: Welcomes new users when they join specific supergroups.
-- **Banned Topic Filtering**: Filters messages for banned topics and alerts the user if a topic is found. It can also auto-delete messages for certain terms organized by yaml files.
-- **Automated Messages**: Can automatically respond to certain terms or regex patterns with predefined messages for certain terms organized by yaml files.
-- **Test Results Extraction**: Extract any document (pdf) or image uploaded to Test Results channel and upload the extracted data to a Google Spreadsheet automatically.
-- **Discord Bridge & Invite Rotation**: Bridges links/images between Discord and Telegram, and keeps a dedicated Discord root channel stocked with fresh Telegram invite links.
+---
 
-## Local Environment Setup
+## Feature Highlights
 
-For local development, create a `.env-dev` file with the following environment variables for each bot environment. If developing on the existing bot, these can be found on the Heroku Dashboard > [Application Name] > Settings > Config Vars or by reaching out to @seeker-seventy-six or @True_Case if you're a Collaborator:
+- **Telegram automation** – `/newbie`, `/lastcall`, `/safety`, auto-welcome, topic moderation, YAML-driven banned topics/responses
+- **Discord ↔ Telegram bridge** – Links & images from Discord → Telegram topic and Telegram images → Discord channel
+- **Telegram invite rotation** – Generates & revokes batches of invites and keeps the Discord root channel updated
+- **Test result ingestion** – Pulls PDFs/images from the Telegram test-results topic and pipes gpt-4.1-mini parsed data into Google Sheets
 
-```
-BOT_TOKEN=your-telegram-bot-token
-WEBHOOK_URL=https://your-heroku-app-url/webhook
-ENVIRONMENT=[PROD or DEV]
-OPENAI_TOKEN=your-openai-token
-GOOGLE_SERVICE_ACCOUNT_FILE=your-google-developer-app-token
-DISCORD_BOT_TOKEN=your-discord-bot-token
-DISCORD_STGTS_CHANNEL_ID=discord-channel-id-for-stgts-bridge
-```
+---
 
-Even without a local `.env-dev` file, you can also test changes in the Telegram dev environment by joining the Test Bot server before merging changes to the main prod environment. Ask @seeker-seventy-six for access.
+## Architecture at a Glance
 
-### Conda environment
+| Component | Description |
+| --- | --- |
+| `bot.py` | Flask app entry point + webhook handling |
+| `src/helpers_*.py` | Domain-specific helpers (Telegram, Discord, invites, OpenAI, Google, etc.) |
+| `mod_topics/*.yml` | Moderation configuration for banned topics / auto responses |
+| Heroku Apps | `tirzhelpbot-dev` (dev) and `tirzhelpbot-prod` (prod) |
 
-To develop locally, you'll need to install packages by:
+---
 
-- install miniconda: https://www.anaconda.com/docs/getting-started/miniconda/install#quickstart-install-instructions
-- Run `conda env create -f local_environment.yml`
+## Getting Started
 
+### Prerequisites
 
-## Deployment
-*Only if setting up a new bot*
+**Mod Team**
+- Access to the GitHub repo (collaborator) if on Mod team
+- Heroku collaborator access to `tirzhelpbot-dev` and `tirzhelpbot-prod`
+- Telegram access to the dev and prod supergroups
+- Optional: Discord admin rights for the Stairway to Gray server if working on the bridge bot
 
-The app is deployed on Heroku and uses the `deploy_bot.sh` script to deploy the application to different environments (dev and prod) based on the Git branch. 
+(for access: TG @seeker-seventy-six or @true_case)
 
-*CI/CD*
+*Public Community**
+- Fork the repo and open pull-request with code updates
 
-Heroku is setup to automatically deploy the webapp when it detects changes to dev and main branches in github. Changes go live to each of these environments within a couple minutes once PRs are successfully merged.
-
-### Prerequisites if Hosting Your Own
-
-- **Heroku Account**: You need a host like a Heroku account to deploy and manage the app. This has already been setup if working as a Collaborator.
-- **Telegram Bot API Token**: You need to generate a bot token from [BotFather](https://core.telegram.org/bots#botfather) on Telegram. This has already been setup if working as a Collaborator.
-
-
-### Deploying the App
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/seeker-seventy-six/tirzhelp-bot.git
-   cd tirzhelp-bot
-   ```
-
-2. **Deploy via Git Branch**:
-
-   Use the `deploy_bot.sh` script to deploy to different Heroku environments (e.g., `dev` or `prod`) based on your Git branch.
-
-     ```bash
-     ./deploy_bot.sh
-     ```
-
-   The script will automatically detect the branch you're on and deploy the app accordingly.
-
-### Automating Deployment with GitHub
-
-To set up automated deployments:
-
-1. **Link GitHub with Heroku**:
-   - Go to your Heroku app's dashboard.
-   - Under the "Deploy" tab, connect your GitHub repository.
-   - Enable **Automatic Deploys** for the relevant branch (e.g., `main` or `dev`).
-
-2. **Merge Requests**:
-   - Whenever changes are merged into the selected branch (e.g., `main` or `dev`), Heroku will automatically deploy the app.
-
-### Webhook Setup
-
-After deployment, you need to set the webhook URL for the Telegram Bot API.
-
-To set the webhook:
+### Clone & Environment Setup
 
 ```bash
-heroku run python bot.py setwebhook
+git clone https://github.com/seeker-seventy-six/tirzhelp-bot.git
+cd tirzhelp-bot
+
+# install local environment for developmment
+conda env create -f local_environment.yml
+conda activate tirzbot
 ```
 
-This command sets the webhook URL for your bot to the Heroku app's URL.
+### Environment Variables
 
-## Bot Functionality
+Create `.env-dev` (and `.env-main` if you run prod locally). Values for the shared bots live in Heroku → *Settings → Config Vars*. Use `.env-template` for reference. These local .env files are just for local development. Deployments run off heroku env vars.
 
-### **Commands**
+| Key | Notes |
+| --- | --- |
+| `BOT_TOKEN` | Telegram bot token (dev or prod) |
+| `WEBHOOK_URL` | e.g. `https://tirzhelpbot-dev.herokuapp.com/webhook` |
+| `ENVIRONMENT` | `DEV` or `PROD` (affects logging + safeguards) |
+| `OPENAI_TOKEN` | For AI-powered helper responses |
+| `GOOGLE_SERVICE_ACCOUNT_FILE` | Path to JSON creds for Sheets upload |
+| `DISCORD_BOT_TOKEN` | Discord bridge bot token |
+| `DISCORD_STGTS_CHANNEL_ID` | Discord channel that mirrors Telegram test results |
+| `DISCORD_ROOT_CHANNEL_ID` | Discord channel where rotating invites post |
 
-- `/newbie`: Sends a welcome message manually.
-- `/lastcall`: Sends a last call message for group tests (based on `lastcall` function).
-- `/safety`: Sends a safety message (based on `safety` function).
 
-## Debugging with Heroku CLI
 
-You can debug any errors that occur on your Heroku app using the following Heroku CLI commands.
+## Discord ↔ Telegram Bridge & Invite Rotation
 
-### **Login to Heroku**
+This functionality lives primarily in `src/helpers_discord.py` and runs alongside the Telegram bot workers.
 
-To log in to Heroku, use the following command:
+### Channels & Topics
+
+- **Discord STGTS Channel** – `#public-test-results-no-discussion`
+- **Telegram Topic** – `Test Results 3P ONLY - No Discussion`
+- **Discord STG Root Channel** – defined via `DISCORD_ROOT_CHANNEL_ID` for invite posts in the landing STG discord
+
+### 1. Create the Discord Bot
+
+1. Visit https://discord.com/developers/applications → *New Application*
+2. Under **Bot**, click **Add Bot**
+3. Copy the token → add to `.env-*`
+4. Enable **Message Content Intent**
+
+### 2. Add the Bot to the Servers
+
+1. Navigate to **OAuth2 → URL Generator**
+2. Scopes: `bot`
+3. Permissions: `View Channels`, `Read Messages`, `Read Message History`, `Send Messages`, `Attach Files`
+4. Use the generated link to invite the bot to the STGTS Discord server and to the STG Discord server
+
+### 3. Required Environment Variables
+
+```env
+DISCORD_BOT_TOKEN=...
+DISCORD_STGTS_CHANNEL_ID=...
+DISCORD_ROOT_CHANNEL_ID=...
+```
+
+### 4. Deploy / Redeploy
+
+Once these vars exist in Heroku (both dev + prod), redeploy the app. The background threads automatically:
+
+- Mirror Discord links/images → Telegram topic
+- Mirror Telegram images → Discord channel
+- Rotate Telegram invite batches and keep the Discord root message fresh
+
+### File Structure Reference
+
+```
+src/
+├── helpers_discord.py    # Bridge + invite rotation
+├── helpers_telegram.py   # Telegram utilities
+└── ...
+```
+
+---
+
+## Local Development Workflow
+
+1. Create Feature Branch from `dev` (e.g. `ft-new-mod-rules`)
+2. Update / add tests if needed (`tests/integration/...`)
+3. Run targeted scripts locally as needed (e.g., `python download_test_data_channel.py`)
+4. Push to GitHub → open PR → merge into `dev` when approved
+
+Merging into `dev` deploys automatically to the Heroku dev app testable in the Testbed TG group, so you can live-test there before promoting to `main`.
+
+---
+
+## Deployment & Release Flow
+
+### CI/CD (GitHub → Heroku)
+
+| Branch | Auto-deploy target |
+| --- | --- |
+| `dev` | `tirzhelpbot-dev` |
+| `main` | `tirzhelpbot-prod` |
+
+- GitHub → Settings → Branch protection ensures PRs are reviewed before landing in `main`
+- Heroku auto deploys the latest successful commit on each branch within ~2 minutes
+
+### Webhook Management
+
+After any fresh Heroku app setup or URL change:
 
 ```bash
-heroku login
+heroku run python bot.py setwebhook --app tirzhelpbot-dev
+heroku run python bot.py setwebhook --app tirzhelpbot-prod
 ```
 
-This will open a browser window where you can log in to your Heroku account.
-
-### **Tail Logs**
-
-To view the live logs of your app, run:
+Confirm with:
 
 ```bash
-heroku logs --tail --app "[app name]"
+curl https://api.telegram.org/bot<token>/getWebhookInfo
 ```
 
-This will stream the logs, allowing you to monitor any issues or errors in real time.
+---
 
-### **Common Errors**
+## Operations Runbook
 
-- **Missing Environment Variables**: Ensure your `.env-dev` file contains the correct variables (`BOT_TOKEN`, `WEBHOOK_URL`, etc.). (NOTE: If developing on the existing bot, these can be found on the Heroku under Dashboard > [Application Name] > Settings > Config Vars) or by contacting @seeker-seventy-six
-- **Webhook Issues**: If your webhook is not working, check if the URL is correctly set by inspecting the logs.
+### Check Heroku Dynos
 
-## Conclusion
+```bash
+heroku ps --app tirzhelpbot-prod
+heroku ps --app tirzhelpbot-dev
+```
 
-This Heroku app leverages the Telegram Bot API for user interaction and integrates with various Telegram groups and channels. You can easily deploy and manage different environments (dev/prod) using Git branches, and you have full access to error logs via Heroku CLI for troubleshooting.
+Expect at least one `web` dyno running. Restart if needed:
+
+```bash
+heroku restart --app tirzhelpbot-prod
+```
+
+### Tail Logs / Debug Issues
+
+```bash
+heroku logs --tail --app tirzhelpbot-dev
+heroku logs --tail --app tirzhelpbot-prod
+```
+
+Helpful filters:
+
+```bash
+heroku logs --tail --app tirzhelpbot-prod | grep Discord
+heroku logs --tail --app tirzhelpbot-prod | grep Invite
+```
+
+### Redeploy / Roll Forward
+
+1. Merge the fix to the appropriate branch (`dev` for staging validation, `main` for production)
+2. Heroku auto deploys
+3. Watch logs to confirm the Flask worker boots and the Discord bridge thread announces readiness
+
+To rollback:
+
+```bash
+heroku releases --app tirzhelpbot-prod
+heroku releases:rollback v123 --app tirzhelpbot-prod
+```
+
+### Common Issues
+
+- **Missing or wrong env vars** – double-check `.env-*` locally or Heroku Config Vars
+- **Webhook 403/404** – rerun `setwebhook` after confirming `WEBHOOK_URL`
+- **Discord bridge silent** – ensure the Discord bot still has channel permissions & intents enabled
+- **Google Sheets failures** – verify the service account still has access to the destination sheet
+
+---
+
+## Helpful Commands Cheat Sheet
+
+| Action | Command |
+| --- | --- |
+| Login to Heroku | `heroku login` |
+| Tail prod logs | `heroku logs --tail --app tirzhelpbot-prod` |
+| Tail dev logs | `heroku logs --tail --app tirzhelpbot-dev` |
+| Restart dynos | `heroku restart --app <app>` |
 
 ---
 
 ## Discord Server Backup Template
+
+If the Discord server ever needs recreating, start from this template:
+
 https://discord.new/EDzNm6Gzz9S3
+
+---
+
+Questions? Ping @seekerseventysix or @true_case in Telegram.

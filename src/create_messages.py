@@ -198,7 +198,7 @@ def summarize_test_results(update, BOT_TOKEN):
             )
             helpers_google.append_to_sheet(data_row)
 
-        raw_data_url =  f"<a href={bot.TEST_RESULTS_SPREADSHEET}>🌐 You can find the raw data here</a>"
+        raw_data_url =  f"<a href=\"{bot.TEST_RESULTS_SPREADSHEET}\">🌐 You can find the raw data here</a>"
         if sample.mass_mg:
             grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
             logging.info(f"Grouped stats: {grouped_stats}")
