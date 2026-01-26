@@ -34,6 +34,8 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 TELEGRAM_CONFIG_JSON = os.getenv("TELEGRAM_CONFIG")
 TEST_RESULTS_SPREADSHEET = os.getenv("TEST_RESULTS_SPREADSHEET")
+DISCORD_STGTS = os.getenv("DISCORD_STGTS")
+OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
 
 if not TELEGRAM_CONFIG_JSON:
     raise RuntimeError("TELEGRAM_CONFIG env var is not set. Please set it to a JSON string with Telegram IDs and accounts.")
@@ -317,7 +319,11 @@ def webhook():
                     logging.info("Test results extraction completed successfully")
                 except Exception as e:
                     logging.error(f"Test results extraction failed: {e}")
-                    helpers_telegram.send_message(chat_id, "🚫 Test results extraction failed. Probably an unsupported file format received or expected mass not included in test result. Please check your file is a .pdf, .png, or .jpeg, and ensure the expected mass is included somewhere in test result and retry.", message_thread_id)
+                    helpers_telegram.send_message(
+                        chat_id,
+                        "🚫 Test results extraction failed. Please verify the file type and that all required details are present, then try again.",
+                        message_thread_id,
+                    )
                 
                 # DISCORD BRIDGE - TELEGRAM TO DISCORD (skip for bot messages)
                 if str(chat_id) == SUPERGROUP_ID:

@@ -4,23 +4,19 @@ import sys
 import json
 import re
 import logging
-import random
 import yaml
 from dotenv import load_dotenv
 from pdf2image import convert_from_path
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
+import bot
+
 # Setup basic logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
 
-# Load environment variables
-load_dotenv('.env-dev')
 
 MODEL_ID = "gpt-4.1-mini"
-OPENAI_TOKEN = os.getenv("OPENAI_TOKEN")
-client = OpenAI(api_key=OPENAI_TOKEN)
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VENDOR_CONFIG_PATH = os.path.join(BASE_DIR, "mod_topics", "vendor_disambiguations.yml")
 
@@ -73,7 +69,7 @@ def extract_data_with_openai(file_path, text, model_id=MODEL_ID):
     Returns:
         list: A list containing extracted data (e.g., mass and purity).
     """
-    global client
+    client = OpenAI(api_key=bot.OPENAI_TOKEN)
 
     vendor_disambiguations = load_vendor_disambiguations()
 
