@@ -43,20 +43,28 @@ flowchart LR
     MAIN_BRANCH -- Auto deploy --> PROD_APP["Heroku app\n`tirzhelpbot-prod`"]
 
     subgraph Shared Integrations
-        TELEGRAM["Telegram Supergroup + Topics"]
         DISCORD["Discord Bots + Channels"]
-        GOOGLE_SHEETS["Google Sheets (Test Results)"]
         OPENAI["OpenAI API"]
     end
 
-    DEV_APP -- Webhook traffic --> TELEGRAM
-    PROD_APP -- Webhook traffic --> TELEGRAM
+    subgraph Dev Targets
+        TELEGRAM_DEV["Telegram\nTirzHelpBot Testbed"]
+        SHEETS_DEV["Google Sheets\ndev-stg-test-results-spreadsheet"]
+    end
+
+    subgraph Prod Targets
+        TELEGRAM_PROD["Telegram\nSTG Supergroup"]
+        SHEETS_PROD["Google Sheets\nstg-test-results-spreadsheet"]
+    end
+
+    DEV_APP -- Webhook traffic --> TELEGRAM_DEV
+    DEV_APP -- Test results + invite sync --> SHEETS_DEV
+
+    PROD_APP -- Webhook traffic --> TELEGRAM_PROD
+    PROD_APP -- Test results + invite sync --> SHEETS_PROD
 
     DEV_APP -- Discord bridge threads --> DISCORD
     PROD_APP -- Discord bridge threads --> DISCORD
-
-    DEV_APP -- Invite rotation + test results sync --> GOOGLE_SHEETS
-    PROD_APP -- Invite rotation + test results sync --> GOOGLE_SHEETS
 
     DEV_APP -. AI helper prompts .-> OPENAI
     PROD_APP -. AI helper prompts .-> OPENAI
