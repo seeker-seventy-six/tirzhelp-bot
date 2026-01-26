@@ -30,6 +30,48 @@ This README doubles as the onboarding guide **and** the day-to-day runbook so an
 | `mod_topics/*.yml` | Moderation configuration for banned topics / auto responses |
 | Heroku Apps | `tirzhelpbot-dev` (dev) and `tirzhelpbot-prod` (prod) |
 
+### Deployment topology
+
+```mermaid
+flowchart LR
+    subgraph GitHub
+        DEV_BRANCH["dev branch"]
+        MAIN_BRANCH["main branch"]
+    end
+
+    DEV_BRANCH -- Auto deploy --> DEV_APP["Heroku app\n`tirzhelpbot-dev`"]
+    MAIN_BRANCH -- Auto deploy --> PROD_APP["Heroku app\n`tirzhelpbot-prod`"]
+
+    subgraph Shared Integrations
+        TELEGRAM["Telegram Supergroup + Topics"]
+        DISCORD["Discord Bots + Channels"]
+        GOOGLE_SHEETS["Google Sheets (Test Results)"]
+        OPENAI["OpenAI API"]
+    end
+
+    DEV_APP -- Webhook traffic --> TELEGRAM
+    PROD_APP -- Webhook traffic --> TELEGRAM
+
+    DEV_APP -- Discord bridge threads --> DISCORD
+    PROD_APP -- Discord bridge threads --> DISCORD
+
+    DEV_APP -- Invite rotation + test results sync --> GOOGLE_SHEETS
+    PROD_APP -- Invite rotation + test results sync --> GOOGLE_SHEETS
+
+    DEV_APP -. AI helper prompts .-> OPENAI
+    PROD_APP -. AI helper prompts .-> OPENAI
+
+    click DEV_APP href "https://dashboard.heroku.com/apps/tirzhelpbot-dev" "Open the dev Heroku dashboard"
+    click PROD_APP href "https://dashboard.heroku.com/apps/tirzhelpbot-prod" "Open the prod Heroku dashboard"
+```
+
+**Notes**
+
+- Both apps share the same codebase but use different config vars (Telegram token, Discord tokens, Google creds, etc.).
+- The Procfile defines a `web` dyno that runs `gunicorn` to serve the Flask webhook plus background threads (invite rotation, Discord bridge, periodic announcements).
+- Heroku release phase runs `python bot.py --delete-webhook`, `--set-webhook`, and `--check-webhook` so Telegram always points to the latest deployment.
+- `dev` runs against the Testbed Telegram/Discord workspace, while `prod` serves the live Stairway to Gray community.
+
 ---
 
 ## Getting Started
