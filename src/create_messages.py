@@ -178,8 +178,26 @@ def summarize_test_results(update, BOT_TOKEN):
     logging.info(f"Extracted data returned: {extracted_test_data}")
 
     if extracted_test_data:
-        # Append data to Google Sheets for each sample tested. One Test Result image may have more than one sample
+        required_fields = [
+            "vendor",
+            "peptide",
+            "test_date",
+            "expected_mass_mg"
+        ]
+
         for sample in extracted_test_data:
+            missing = [field for field in required_fields if getattr(sample, field, None) in (None, "")]
+            if missing:
+                os.remove(local_path)
+                missing_fields = ', '.join(missing)
+                logging.warning(
+                    "Test results extraction incomplete. Missing fields: %s", missing_fields
+                )
+                return (
+                    "😕 We couldn't extract all required details from this test result. "
+                    f"Missing fields: {missing_fields}. Please review and update the file as needed, and try again."
+                )
+
             data_row = (
                 [sample.vendor]
                 + [sample.peptide]
@@ -198,7 +216,7 @@ def summarize_test_results(update, BOT_TOKEN):
             )
             helpers_google.append_to_sheet(data_row)
 
-        raw_data_url =  f"<a href=\"{bot.TEST_RESULTS_SPREADSHEET}\">🌐 You can find the raw data here</a>"
+        raw_data_url =  f"<a href='{bot.TEST_RESULTS_SPREADSHEET}'>🌐 You can find the raw data here</a>"
         if sample.mass_mg:
             grouped_stats = helpers_google.calculate_statistics(sample.vendor, sample.peptide)
             logging.info(f"Grouped stats: {grouped_stats}")
