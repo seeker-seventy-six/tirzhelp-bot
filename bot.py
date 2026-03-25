@@ -64,6 +64,7 @@ SUPERGROUP_ID = str(_require_value("SUPERGROUP_ID"))
 TEST_RESULTS_CHANNEL = str(_require_value("TEST_RESULTS_CHANNEL"))
 GROUP_TEST_CHANNEL = str(_require_value("GROUP_TEST_CHANNEL"))
 NEWBIE_CHANNEL = str(_require_value("NEWBIE_CHANNEL"))
+WELCOME_CHANNEL = str(_require_value("WELCOME_CHANNEL"))
 GENERAL_CHANNEL = str(_require_value("GENERAL_CHANNEL"))
 IGNORE_AUTOMOD_CHANNELS = [str(channel) for channel in _require_list("IGNORE_AUTOMOD_CHANNELS")]
 MOD_ACCOUNTS = [str(account) for account in TELEGRAM_CONFIG.get("MOD_ACCOUNTS", [])]
@@ -237,7 +238,7 @@ def webhook():
             if new_status == "member" and old_status in ["left", "kicked"]:
                 if str(chat_id) == SUPERGROUP_ID:
                     welcome_message = msgs.welcome_newbie(new_member)
-                    helpers_telegram.send_message(chat_id, welcome_message, NEWBIE_CHANNEL)
+                    helpers_telegram.send_message(chat_id, welcome_message, WELCOME_CHANNEL)
                     return jsonify({"ok": True}), 200
             
         ### EXTRACT TG UPDATE IDs ###
