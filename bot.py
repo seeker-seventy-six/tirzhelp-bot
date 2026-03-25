@@ -261,6 +261,10 @@ def webhook():
         if str(chat_id) != SUPERGROUP_ID:
             return jsonify({"ok": True}), 200  # Exit after handling the command for non-target groups
         
+        ### Skip all bot actions in the group test invite channel
+        if str(message_thread_id) == GROUP_TEST_CHANNEL:
+            return jsonify({"ok": True}), 200
+        
         ### ALL OTHER MESSAGES ###
         elif "message" in update:
 
