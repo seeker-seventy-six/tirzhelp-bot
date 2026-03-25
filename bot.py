@@ -359,13 +359,13 @@ def webhook():
                 return jsonify({"ok": True}), 200
 
             ### AUTO POOF LINKED COMMUNITIES ###
-            # Flag t.me/ links in group test channel
-            if "t.me/" in text and str(message_thread_id) == GROUP_TEST_CHANNEL and username not in MOD_ACCOUNTS: 
-                logging.info(f"Detected t.me/ link in group test thread")
-                reply_message = msgs.dont_link_group_test(user_id, user_firstname)
-                helpers_telegram.send_message(chat_id, reply_message, message_thread_id, reply_to_message_id=message_id)
-                helpers_telegram.delete_message(chat_id, message_id)
-                return jsonify({"ok": True}), 200
+            # Flag t.me/ links in group test channel — DISABLED per admin request
+            # if "t.me/" in text and str(message_thread_id) == GROUP_TEST_CHANNEL and username not in MOD_ACCOUNTS: 
+            #     logging.info(f"Detected t.me/ link in group test thread")
+            #     reply_message = msgs.dont_link_group_test(user_id, user_firstname)
+            #     helpers_telegram.send_message(chat_id, reply_message, message_thread_id, reply_to_message_id=message_id)
+            #     helpers_telegram.delete_message(chat_id, message_id)
+            #     return jsonify({"ok": True}), 200
 
             # If the text contains any ignored URL, skip moderation
             if any(ignore_url in text for ignore_url in ignore_domains):
