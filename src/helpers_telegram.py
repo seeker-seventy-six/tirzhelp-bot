@@ -55,6 +55,12 @@ def send_message(chat_id, text, message_thread_id=None, reply_to_message_id=None
                 logging.warning("Reply message not found. Skipping sending message.")
                 return  # Exit the function without sending
 
+            # Forum groups require a message_thread_id; give a clear diagnostic.
+            if "PEER_ID_INVALID" in response.text:
+                logging.warning(f"PEER_ID_INVALID for chat {payload.get('chat_id')}. "
+                                "Likely missing message_thread_id for a forum group. Skipping.")
+                return
+
             # Handle missing topic/thread: retry without message_thread_id
             if (
                 "Bad Request: message thread not found" in response.text

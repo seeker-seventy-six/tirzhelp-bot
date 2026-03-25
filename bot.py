@@ -237,7 +237,7 @@ def webhook():
             if new_status == "member" and old_status in ["left", "kicked"]:
                 if str(chat_id) == SUPERGROUP_ID:
                     welcome_message = msgs.welcome_newbie(new_member)
-                    helpers_telegram.send_message(chat_id, welcome_message)
+                    helpers_telegram.send_message(chat_id, welcome_message, NEWBIE_CHANNEL)
                     return jsonify({"ok": True}), 200
             
         ### EXTRACT TG UPDATE IDs ###
@@ -386,7 +386,7 @@ def webhook():
     except Exception as e:
         # Log the error to check what went wrong
         logging.error(f"Error processing webhook: {e}")
-        return jsonify({"error": f"Internal server error: {e}"}), 500
+        return jsonify({"ok": True}), 200
 
 
 # Helper to handle commands
